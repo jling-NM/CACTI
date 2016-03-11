@@ -16,10 +16,10 @@
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>
-        <Menu text="_File">
+        <Menu text="%menu.title.file">
           <items>
-            <MenuItem fx:id="mniNew" mnemonicParsing="false" onAction="#playMedia" text="New" />
-            <MenuItem fx:id="mniOpen" mnemonicParsing="false" onAction="#openFile" text="Open…" />
+            <MenuItem fx:id="mniNew" mnemonicParsing="false" onAction="#playMedia" text="%menu.title.new" />
+            <MenuItem fx:id="mniOpen" mnemonicParsing="false" onAction="#openFile" text="%menu.title.open" />
             <Menu mnemonicParsing="false" text="Open Recent" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Close" />
@@ -29,7 +29,7 @@
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Preferences…" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem fx:id="mniQuit" onAction="#actQuit" text="Quit">
+            <MenuItem fx:id="mniQuit" onAction="#actQuit" text="%menu.title.quit">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
