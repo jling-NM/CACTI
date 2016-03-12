@@ -3,11 +3,19 @@
     <output-path>$PROJECT_DIR$/out/artifacts/cacti2App</output-path>
     <properties id="javafx-properties">
       <options>
-        <option name="appClass" value="sample.Main" />
+        <option name="appClass" value="edu.unm.casaa.main.Main" />
+        <option name="convertCss2Bin" value="true" />
+        <option name="description" value="" />
+        <option name="height" value="768" />
+        <option name="htmlParamFile" value="" />
+        <option name="paramFile" value="" />
+        <option name="title" value="" />
+        <option name="vendor" value="" />
+        <option name="width" value="1024" />
       </options>
     </properties>
     <root id="root">
-      <element id="archive" name="JavaFXApp.jar">
+      <element id="archive" name="cacti2.jar">
         <element id="module-output" name="cacti2" />
       </element>
     </root>
