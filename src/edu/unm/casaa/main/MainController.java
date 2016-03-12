@@ -9,24 +9,42 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 
 public class MainController {
     public MenuBar menuBar;
-    public MenuItem mniQuit;
     public MediaView mediaView;
     public MediaPlayer mediaPlayer;
     public Slider playbackSlider;
-    public MenuItem mniOpen;
     public Button btnPlayer;
     public Label lblDuration;
+    public MenuItem mniLoad;
+    public MenuItem mniPrefs;
+    public MenuItem mniExit;
+    public Menu mnuCodeUterrances;
+    public MenuItem mniCodeStart;
+    public MenuItem mniCodeResume;
+    public Menu mnuFile;
+    public Menu mnuGlobalRatings;
+    public MenuItem mniGlobalScore;
+    public MenuItem mniOnlineHelp;
+    public Button btnPlayPause;
+    public Button btnRewind;
 
-    public void actQuit(ActionEvent actionEvent) {
-        Platform.exit();
-    }
+
+
+
+
+    //TODO: where to get strings resource bundle ONCE for controller. Some contructor or initialzer should do it
+
+
 
     public void playMedia(ActionEvent actionEvent) {
         try {
@@ -45,8 +63,61 @@ public class MainController {
         }
     }
 
-    public void openFile(ActionEvent actionEvent) {
 
+
+    public void playerAction(ActionEvent actionEvent) {
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY || mediaPlayer.getStatus() == MediaPlayer.Status.STOPPED) {
+            mediaPlayer.play();
+        } else {
+            mediaPlayer.stop();
+        }
+    }
+
+    public void btnActRewind(ActionEvent actionEvent) {
+    }
+
+    public void mniActAbout(ActionEvent actionEvent) {
+
+        Locale locale = new Locale("en", "US");
+        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(resourceStrings.getString("wind.title.about"));
+        alert.setHeaderText(null);
+        alert.setContentText(resourceStrings.getString("txt.about"));
+        alert.setHeight(800); //TODO: this doesn't give proper size yet
+        alert.setWidth(600);
+        alert.initStyle(StageStyle.UTILITY);
+        alert.showAndWait();
+
+    }
+
+
+    public void mniActOnlineHelp(ActionEvent actionEvent) {
+
+        Locale locale = new Locale("en", "US");
+        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(resourceStrings.getString("wind.title.help"));
+        alert.setHeaderText(null);
+        alert.setContentText(resourceStrings.getString("txt.help.message"));
+        alert.initStyle(StageStyle.UTILITY);
+        alert.showAndWait();
+
+    }
+
+
+    public void mniActExit(ActionEvent actionEvent) {
+
+        // check what needs to be saved and closed
+
+        // exit
+        Platform.exit();
+    }
+
+
+    public void mniActOpenFile(ActionEvent actionEvent) {
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
 
         FileChooser fc = new FileChooser();
@@ -68,14 +139,6 @@ public class MainController {
             System.out.println(mediaPlayer.currentTimeProperty().toString());
 
             //lblDuration.setText(mediaPlayer.totalDurationProperty().toString());
-        }
-    }
-
-    public void playerAction(ActionEvent actionEvent) {
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY || mediaPlayer.getStatus() == MediaPlayer.Status.STOPPED) {
-            mediaPlayer.play();
-        } else {
-            mediaPlayer.stop();
         }
     }
 }
