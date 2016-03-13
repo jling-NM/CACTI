@@ -3,6 +3,7 @@ package edu.unm.casaa.main;
 import javafx.application.Platform;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -37,9 +38,7 @@ public class MainController {
     public MenuItem mniOnlineHelp;
     public Button btnPlayPause;
     public Button btnRewind;
-
-
-
+    public Slider sldVolume;
 
 
     //TODO: where to get strings resource bundle ONCE for controller. Some contructor or initialzer should do it
@@ -66,10 +65,10 @@ public class MainController {
 
 
     public void playerAction(ActionEvent actionEvent) {
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY || mediaPlayer.getStatus() == MediaPlayer.Status.STOPPED) {
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY || mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
             mediaPlayer.play();
         } else {
-            mediaPlayer.stop();
+            mediaPlayer.pause();
         }
     }
 
@@ -140,5 +139,13 @@ public class MainController {
 
             //lblDuration.setText(mediaPlayer.totalDurationProperty().toString());
         }
+    }
+
+    public void sldActVolume(Event event) {
+        System.out.println(String.format("volume:%f",sldVolume.getValue()));
+
+        // change player volume; mediaplayer must be initiated
+        mediaPlayer.setVolume(sldVolume.getValue());
+
     }
 }
