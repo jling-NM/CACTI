@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -20,34 +21,65 @@ import java.util.ResourceBundle;
 
 
 public class MainController {
-    public MenuBar menuBar;
-    public MediaView mediaView;
-    public MediaPlayer mediaPlayer;
-    public Slider playbackSlider;
-    public Button btnPlayer;
-    public Label lblDuration;
-    public MenuItem mniLoad;
-    public MenuItem mniPrefs;
-    public MenuItem mniExit;
-    public Menu mnuCodeUterrances;
-    public MenuItem mniCodeStart;
-    public MenuItem mniCodeResume;
-    public Menu mnuFile;
-    public Menu mnuGlobalRatings;
-    public MenuItem mniGlobalScore;
-    public MenuItem mniOnlineHelp;
-    public Button btnPlayPause;
-    public Button btnRewind;
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private MediaView mediaView;
+    @FXML
+    private MediaPlayer mediaPlayer;
+    @FXML
+    private Slider playbackSlider;
+    @FXML
+    private Button btnPlayer;
+    @FXML
+    private Label lblDuration;
+    @FXML
+    private MenuItem mniLoad;
+    @FXML
+    private MenuItem mniPrefs;
+    @FXML
+    private MenuItem mniExit;
+    @FXML
+    private Menu mnuCodeUterrances;
+    @FXML
+    private MenuItem mniCodeStart;
+    @FXML
+    private MenuItem mniCodeResume;
+    @FXML
+    private Menu mnuFile;
+    @FXML
+    private Menu mnuGlobalRatings;
+    @FXML
+    private MenuItem mniGlobalScore;
+    @FXML
+    private MenuItem mniOnlineHelp;
+    @FXML
+    private Button btnPlayPause;
+    @FXML
+    private Button btnRewind;
+    @FXML
     public Slider sldVolume;
 
 
     //TODO: where to get strings resource bundle ONCE for controller. Some contructor or initialzer should do it
 
+    @FXML
+    private void initialize() {
+        System.out.println("Controller Initializing...");
+
+        // i'm thinking this lambda gets used to set mediaplayer volume only; is there a way to bind the two?
+        // i will not use this to set volume app prefs because i only need to do that at the end of some action
+        // not everytime the slider value changes.
+        sldVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Slider Value Changed (newValue: " + newValue.intValue() + ")");
+            // change player volume; mediaplayer must be initiated
+            // mediaPlayer.setVolume(sldVolume.getValue());
+        });
+    }
 
 
     public void playMedia(ActionEvent actionEvent) {
         try {
-
             final Media media = new Media(Main.class.getResource("/media/sample_tone.wav").toURI().toURL().toExternalForm());
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.play();
@@ -143,9 +175,6 @@ public class MainController {
 
     public void sldActVolume(Event event) {
         System.out.println(String.format("volume:%f",sldVolume.getValue()));
-
-        // change player volume; mediaplayer must be initiated
-        mediaPlayer.setVolume(sldVolume.getValue());
-
     }
+
 }
