@@ -66,7 +66,7 @@ public class Main extends Application {
         appPrefs.putDouble("main.wind.w",mainStage.getWidth());
 
         // save current volume preference
-        appPrefs.putDouble("player.volume",mainController.sldVolume.getValue());
+        //appPrefs.putDouble("player.volume",mainController.sldVolume.getValue());
 
     }
 
