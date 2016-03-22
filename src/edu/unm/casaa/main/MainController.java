@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -21,14 +22,23 @@ import java.util.ResourceBundle;
 
 
 public class MainController {
+
+    @FXML
+    private Label lblVolume;
+    @FXML
+    private Slider sldSeek;
+    @FXML
+    private AnchorPane apMediaCtrls;
+    @FXML
+    private AnchorPane apBtnBar;
+    @FXML
+    private MenuItem mniAbout;
     @FXML
     private MenuBar menuBar;
     @FXML
     private MediaView mediaView;
     @FXML
     private MediaPlayer mediaPlayer;
-    @FXML
-    private Slider playbackSlider;
     @FXML
     private Button btnPlayer;
     @FXML
@@ -70,33 +80,32 @@ public class MainController {
         // i'm thinking this lambda gets used to set mediaplayer volume only; is there a way to bind the two?
         // i will not use this to set volume app prefs because i only need to do that at the end of some action
         // not everytime the slider value changes.
-        sldVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Slider Value Changed (newValue: " + newValue.intValue() + ")");
+        //sldVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
+        //    System.out.println("Slider Value Changed (newValue: " + newValue.intValue() + ")");
             // change player volume; mediaplayer must be initiated
             // mediaPlayer.setVolume(sldVolume.getValue());
-        });
+        //});
+
     }
 
 
-    public void playMedia(ActionEvent actionEvent) {
-        try {
-            final Media media = new Media(Main.class.getResource("/media/sample_tone.wav").toURI().toURL().toExternalForm());
-            mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.play();
+    // when player is ready with a media loaded
+    Runnable playerReady = () -> {
+        System.out.println("setOnReady Called");
 
-        } catch (URISyntaxException ex) {
-            System.out.println("Error with playing sound.");
-            System.out.println(ex.toString());
-        } catch(MalformedURLException ex) {
+        // enable all the media controls; perhaps through a single pane of some sort???
+        apBtnBar.setDisable(false);
+        apMediaCtrls.setDisable(false);
 
-            System.out.println("Error with playing sound.");
-            System.out.println(ex.toString());
-        }
-    }
+        // bind the volume slider to the mediaplayer volume
+        mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
+        // bind
+        lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
+    };
 
 
 
-    public void playerAction(ActionEvent actionEvent) {
+    public void btnActPlayPause(ActionEvent actionEvent) {
         if (mediaPlayer.getStatus() == MediaPlayer.Status.READY || mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
             mediaPlayer.play();
         } else {
@@ -116,8 +125,9 @@ public class MainController {
         alert.setTitle(resourceStrings.getString("wind.title.about"));
         alert.setHeaderText(null);
         alert.setContentText(resourceStrings.getString("txt.about"));
-        alert.setHeight(800); //TODO: this doesn't give proper size yet
-        alert.setWidth(600);
+        //alert.setHeight(800); //TODO: this doesn't give proper size yet
+        //alert.setWidth(600);
+        //alert.setX(400);
         alert.initStyle(StageStyle.UTILITY);
         alert.showAndWait();
 
@@ -143,12 +153,15 @@ public class MainController {
 
         // check what needs to be saved and closed
 
+        // perhaps save volume to prefs here??
+
         // exit
         Platform.exit();
     }
 
 
     public void mniActOpenFile(ActionEvent actionEvent) {
+
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
 
         FileChooser fc = new FileChooser();
@@ -159,22 +172,31 @@ public class MainController {
             final Media media = new Media(selectedFile.toURI().toString());
 
             // just trying to see if duration is in metadata. nope.
-            ObservableMap<String, Object> metadata =media.getMetadata();
-            for(String key : metadata.keySet()) {
-                System.out.println(key + " = " + metadata.get(key));
+            //ObservableMap<String, Object> metadata =media.getMetadata();
+            //for(String key : metadata.keySet()) {
+            //    System.out.println(key + " = " + metadata.get(key));
+            //}
+
+            try {
+                mediaPlayer = new MediaPlayer(media);
+                mediaPlayer.setOnReady(playerReady);
+
+            } catch (Exception ex) {
+                System.out.println("Error with playing sound.");
+                System.out.println(ex.toString());
             }
 
-            mediaPlayer = new MediaPlayer(media);
-            btnPlayer.setDisable(false);
             //final Duration totalDuration = mediaPlayer.getTotalDuration();
-            System.out.println(mediaPlayer.currentTimeProperty().toString());
-
+            //System.out.println(mediaPlayer.currentTimeProperty().toString());
             //lblDuration.setText(mediaPlayer.totalDurationProperty().toString());
+
         }
     }
 
     public void sldActVolume(Event event) {
+
         System.out.println(String.format("volume:%f",sldVolume.getValue()));
+        //appPrefs.putDouble("player.volume",sldVolume.getValue());
     }
 
 }
