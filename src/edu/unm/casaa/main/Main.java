@@ -13,9 +13,9 @@ import java.util.prefs.Preferences;
 
 public class Main extends Application {
 
-    public Preferences appPrefs;
+    public Preferences appPrefs;           // reference for user preferences
     private Stage mainStage;
-    private MainController mainController;
+    private MainController mainController; // reference for the controller
 
 
     @Override
@@ -28,15 +28,25 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
+        // TODO: exception handling for start
+
         // store reference
         mainStage = primaryStage;
 
+        /*
         FXMLLoader fxmlLoader = new FXMLLoader();
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
         Parent root = fxmlLoader.load(getClass().getResource("Main.fxml"), resourceStrings);
+        */
 
-        //
+
+        Locale locale = new Locale("en", "US");
+        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Main.fxml"), resourceStrings);
+        Parent root = fxmlLoader.load();
+
+        // get controller instance for manipulating/querying controller members
         mainController = fxmlLoader.getController();
 
         // main window position and size from preferences
@@ -49,10 +59,16 @@ public class Main extends Application {
         mainStage.setHeight(windH);
         mainStage.setWidth(windW);
         mainStage.setTitle(resourceStrings.getString("wind.title.main"));
+
         // application window icon is set
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color.png")));
         mainStage.setScene(new Scene(root));
+
+        // set volume to user prefs value
+        mainController.sldVolume.adjustValue(appPrefs.getDouble("player.volume",0.5));
+        //
         mainStage.show();
+
     }
 
 
@@ -66,7 +82,7 @@ public class Main extends Application {
         appPrefs.putDouble("main.wind.w",mainStage.getWidth());
 
         // save current volume preference
-        //appPrefs.putDouble("player.volume",mainController.sldVolume.getValue());
+        appPrefs.putDouble("player.volume",mainController.sldVolume.getValue());
 
     }
 

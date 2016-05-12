@@ -1,11 +1,13 @@
 package edu.unm.casaa.main;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableMap;
+import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -13,16 +15,18 @@ import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
+import javax.swing.*;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 
 public class MainController {
 
+    @FXML
+    private Label lblTimePos;
     @FXML
     private Label lblVolume;
     @FXML
@@ -32,66 +36,35 @@ public class MainController {
     @FXML
     private AnchorPane apBtnBar;
     @FXML
-    private MenuItem mniAbout;
-    @FXML
     private MenuBar menuBar;
-    @FXML
-    private MediaView mediaView;
     @FXML
     private MediaPlayer mediaPlayer;
     @FXML
-    private Button btnPlayer;
-    @FXML
     private Label lblDuration;
     @FXML
-    private MenuItem mniLoad;
-    @FXML
-    private MenuItem mniPrefs;
-    @FXML
-    private MenuItem mniExit;
-    @FXML
-    private Menu mnuCodeUterrances;
-    @FXML
-    private MenuItem mniCodeStart;
-    @FXML
-    private MenuItem mniCodeResume;
-    @FXML
-    private Menu mnuFile;
-    @FXML
-    private Menu mnuGlobalRatings;
-    @FXML
-    private MenuItem mniGlobalScore;
-    @FXML
-    private MenuItem mniOnlineHelp;
-    @FXML
-    private Button btnPlayPause;
-    @FXML
-    private Button btnRewind;
-    @FXML
     public Slider sldVolume;
+    @FXML
+    private ImageView btnPlayImgVw;
+    @FXML
+    private SwingNode snCoding;
 
 
-    //TODO: where to get strings resource bundle ONCE for controller. Some contructor or initialzer should do it
+    //
+    private Duration totalDuration;
 
+
+    /* don't know what i want to do here yet */
     @FXML
     private void initialize() {
         System.out.println("Controller Initializing...");
-
-        // i'm thinking this lambda gets used to set mediaplayer volume only; is there a way to bind the two?
-        // i will not use this to set volume app prefs because i only need to do that at the end of some action
-        // not everytime the slider value changes.
-        //sldVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-        //    System.out.println("Slider Value Changed (newValue: " + newValue.intValue() + ")");
-            // change player volume; mediaplayer must be initiated
-            // mediaPlayer.setVolume(sldVolume.getValue());
-        //});
-
     }
 
 
-    // when player is ready with a media loaded
+
+
+    // lambda runnable called when player is ready with a media loaded
     Runnable playerReady = () -> {
-        System.out.println("setOnReady Called");
+        System.out.println("MEDIAPLAYER: OnReady");
 
         // enable all the media controls; perhaps through a single pane of some sort???
         apBtnBar.setDisable(false);
@@ -101,21 +74,54 @@ public class MainController {
         mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
         // bind
         lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
+
+        // i'm not sure it is worth having this as private member unless it helps inside
+        // the listener code to avoid making the duration call repeatedly.
+        totalDuration = mediaPlayer.getTotalDuration();
+        // duration label
+        //Duration totalDuration = mediaPlayer.getMedia().getDuration();
+        lblDuration.setText(Utils.formatDuration(totalDuration));
+
     };
 
 
+    /**********************************************************************
+     * Button event handlers
+     **********************************************************************/
 
+    /**********************************************************************
+     * btnActPlayPause
+     * @param actionEvent
+     * button event: play media
+     **********************************************************************/
     public void btnActPlayPause(ActionEvent actionEvent) {
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY || mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
-            mediaPlayer.play();
-        } else {
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
+        } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
+            mediaPlayer.play();
         }
     }
 
+    /**********************************************************************
+     *  button event: 5 second rewind
+     *  @param actionEvent
+     **********************************************************************/
     public void btnActRewind(ActionEvent actionEvent) {
+        /* specific rewind button back 5 seconds */
+        if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
+            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+        }
     }
 
+
+
+    /**********************************************************************
+     * Menu event handlers
+     **********************************************************************/
+
+    /**********************************************************************
+     * menu selection event: About
+     **********************************************************************/
     public void mniActAbout(ActionEvent actionEvent) {
 
         Locale locale = new Locale("en", "US");
@@ -133,7 +139,7 @@ public class MainController {
 
     }
 
-
+    /* menu selection event: Help */
     public void mniActOnlineHelp(ActionEvent actionEvent) {
 
         Locale locale = new Locale("en", "US");
@@ -148,18 +154,25 @@ public class MainController {
 
     }
 
-
+    /* menu selection event: Exit */
     public void mniActExit(ActionEvent actionEvent) {
 
         // check what needs to be saved and closed
 
-        // perhaps save volume to prefs here??
+        /* save current volume in user prefs */
 
-        // exit
+        /* this disabled but if we need to write more user prefs from controller, here is an example
+           you'd have to pass in appPrefs to controller at that point
+         */
+        //System.out.println(String.format("volume:%f",sldVolume.getValue()));
+        //appPrefs.putDouble("player.volume",sldVolume.getValue());
+
+        /* Application exit */
         Platform.exit();
     }
 
 
+    /* menu selection event: Open File */
     public void mniActOpenFile(ActionEvent actionEvent) {
 
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
@@ -171,32 +184,104 @@ public class MainController {
         if (selectedFile != null) {
             final Media media = new Media(selectedFile.toURI().toString());
 
-            // just trying to see if duration is in metadata. nope.
-            //ObservableMap<String, Object> metadata =media.getMetadata();
-            //for(String key : metadata.keySet()) {
-            //    System.out.println(key + " = " + metadata.get(key));
-            //}
-
             try {
+
                 mediaPlayer = new MediaPlayer(media);
+
+                /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(playerReady);
+
+                /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
+                mediaPlayer.setOnPlaying(() -> btnPlayImgVw.getStyleClass().add("img-btn-pause"));
+
+                /* Status Handler:  OnPaused */
+                mediaPlayer.setOnPaused(() -> {
+                    // assumes OnPlay has overlayed style class so just remove that to expose pause class
+                    btnPlayImgVw.getStyleClass().remove("img-btn-pause");
+                } );
+
+                /* Status Handler: OnStop */
+                mediaPlayer.setOnStopped(() -> {
+                    System.out.println("MEDIAPLAYER: Stopped");
+                    btnPlayImgVw.getStyleClass().remove("img-btn-pause");
+                });
+
+                /* Status Handler:  lambda runnable when mediaplayer reaches end of media
+                * move back to the beginning of the track */
+                mediaPlayer.setOnEndOfMedia(() -> {
+                    System.out.println("MEDIAPLAYER: End of Media");
+                    // seek to zero otherwise it is still at the end time
+                    mediaPlayer.seek(Duration.ZERO);
+                    // change state
+                    mediaPlayer.stop();
+                });
+
+
+
+                /* Listener: currentTime
+                   responsible for updating gui components with current playback position
+                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
+                 */
+                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                    // label
+                    lblTimePos.setText(Utils.formatDuration(newValue));
+                    //slider
+                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
+                });
+
+
+                /* Listener: Update the media position if user is dragging the slider.
+                 * Otherwise, do nothing. See sldSeekMousePressed() for when slider is clicked with mouse
+                 * Seems odd to bind to valueProperty and check isValueChanging
+                 * but when i use "valueChangingProperty" this performance is
+                 * not as smooth*/
+                sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                    /* if dragging slider, update media position */
+                    if (sldSeek.isValueChanging()) {
+                        // multiply duration by percentage calculated by slider position
+                        mediaPlayer.seek(totalDuration.multiply((Double) newValue));
+                    }
+                });
+
+
 
             } catch (Exception ex) {
                 System.out.println("Error with playing sound.");
                 System.out.println(ex.toString());
             }
 
-            //final Duration totalDuration = mediaPlayer.getTotalDuration();
-            //System.out.println(mediaPlayer.currentTimeProperty().toString());
-            //lblDuration.setText(mediaPlayer.totalDurationProperty().toString());
+
 
         }
     }
 
-    public void sldActVolume(Event event) {
 
-        System.out.println(String.format("volume:%f",sldVolume.getValue()));
-        //appPrefs.putDouble("player.volume",sldVolume.getValue());
+    /* test coding swing node */
+    public void mniStartCoding(ActionEvent actionEvent) {
+        System.out.println("codeView Test");
+        snCoding.setContent(new JButton("Click me!"));
+    }
+
+
+
+    /* sldSeek mouse event:
+       change time seek when user clicks on slid bar instead of dragging the controller
+     * to change the position */
+    public void sldSeekMousePressed(Event event) {
+        /* if playing we first pause, seek and resume */
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            mediaPlayer.pause();
+            mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
+            mediaPlayer.play();
+        } else {
+            /* if not playing, we can't seek stopped media so i pause it and then seek
+               label then updated manually since seek an paused media doesn't.
+               This method seems reasonable since user will likely play after clicking seek bar
+             */
+            mediaPlayer.pause();
+            mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
+            lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+        }
     }
 
 }
