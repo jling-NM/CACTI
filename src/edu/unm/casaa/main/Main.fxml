@@ -36,7 +36,7 @@
         <Menu fx:id="mnuCodeUterrances" mnemonicParsing="false" text="%menu.title.code">
           <items>
             <MenuItem fx:id="mniCodeStart" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.code.start" />
-            <MenuItem fx:id="mniCodeResume" mnemonicParsing="false" text="%menu.title.code.resume" />
+            <MenuItem fx:id="mniCodeResume" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.code.resume" />
           </items>
         </Menu>
         <Menu fx:id="mnuGlobalRatings" mnemonicParsing="false" text="%menu.title.global.ratings">
