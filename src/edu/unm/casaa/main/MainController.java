@@ -25,11 +25,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXParseException;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -40,6 +37,8 @@ import java.util.ResourceBundle;
 
 public class MainController {
 
+
+    
     @FXML
     private Label lblTimePos;
     @FXML
@@ -62,6 +61,18 @@ public class MainController {
     private ImageView btnPlayImgVw;
     @FXML
     private SwingNode snCoding;
+
+    @FXML
+    private Label lblCurUtrEnum;
+    @FXML
+    private Label lblCurUtrCode;
+    @FXML
+    private Label lblCurUtrStartTime;
+    @FXML
+    private Label lblCurUtrEndTime;
+    @FXML
+    private Label lblPrevUtr;
+
 
 
     // mediaplayer attributes
@@ -140,6 +151,56 @@ public class MainController {
         }
     }
 
+    /**********************************************************************
+     *  button event: replay something
+     *  @param actionEvent
+     **********************************************************************/
+    public void btnActReplay(ActionEvent actionEvent) {
+        /* specific rewind button back 5 seconds */
+        if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
+            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+        }
+    }
+
+    /**********************************************************************
+     *  button event: Uncode last utterance
+     *  @param actionEvent
+     **********************************************************************/
+    public void btnActUncode(ActionEvent actionEvent) {
+        /* specific rewind button back 5 seconds */
+        if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
+            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+        }
+    }
+
+    /**********************************************************************
+     *  button event: Uncode last utterance and replay it, i think
+     *  @param actionEvent
+     **********************************************************************/
+    public void btnActUncodeReplay(ActionEvent actionEvent) {
+        /* specific rewind button back 5 seconds */
+        if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
+            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+        }
+    }
+
+    /**********************************************************************
+     *  button event: Begin utterance coding
+     *  @param actionEvent
+     **********************************************************************/
+    public void btnActStartCoding(ActionEvent actionEvent) {
+        System.out.println("btnActStartCoding");
+    }
+
+    /**********************************************************************
+     *  button event: Apply utterance code
+     *  @param actionEvent
+     **********************************************************************/
+    public void btnActCode(ActionEvent actionEvent) {
+        System.out.println(actionEvent.getSource().toString());
+    }
+
+
 
 
     /**********************************************************************
@@ -210,83 +271,9 @@ public class MainController {
      * @param actionEvent
      **********************************************************************/
     public void mniActOpenFile(ActionEvent actionEvent) {
-
         File selectedFile = selectAudioFile();
         if (selectedFile != null) {
-            final Media media = new Media(selectedFile.toURI().toString());
-
-            try {
-
-                // legacy TODO: notes
-                setAudioLength(selectedFile);
-                setBytesPerSecond(selectedFile);
-
-                mediaPlayer = new MediaPlayer(media);
-
-                /* Status Handler: OnReady */
-                mediaPlayer.setOnReady(playerReady);
-
-                /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
-                mediaPlayer.setOnPlaying(() -> btnPlayImgVw.getStyleClass().add("img-btn-pause"));
-
-                /* Status Handler:  OnPaused */
-                mediaPlayer.setOnPaused(() -> {
-                    // assumes OnPlay has overlayed style class so just remove that to expose pause class
-                    btnPlayImgVw.getStyleClass().remove("img-btn-pause");
-                } );
-
-                /* Status Handler: OnStop */
-                mediaPlayer.setOnStopped(() -> {
-                    System.out.println("MEDIAPLAYER: Stopped");
-                    btnPlayImgVw.getStyleClass().remove("img-btn-pause");
-                });
-
-                /* Status Handler:  lambda runnable when mediaplayer reaches end of media
-                * move back to the beginning of the track */
-                mediaPlayer.setOnEndOfMedia(() -> {
-                    System.out.println("MEDIAPLAYER: End of Media");
-                    // seek to zero otherwise it is still at the end time
-                    mediaPlayer.seek(Duration.ZERO);
-                    // change state
-                    mediaPlayer.stop();
-                });
-
-
-
-                /* Listener: currentTime
-                   responsible for updating gui components with current playback position
-                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
-                 */
-                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-                    // label
-                    lblTimePos.setText(Utils.formatDuration(newValue));
-                    //slider
-                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
-                });
-
-
-                /* Listener: Update the media position if user is dragging the slider.
-                 * Otherwise, do nothing. See sldSeekMousePressed() for when slider is clicked with mouse
-                 * Seems odd to bind to valueProperty and check isValueChanging
-                 * but when i use "valueChangingProperty" this performance is
-                 * not as smooth*/
-                sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-                    /* if dragging slider, update media position */
-                    if (sldSeek.isValueChanging()) {
-                        // multiply duration by percentage calculated by slider position
-                        mediaPlayer.seek(totalDuration.multiply((Double) newValue));
-                    }
-                });
-
-
-
-            } catch (Exception ex) {
-                System.out.println("Error with playing sound.");
-                System.out.println(ex.toString());
-            }
-
-
-
+            initializeMediaPlayer(selectedFile);
         }
     }
 
@@ -322,7 +309,7 @@ public class MainController {
     /******************************************************
      * Resume Misc Coding
      * @param actionEvent
-     */
+     ******************************************************/
     public void mniResumeCoding(ActionEvent actionEvent) {
 
         // this something be playing, stop it
@@ -330,48 +317,72 @@ public class MainController {
             mediaPlayer.pause();
         }
 
+        // load config file to load user edited codes
+        parseUserConfig();
+
+        // user selects a casaa file or we leave
         File miscFile = selectMiscFile("");
         if( miscFile == null )
             return;
 
+        // reset some utterance accounting
+        // TODO: is this called more than once and needs to be separate method?
         cleanupMode();
+        // store the coding file name
+        // TODO: ever used?
         filenameMisc = miscFile.getAbsolutePath();
+        // store the audio file name
         filenameAudio = getUtteranceList().loadFromFile(miscFile);
+        File audioFile = new File(filenameAudio);
+        if (audioFile != null) {
+            initializeMediaPlayer(audioFile);
+        }
+
+        // this resets the timeline display.
+        // TODO: why does method have this name?
         utteranceListChanged();
+        // reset some utterance accounting but now in a different method
+        // TODO: why separate?
         Utterance utterance = getCurrentUtterance();
 
+        // TODO: utterances still end up with null data since MiscCode can't be found
+        // where is that stored???
 
-        // We expect utterances in file to be coded.  For backwards compatibility,
-        // tolerate uncoded utterances in file.
-        if( utterance.isCoded() ) {
-            // Start new utterance.
-            int 		position		= utterance.getEndBytes();
-            String 		positionString 	= TimeCode.toString( position / getBytesPerSecond() );
-            int         order 		  	= getUtteranceList().size();
-            Utterance   data		 	= new MiscDataItem( order, positionString, position );
 
-            getUtteranceList().add( data );
-            // TODO: how to handle position update after medidplayer ready status
-            // playerSeek( position );
+        // if the file has utterances we load them, i think.
+        if( utterance != null ) {
+            // We expect utterances in file to be coded.  For backwards compatibility,
+            // tolerate uncoded utterances in file.
+            if( utterance.isCoded() ) {
+                // Start new utterance.
+                int 		position		= utterance.getEndBytes();
+                String 		positionString 	= TimeCode.toString( position / getBytesPerSecond() );
+                int         order 		  	= getUtteranceList().size();
+                Utterance   data		 	= new MiscDataItem( order, positionString, position );
+
+                getUtteranceList().add( data );
+                // TODO: how to handle position update after medidplayer ready status
+                // playerSeek( position );
+            }
+            else {
+                // Tolerate uncoded final utterance.  Strip end data, so it is consistent
+                // with how we treat current utterance.  NOTE: This does not check for
+                // uncoded utterances anywhere else in file.
+                utterance.stripEndData();
+                // TODO: see above
+                // playerSeek( utterance.getStartBytes() );
+            }
+
         }
-        else {
-            // Tolerate uncoded final utterance.  Strip end data, so it is consistent
-            // with how we treat current utterance.  NOTE: This does not check for
-            // uncoded utterances anywhere else in file.
-            utterance.stripEndData();
-            // TODO: see above
-            // playerSeek( utterance.getStartBytes() );
-        }
 
+        // update the utterance data in the gui here
+        updateUtteranceDisplays();
 
-        // TODO: this will need to be handled
-        // updateUtteranceDisplays();
-
-        numSaves = 0; // Reset save counter, so we backup on next save (i.e. as
+        // Reset save counter, so we backup on next save (i.e. as
         // soon as player saves changes to newly loaded data).
+        numSaves = 0;
 
 
-        snCoding.setContent(new MiscTemplateView());
     }
 
 
@@ -437,9 +448,108 @@ public class MainController {
         return selectedFile;
     }
 
+
+    /**********************************************************************
+     * Initialize the media player with media
+     * @param mediaFile
+     **********************************************************************/
+    public void initializeMediaPlayer(File mediaFile) {
+
+        if (mediaFile != null) {
+            final Media media = new Media(mediaFile.toURI().toString());
+
+            try {
+
+                // legacy TODO: notes
+                setAudioLength(mediaFile);
+                setBytesPerSecond(mediaFile);
+
+                mediaPlayer = new MediaPlayer(media);
+
+                /* Status Handler: OnReady */
+                mediaPlayer.setOnReady(playerReady);
+
+                /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
+                mediaPlayer.setOnPlaying(() -> btnPlayImgVw.getStyleClass().add("img-btn-pause"));
+
+                /* Status Handler:  OnPaused */
+                mediaPlayer.setOnPaused(() -> {
+                    // assumes OnPlay has overlayed style class so just remove that to expose pause class
+                    btnPlayImgVw.getStyleClass().remove("img-btn-pause");
+                } );
+
+                /* Status Handler: OnStop */
+                mediaPlayer.setOnStopped(() -> {
+                    System.out.println("MEDIAPLAYER: Stopped");
+                    btnPlayImgVw.getStyleClass().remove("img-btn-pause");
+                });
+
+                /* Status Handler:  lambda runnable when mediaplayer reaches end of media
+                * move back to the beginning of the track */
+                mediaPlayer.setOnEndOfMedia(() -> {
+                    System.out.println("MEDIAPLAYER: End of Media");
+                    // seek to zero otherwise it is still at the end time
+                    mediaPlayer.seek(Duration.ZERO);
+                    // change state
+                    mediaPlayer.stop();
+                });
+
+
+
+                /* Listener: currentTime
+                   responsible for updating gui components with current playback position
+                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
+                 */
+                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                    // label
+                    lblTimePos.setText(Utils.formatDuration(newValue));
+                    //slider
+                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
+                });
+
+
+                /* Listener: Update the media position if user is dragging the slider.
+                 * Otherwise, do nothing. See sldSeekMousePressed() for when slider is clicked with mouse
+                 * Seems odd to bind to valueProperty and check isValueChanging
+                 * but when i use "valueChangingProperty" this performance is
+                 * not as smooth*/
+                sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                    /* if dragging slider, update media position */
+                    if (sldSeek.isValueChanging()) {
+                        // multiply duration by percentage calculated by slider position
+                        mediaPlayer.seek(totalDuration.multiply((Double) newValue));
+                    }
+                });
+
+
+            } catch (Exception ex) {
+                showError("Error Starting MediaPlayer", ex.getMessage());
+            }
+
+        }
+    }
+
+
+
+
+
     // ******************************
     // Begin Integrate
     // ******************************
+
+    /*******************************************************
+     * Reusable method to display runtime errors
+     * @param title
+     * @param message
+     *******************************************************/
+    public static void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initStyle(StageStyle.UTILITY);
+        alert.showAndWait();
+    }
 
 
     /*******************************************************
@@ -447,13 +557,16 @@ public class MainController {
      * @param title
      * @param message
      *******************************************************/
-    public static void showWarning(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    public static void showFatalWarning(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.initStyle(StageStyle.UTILITY);
         alert.showAndWait();
+
+        // just kill JVM as we don't need to stop cleanly and Platform.exit() won't work here.
+        System.exit(1);
     }
 
     /**********************************************************
@@ -481,7 +594,7 @@ public class MainController {
     }
 
     private void utteranceListChanged() {
-        //playerView.getTimeline().repaint();
+        // TODO: playerView.getTimeline().repaint();
         System.out.println("Unhandled method: utteranceListChanged()");
     }
     // Get previous utterance, or null if no previous utterance exists.
@@ -560,29 +673,25 @@ public class MainController {
     // successfully, so all of these errors are fatal.
     public void handleUserCodesParseException(File file, SAXParseException e) {
         // Alert and quit.
-        this.showWarning("Failed to load user codes","Parse error in " + file.getAbsolutePath() + " (line " + e.getLineNumber() + "):\n" + e.getMessage());
-        Platform.exit();
+        this.showFatalWarning("Failed to load user codes","Parse error in " + file.getAbsolutePath() + " (line " + e.getLineNumber() + "):\n" + e.getMessage());
     }
 
     public void handleUserCodesGenericException(File file, Exception e) {
-        this.showWarning("Failed to load user codes","Unknown error parsing file: " + file.getAbsolutePath() + "\n" + e.toString());
-        Platform.exit();
+        this.showFatalWarning("Failed to load user codes","Unknown error parsing file: " + file.getAbsolutePath() + "\n" + e.toString());
     }
 
     public void handleUserCodesError(File file, String message) {
-        this.showWarning("Failed to load user codes", "Error loading file: " + file.getAbsolutePath() + "\n" + message);
-        Platform.exit();
+        this.showFatalWarning("Failed to load user codes", "Error loading file: " + file.getAbsolutePath() + "\n" + message);
     }
 
     public void handleUserCodesMissing(File file) {
         // Alert and quit.
-        this.showWarning("Failed to load user codes","Failed to find required file." + file.getAbsolutePath());
-        Platform.exit();
+        this.showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
     }
 
     // Parse user codes and globals from XML.
     private void parseUserConfig() {
-        // NOTE: We display parse errors to user, so user can correct XML file, then quit.
+        // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
         File file = new File( "userConfiguration.xml" );
 
         if( file.exists() ) {
@@ -694,4 +803,47 @@ public class MainController {
         resetUncodeCount();
     }
 
+
+    /************************************************************
+     * Update utterance displays (e.g. current, last, etc) in active template view
+     */
+    private synchronized void updateUtteranceDisplays() {
+
+        // update timeline display
+        //playerView.getTimeline().repaint();
+
+        // TODO: temporarily mark if we are misc coding. later see if necessary in globals mode
+        if( 1 ==1 ) {
+
+            Utterance        current = getCurrentUtterance();
+            Utterance        prev    = getPreviousUtterance();
+
+            if( prev == null )
+                lblPrevUtr.setText( "" );
+            else
+                lblPrevUtr.setText( prev.toString() );
+
+            if( current == null ) {
+                lblCurUtrEnum.setText( "" );
+                lblCurUtrCode.setText( "" );
+                lblCurUtrStartTime.setText( "" );
+                lblCurUtrEndTime.setText( "" );
+            } else {
+                lblCurUtrEnum.setText( "" + current.getEnum() );
+                if( current.getMiscCode().value == MiscCode.INVALID )
+                    lblCurUtrCode.setText( "" );
+                else
+                    lblCurUtrCode.setText( current.getMiscCode().name );
+
+                lblCurUtrStartTime.setText( current.getStartTime() );
+                lblCurUtrEndTime.setText( current.getEndTime() );
+
+                // Visual indication when in between utterances.
+                if( streamPosition() < current.getStartBytes() )
+                    lblCurUtrStartTime.setStyle("-fx-text-fill: 'Red';");
+                else
+                    lblCurUtrStartTime.setStyle("-fx-text-fill: 'Black';");
+            }
+        }
+    }
 }

@@ -44,7 +44,7 @@ public class GlobalCode {
             GlobalCode code = list.get( i );
 
             if( code.value == newCode.value || code.name.equals( newCode.name ) ) {
-                MainController.showWarning(
+                MainController.showFatalWarning(
                         "User Code Error",
                         "New global code " + 
                         newCode.toDisplayString() + " conflicts with existing global code " + code.toDisplayString() );

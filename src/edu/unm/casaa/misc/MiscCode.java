@@ -44,7 +44,7 @@ public class MiscCode {
 			MiscCode code = list.get( i );
 
 			if( code.value == newCode.value || code.name.equals( newCode.name ) ) {
-				MainController.showWarning(
+				MainController.showFatalWarning(
 						"User Code Error",
 						"New code " + 
 						newCode.toDisplayString() + " conflicts with existing code " + code.toDisplayString() );
