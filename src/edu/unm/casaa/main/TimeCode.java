@@ -23,6 +23,7 @@ import java.util.StringTokenizer;
 // Convenience class, converts representation of time between HH:MM::SS string and integer seconds.
 public class TimeCode {
 
+	// NOTE: if you change this format you break ability to read existing code files(*.casaa)
 	public static String toString( int seconds ) {
 		int hours 	= seconds / 3600;
 		int minutes = (seconds / 60) - (hours * 60);

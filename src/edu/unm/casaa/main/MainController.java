@@ -38,7 +38,6 @@ import java.util.ResourceBundle;
 public class MainController {
 
 
-    
     @FXML
     private Label lblTimePos;
     @FXML
@@ -63,6 +62,8 @@ public class MainController {
     private SwingNode snCoding;
 
     @FXML
+    private Label lblCurMiscFile;
+    @FXML
     private Label lblCurUtrEnum;
     @FXML
     private Label lblCurUtrCode;
@@ -79,15 +80,16 @@ public class MainController {
     private Duration totalDuration;
     private int bytesPerSecond           = 0; // legacy Cached when we load audio file.
     private int audioLength                               = 0; // legacy to be noted later
+    private Duration onReadySeekDuration = Duration.ZERO;  // temporary hack? TODO: better way?
 
     // integrate
     private int numSaves                 = 0;                // Number of times we've saved since loading current session data.
     private int numUninterruptedUncodes  = 0;                // Number of times user has uncoded without doing anything else.
-    private String               filenameMisc             = null;				// CASAA file.
-    private String               filenameGlobals          = null;
-    private String               filenameAudio            = null;
-    private UtteranceList        utteranceList            = null;
-    private String               globalsLabel             = "Global Ratings";   // Label for global template view.
+    private String filenameMisc          = null;			 // CASAA file.
+    private String filenameGlobals       = null;
+    private String filenameAudio         = null;
+    private UtteranceList utteranceList  = null;
+    private String globalsLabel          = "Global Ratings"; // Label for global template view.
 
 
 
@@ -95,12 +97,14 @@ public class MainController {
     @FXML
     private void initialize() {
         System.out.println("Controller Initializing...");
+        // load user config file to load user specific edited codes
+        parseUserConfig();
+
     }
 
 
 
-
-    // lambda runnable called when player is ready with a media loaded
+    // define lambda runnable later called by player when ready with a media loaded
     Runnable playerReady = () -> {
         System.out.println("MEDIAPLAYER: OnReady");
 
@@ -117,10 +121,98 @@ public class MainController {
         // the listener code to avoid making the duration call repeatedly.
         totalDuration = mediaPlayer.getTotalDuration();
         // duration label
-        //Duration totalDuration = mediaPlayer.getMedia().getDuration();
         lblDuration.setText(Utils.formatDuration(totalDuration));
 
+        // TODO: clear or disable or hide coding stuff check all this is here
+        Duration onReadySeekDuration = Duration.ZERO;
+        mediaPlayer.seek(onReadySeekDuration);
+        lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
+        sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+        // update the utterance data(previous/current) displayed in the gui
+        updateUtteranceDisplays();
     };
+
+
+
+
+    // define lambda runnable later called by player when ready with a media loaded
+    Runnable playerReadyToCode = () -> {
+        System.out.println("MEDIAPLAYER: Ready for Coding");
+
+        // enable all the media controls; perhaps through a single pane of some sort???
+        apBtnBar.setDisable(false);
+        apMediaCtrls.setDisable(false);
+
+        // bind the volume slider to the mediaplayer volume
+        mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
+        // bind
+        lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
+
+        // i'm not sure it is worth having this as private member unless it helps inside
+        // the listener code to avoid making the duration call repeatedly.
+        totalDuration = mediaPlayer.getTotalDuration();
+        // duration label
+        lblDuration.setText(Utils.formatDuration(totalDuration));
+
+
+        /***
+         * BEGIN: initialize active utterance
+         * we want to initialize the active utterance record to use it to resuming coding.
+         * we do so by taking the last utterance, using its end time and end bytes as the
+         * start time/start bytes of a new utterance.         *
+         ***/
+        Utterance utterance = getCurrentUtterance();
+
+        int mediaplayerSeekBytes = 0;
+
+        // We expect utterances in file to be coded.  For backwards compatibility,
+        // tolerate uncoded utterances in file.
+        if( utterance != null ) {
+            if( utterance.isCoded() ) {
+                // Start new utterance.
+                int 		position		= utterance.getEndBytes();
+                String 		positionString 	= TimeCode.toString( position / getBytesPerSecond() );
+                int         order 		  	= getUtteranceList().size();
+
+                // create new utterance from relevant last utterance data
+                Utterance   data		 	= new MiscDataItem( order, positionString, position );
+
+                // add this to our utterance listing and it is our active utterance
+                getUtteranceList().add( data );
+                // update mediaplayer position appropriately for our now active utterance
+                mediaplayerSeekBytes = utterance.getEndBytes();
+            }
+            else {
+                // Tolerate uncoded final utterance.  Strip end data, so it is consistent
+                // with how we treat current utterance.  NOTE: This does not check for
+                // uncoded utterances anywhere else in file.
+                utterance.stripEndData();
+                // update mediaplayer position appropriately for our now active utterance
+                mediaplayerSeekBytes = utterance.getStartBytes();
+            }
+
+        }
+        /***
+         * END: initialize active utterance
+         ***/
+
+
+        double positionInSecs = mediaplayerSeekBytes/getBytesPerSecond();
+        Duration onReadySeekDuration = Duration.seconds(positionInSecs);
+        mediaPlayer.seek(onReadySeekDuration);
+        lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
+        sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+        // update the utterance data(previous/current) displayed in the gui
+        updateUtteranceDisplays();
+
+
+
+        // this resets the timeline display.
+        // TODO: why does method have this name?
+        utteranceListChanged();
+
+    };
+
 
 
     /**********************************************************************
@@ -148,29 +240,47 @@ public class MainController {
         /* specific rewind button back 5 seconds */
         if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+
+            updateUtteranceDisplays();
+
+            // TODO
+            //updateTimeDisplay();
         }
     }
 
+
     /**********************************************************************
-     *  button event: replay something
+     *  button event: Seek to beginning of current utterance.  Seek a little further back
+     *  to ensure audio synchronization issues don't cause player to actually
+     *  seek later than beginning of utterance.
      *  @param actionEvent
      **********************************************************************/
     public void btnActReplay(ActionEvent actionEvent) {
-        /* specific rewind button back 5 seconds */
-        if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
-            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+
+        Utterance   utterance   = getCurrentUtterance();
+        int         pos         = 0;
+
+        if( utterance != null ) {
+            // Position one second before start of utterance.
+            pos = utterance.getStartBytes() - bytesPerSecond;
+            pos = Math.max( pos, 0 ); // Clamp.
         }
+
+        setMediaPlayerPositionByBytes( pos );
+
+        // TODO: complete
+        //updateTimeDisplay();
+        //updateSeekSliderDisplay();
     }
 
     /**********************************************************************
-     *  button event: Uncode last utterance
+     *  button event: Remove last utterance
      *  @param actionEvent
      **********************************************************************/
     public void btnActUncode(ActionEvent actionEvent) {
-        /* specific rewind button back 5 seconds */
-        if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
-            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
-        }
+        uncode();
+        saveSession();
+        incrementUncodeCount();
     }
 
     /**********************************************************************
@@ -178,10 +288,24 @@ public class MainController {
      *  @param actionEvent
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
-        /* specific rewind button back 5 seconds */
-        if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
-            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+        uncode();
+        saveSession();
+        incrementUncodeCount();
+
+        Utterance   utterance   = getCurrentUtterance();
+        int         pos         = 0;
+
+        if( utterance != null ) {
+            // Position one second before start of utterance.
+            pos = utterance.getStartBytes() - bytesPerSecond;
+            pos = Math.max( pos, 0 ); // Clamp.
         }
+
+        setMediaPlayerPositionByBytes( pos );
+
+        // TODO: complete
+        //updateTimeDisplay();
+        //updateSeekSliderDisplay();
     }
 
     /**********************************************************************
@@ -197,8 +321,11 @@ public class MainController {
      *  @param actionEvent
      **********************************************************************/
     public void btnActCode(ActionEvent actionEvent) {
-        System.out.println(actionEvent.getSource().toString());
+        Button src = (Button) actionEvent.getSource();
+        MiscCode mc = MiscCode.codeWithName(src.getText());
+        handleButtonMiscCode(mc);
     }
+
 
 
 
@@ -228,6 +355,8 @@ public class MainController {
 
     }
 
+
+
     /**********************************************************************
      * menu selection event: Help
      * @param actionEvent
@@ -246,39 +375,42 @@ public class MainController {
 
     }
 
+
+
     /**********************************************************************
      * menu selection event: Exit
      * @param actionEvent
      **********************************************************************/
     public void mniActExit(ActionEvent actionEvent) {
 
-        // check what needs to be saved and closed
-
-        /* save current volume in user prefs */
-
-        /* this disabled but if we need to write more user prefs from controller, here is an example
-           you'd have to pass in appPrefs to controller at that point
-         */
-        //System.out.println(String.format("volume:%f",sldVolume.getValue()));
-        //appPrefs.putDouble("player.volume",sldVolume.getValue());
+        // user prefs like current volume setting are saved in
+        // Application.stop() when Platform.exit() is called.
+        // Anything else you want to do before leaving???
 
         /* Application exit */
         Platform.exit();
     }
 
+
+
     /**********************************************************************
-     * menu selection event: Open File
+     * menu selection event: Open Audio File to listen independently of
+     * coding
      * @param actionEvent
      **********************************************************************/
     public void mniActOpenFile(ActionEvent actionEvent) {
         File selectedFile = selectAudioFile();
         if (selectedFile != null) {
-            initializeMediaPlayer(selectedFile);
+            initializeMediaPlayer(selectedFile, playerReady);
         }
     }
 
 
-    /* test coding swing node */
+
+    /**********************************************************************
+     * Begin Misc Coding
+     * @param actionEvent
+     */
     public void mniStartCoding(ActionEvent actionEvent) {
 
         // this something be playing, stop it
@@ -286,25 +418,27 @@ public class MainController {
             mediaPlayer.pause();
         }
 
-
         // Select audio file.
         File audioFile = selectAudioFile();
         if( audioFile == null )
             return;
+        filenameAudio = audioFile.getAbsolutePath();
 
         // Default casaa filename to match audio file, with .casaa suffix.
         String newFileName = changeSuffix( audioFile.getName(), "casaa" );
         File miscFile = selectMiscFile(newFileName);
+        filenameMisc = miscFile.getAbsolutePath();
+
+        // display path in gui
+        lblCurMiscFile.setText(miscFile.getAbsolutePath());
         //
-        cleanupMode();
-        //
-        filenameMisc = miscFile.getName();
-        //
-        utteranceListChanged();
-        //setMode( Mode.CODE );
-        //
-        snCoding.setContent(new MiscTemplateView());
+        initializeMediaPlayer(audioFile, playerReadyToCode);
+
+        // TODO: finish this
+        //snCoding.setContent(new MiscTemplateView());
     }
+
+
 
     /******************************************************
      * Resume Misc Coding
@@ -317,78 +451,32 @@ public class MainController {
             mediaPlayer.pause();
         }
 
-        // load config file to load user edited codes
-        parseUserConfig();
-
         // user selects a casaa file or we leave
         File miscFile = selectMiscFile("");
         if( miscFile == null )
             return;
+        filenameMisc = miscFile.getAbsolutePath();
+
+        // display path in gui
+        lblCurMiscFile.setText(miscFile.getAbsolutePath());
 
         // reset some utterance accounting
-        // TODO: is this called more than once and needs to be separate method?
-        cleanupMode();
-        // store the coding file name
-        // TODO: ever used?
-        filenameMisc = miscFile.getAbsolutePath();
-        // store the audio file name
+        resetUtteranceCoding();
+
+        // load audio file and utterancelist at same time
+        // TODO: consider clarifying this with separate class
         filenameAudio = getUtteranceList().loadFromFile(miscFile);
         File audioFile = new File(filenameAudio);
         if (audioFile != null) {
-            initializeMediaPlayer(audioFile);
+            initializeMediaPlayer(audioFile, playerReadyToCode);
         }
-
-        // this resets the timeline display.
-        // TODO: why does method have this name?
-        utteranceListChanged();
-        // reset some utterance accounting but now in a different method
-        // TODO: why separate?
-        Utterance utterance = getCurrentUtterance();
-
-        // TODO: utterances still end up with null data since MiscCode can't be found
-        // where is that stored???
-
-
-        // if the file has utterances we load them, i think.
-        if( utterance != null ) {
-            // We expect utterances in file to be coded.  For backwards compatibility,
-            // tolerate uncoded utterances in file.
-            if( utterance.isCoded() ) {
-                // Start new utterance.
-                int 		position		= utterance.getEndBytes();
-                String 		positionString 	= TimeCode.toString( position / getBytesPerSecond() );
-                int         order 		  	= getUtteranceList().size();
-                Utterance   data		 	= new MiscDataItem( order, positionString, position );
-
-                getUtteranceList().add( data );
-                // TODO: how to handle position update after medidplayer ready status
-                // playerSeek( position );
-            }
-            else {
-                // Tolerate uncoded final utterance.  Strip end data, so it is consistent
-                // with how we treat current utterance.  NOTE: This does not check for
-                // uncoded utterances anywhere else in file.
-                utterance.stripEndData();
-                // TODO: see above
-                // playerSeek( utterance.getStartBytes() );
-            }
-
-        }
-
-        // update the utterance data in the gui here
-        updateUtteranceDisplays();
-
-        // Reset save counter, so we backup on next save (i.e. as
-        // soon as player saves changes to newly loaded data).
-        numSaves = 0;
-
-
     }
+
 
 
     /**********************************************************************
      * sldSeek mouse event:
-     * change time seek when user clicks on slid bar instead of dragging the controller
+     * change seek time when user clicks on slid bar instead of dragging the controller
      * to change the position
      * @param event
      **********************************************************************/
@@ -415,19 +503,29 @@ public class MainController {
 
 
 
+    /************************************************************************
+     *
+     * @return Audio File object
+     ***********************************************************************/
     private File selectAudioFile() {
 
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
 
         FileChooser fc = new FileChooser();
         fc.setTitle("Open audio file");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3", "*.aac"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio Files", "*.wav"));
         File selectedFile = fc.showOpenDialog(stageTheLabelBelongs);
 
         return selectedFile;
     }
 
 
+
+    /************************************************************************
+     * Specify a Misc code file for coding
+     * @param newFileName
+     * @return Misc Codes File object
+     ************************************************************************/
     private File selectMiscFile(String newFileName) {
 
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
@@ -449,11 +547,12 @@ public class MainController {
     }
 
 
+
     /**********************************************************************
-     * Initialize the media player with media
+     * Initialize the media player state with media file
      * @param mediaFile
      **********************************************************************/
-    public void initializeMediaPlayer(File mediaFile) {
+    public void initializeMediaPlayer(File mediaFile, Runnable onReadyMethod) {
 
         if (mediaFile != null) {
             final Media media = new Media(mediaFile.toURI().toString());
@@ -467,7 +566,7 @@ public class MainController {
                 mediaPlayer = new MediaPlayer(media);
 
                 /* Status Handler: OnReady */
-                mediaPlayer.setOnReady(playerReady);
+                mediaPlayer.setOnReady(onReadyMethod);
 
                 /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
                 mediaPlayer.setOnPlaying(() -> btnPlayImgVw.getStyleClass().add("img-btn-pause"));
@@ -530,6 +629,19 @@ public class MainController {
     }
 
 
+    /**********************************************************************
+     * Set mediaplayer position using bytes
+     * This makes new mediaplayer compatible with legacy code
+     * @param positionInBytes
+     **********************************************************************/
+    private synchronized void setMediaPlayerPositionByBytes(int positionInBytes){
+        double positionInSecs = positionInBytes/getBytesPerSecond();
+
+        // pause player whether playing or not which enables seek
+        mediaPlayer.pause();
+        mediaPlayer.seek(Duration.seconds(positionInSecs));
+        mediaPlayer.play();
+    }
 
 
 
@@ -653,17 +765,112 @@ public class MainController {
      * @return current playback position, in bytes.
      ***********************************************/
     public int streamPosition() {
-/*        int position = player.getEncodedStreamPosition();
 
-        // If playback has reached end of file, position will be -1.
-        // In that case, use length - 1.
-        if( position < 0 ) {
-            int length = player.getEncodedLength() - 1;
+        int position = Utils.convertTimeToBytes(getBytesPerSecond(), mediaPlayer.getCurrentTime());
+        return position;
 
-            position = (length > 0) ? (length - 1) : 0;
+    }
+
+
+    // Undo the actions of pressing a MISC code button.
+    private synchronized void uncode() {
+        // Remove last utterance, if uncoded (utterance was
+        // generated when user coded the second-to-last utterance).
+        UtteranceList 	list 	= getUtteranceList();
+        Utterance 		u 		= list.last();
+
+        if( u != null && !u.isCoded() )
+            list.removeLast();
+
+        // Strip code and end data from last remaining utterance.
+        u = list.last();
+        if( u != null )
+        {
+            u.stripEndData();
+            u.stripMiscCode();
         }
-        return position;*/
-        return 0;
+        updateUtteranceDisplays();
+    }
+
+
+    // Save current session. Periodically also save backup copy.
+    private synchronized void saveSession() {
+        // Save normal file.
+        saveCurrentTextFile( false );
+
+        // Backup every n'th save.
+        if( numSaves % 10 == 0 ) {
+            saveCurrentTextFile( true );
+        }
+        numSaves++;
+    }
+
+
+    private synchronized void saveCurrentTextFile( boolean asBackup ) {
+       // if( templateView instanceof MiscTemplateView && filenameMisc != null ) {
+            String filename = filenameMisc;
+
+            if( asBackup ) {
+                filename += ".backup";
+                getUtteranceList().writeToFile( new File( filename ), filenameAudio );
+            }
+
+        // TODO: determine how coding type will be stored and complete this
+//        } else if( templateView instanceof GlobalTemplateView ) {
+//            String filename = filenameGlobals;
+//
+//            if( asBackup )
+//                filename += ".backup";
+//            ((GlobalTemplateUiService) templateUI).writeGlobalsToFile( new File( filename ), filenameAudio );
+//        }
+    }
+
+
+
+    private synchronized void incrementUncodeCount() {
+        numUninterruptedUncodes++;
+        if( numUninterruptedUncodes >= 4 ) {
+            showError( "Uncode Warning", "You have uncoded 4 times in a row." );
+            numUninterruptedUncodes = 0;
+        }
+    }
+
+
+    public synchronized void handleButtonMiscCode( MiscCode miscCode ) {
+
+        assert (miscCode.isValid());
+
+        // Assign code to current utterance, if one exists.
+        Utterance utterance = getCurrentUtterance();
+
+        if( utterance == null )
+            return; // No current utterance.
+
+        int position = streamPosition();
+
+        if( position <= utterance.getStartBytes() )
+            return; // Ignore when playback is outside utterance.
+        if( utterance.isCoded() )
+            return; // Ignore if already coded.
+
+        utterance.setMiscCode( miscCode );
+        numUninterruptedUncodes = 0;
+
+        // End utterance.
+        assert (bytesPerSecond > 0);
+        String positionString = TimeCode.toString( position / bytesPerSecond );
+        //Utils.convertTimeToBytes();
+
+        utterance.setEndTime( positionString );
+        utterance.setEndBytes( position );
+
+        // Start new utterance.
+        int         order   = getUtteranceList().size();
+        Utterance   data    = new MiscDataItem( order, positionString, position );
+
+        getUtteranceList().add( data );
+        updateUtteranceDisplays();
+        saveSession();
     }
 
 
@@ -691,33 +898,38 @@ public class MainController {
 
     // Parse user codes and globals from XML.
     private void parseUserConfig() {
-        // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
-        File file = new File( "userConfiguration.xml" );
 
-        if( file.exists() ) {
-            try {
-                DocumentBuilderFactory fact    = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = fact.newDocumentBuilder();
-                Document doc     = builder.parse( file.getCanonicalFile() );
-                Node root    = doc.getDocumentElement();
+        // cheap way to check if we need to reload userconfig which we will only allow once per lifecycle
+        if( MiscCode.numCodes() == 0 ){
 
-                // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
-                for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
+            // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
+            File file = new File( "userConfiguration.xml" );
 
-                    if( node.getNodeName().equalsIgnoreCase( "codes" ) )
-                        parseUserCodes( file, node );
-                    else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
-                        parseUserGlobals( file, node );
-                    else if( node.getNodeName().equalsIgnoreCase( "globalsBorder" ) )
-                        parseUserGlobalsBorder( file, node );
+            if( file.exists() ) {
+                try {
+                    DocumentBuilderFactory fact    = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder builder = fact.newDocumentBuilder();
+                    Document doc     = builder.parse( file.getCanonicalFile() );
+                    Node root    = doc.getDocumentElement();
+
+                    // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
+                    for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
+
+                        if( node.getNodeName().equalsIgnoreCase( "codes" ) )
+                            parseUserCodes( file, node );
+                        else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
+                            parseUserGlobals( file, node );
+                        else if( node.getNodeName().equalsIgnoreCase( "globalsBorder" ) )
+                            parseUserGlobalsBorder( file, node );
+                    }
+                } catch( SAXParseException e ) {
+                    handleUserCodesParseException( file, e );
+                } catch( Exception e ) {
+                    handleUserCodesGenericException( file, e );
                 }
-            } catch( SAXParseException e ) {
-                handleUserCodesParseException( file, e );
-            } catch( Exception e ) {
-                handleUserCodesGenericException( file, e );
+            } else {
+                handleUserCodesMissing( file );
             }
-        } else {
-            handleUserCodesMissing( file );
         }
     }
 
@@ -795,12 +1007,13 @@ public class MainController {
         return result + "." + newSuffix;
     }
 
-    private synchronized void resetUncodeCount() {
-        numUninterruptedUncodes = 0;
-    }
-    private void cleanupMode() {
+
+    private void resetUtteranceCoding() {
         utteranceList = null;
-        resetUncodeCount();
+        numUninterruptedUncodes = 0;
+        // Reset save counter, so we backup on next save (i.e. as
+        // soon as player saves changes to newly loaded data).
+        numSaves = 0;
     }
 
 
@@ -810,19 +1023,23 @@ public class MainController {
     private synchronized void updateUtteranceDisplays() {
 
         // update timeline display
+        // WHY is this here?? can it be moved to a more specific function?
         //playerView.getTimeline().repaint();
+
 
         // TODO: temporarily mark if we are misc coding. later see if necessary in globals mode
         if( 1 ==1 ) {
 
-            Utterance        current = getCurrentUtterance();
+            // display full string of previous utterance
             Utterance        prev    = getPreviousUtterance();
-
             if( prev == null )
                 lblPrevUtr.setText( "" );
             else
                 lblPrevUtr.setText( prev.toString() );
 
+
+            // display individual fields of the active utterance
+            Utterance        current = getCurrentUtterance();
             if( current == null ) {
                 lblCurUtrEnum.setText( "" );
                 lblCurUtrCode.setText( "" );

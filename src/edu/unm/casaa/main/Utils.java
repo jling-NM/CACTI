@@ -11,4 +11,8 @@ public class Utils {
         double duration_secs = duration.toSeconds();
         return String.format("%02.0f:%02.0f:%02.0f", Math.floor((duration_secs/3600) % 24), Math.floor( (duration_secs/60) % 60), (duration_secs % 60) );
     }
+
+    public static int convertTimeToBytes( int bytesPerSecond, Duration time ) {
+        return ((int) time.toSeconds()) * bytesPerSecond;
+    }
 }

@@ -38,6 +38,8 @@ public class MiscCode {
 	// Class:
 
 	// Add new code.  Returns true on success, shows warning dialog on failure.
+	// TODO: this shouldn't call controller but raise an error or send 'false'
+    // TODO: fix this
 	public static boolean	addCode( MiscCode newCode ) {
 		// Check that we're not duplicating an existing value or label.
 		for( int i = 0; i < list.size(); i++ ) {
