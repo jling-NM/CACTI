@@ -2,7 +2,6 @@ package edu.unm.casaa.main;
 
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
-import edu.unm.casaa.misc.MiscTemplateView;
 import edu.unm.casaa.utterance.*;
 import edu.unm.casaa.globals.*;
 import javafx.application.Platform;
@@ -37,7 +36,14 @@ import java.util.ResourceBundle;
 
 public class MainController {
 
-
+    @FXML
+    private AnchorPane pnCoding;
+    @FXML
+    private Button btnReplay;
+    @FXML
+    private Button btnUncode;
+    @FXML
+    private Button btnUncodeReplay;
     @FXML
     private Label lblTimePos;
     @FXML
@@ -59,7 +65,7 @@ public class MainController {
     @FXML
     private ImageView btnPlayImgVw;
     @FXML
-    private SwingNode snCoding;
+    private SwingNode snTimeline;
 
     @FXML
     private Label lblCurMiscFile;
@@ -79,8 +85,7 @@ public class MainController {
     // mediaplayer attributes
     private Duration totalDuration;
     private int bytesPerSecond           = 0; // legacy Cached when we load audio file.
-    private int audioLength                               = 0; // legacy to be noted later
-    private Duration onReadySeekDuration = Duration.ZERO;  // temporary hack? TODO: better way?
+    private int audioLength              = 0; // legacy to be noted later
 
     // integrate
     private int numSaves                 = 0;                // Number of times we've saved since loading current session data.
@@ -93,13 +98,12 @@ public class MainController {
 
 
 
-    /* don't know what i want to do here yet */
+    /* handle controller initialization tasks */
     @FXML
     private void initialize() {
         System.out.println("Controller Initializing...");
         // load user config file to load user specific edited codes
         parseUserConfig();
-
     }
 
 
@@ -204,13 +208,8 @@ public class MainController {
         sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
         // update the utterance data(previous/current) displayed in the gui
         updateUtteranceDisplays();
-
-
-
-        // this resets the timeline display.
-        // TODO: why does method have this name?
-        utteranceListChanged();
-
+        // update timeline display as player seek doesn't update correctly on reload
+        updateTimeLineDisplay();
     };
 
 
@@ -242,9 +241,6 @@ public class MainController {
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
 
             updateUtteranceDisplays();
-
-            // TODO
-            //updateTimeDisplay();
         }
     }
 
@@ -267,10 +263,6 @@ public class MainController {
         }
 
         setMediaPlayerPositionByBytes( pos );
-
-        // TODO: complete
-        //updateTimeDisplay();
-        //updateSeekSliderDisplay();
     }
 
     /**********************************************************************
@@ -302,10 +294,6 @@ public class MainController {
         }
 
         setMediaPlayerPositionByBytes( pos );
-
-        // TODO: complete
-        //updateTimeDisplay();
-        //updateSeekSliderDisplay();
     }
 
     /**********************************************************************
@@ -313,8 +301,36 @@ public class MainController {
      *  @param actionEvent
      **********************************************************************/
     public void btnActStartCoding(ActionEvent actionEvent) {
-        System.out.println("btnActStartCoding");
+
+        // Cache stream position, as it may change over repeated queries (because it advances
+        // with player thread).
+        int position = streamPosition();
+
+        // Start/resume playback.
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            mediaPlayer.pause();
+        } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
+            mediaPlayer.play();
+        }
+
+        if( getUtteranceList().size() > 0 )
+            return; // Parsing starts only once.
+
+        // Record start data.
+        if (bytesPerSecond > 0) {
+            return;
+        }
+        String startString = TimeCode.toString( position / bytesPerSecond );
+
+        // Create first utterance.
+        Utterance data = new MiscDataItem( 0, startString, position );
+
+        getUtteranceList().add( data );
+
+        numUninterruptedUncodes = 0;
+        updateUtteranceDisplays();
     }
+
 
     /**********************************************************************
      *  button event: Apply utterance code
@@ -403,12 +419,17 @@ public class MainController {
         if (selectedFile != null) {
             initializeMediaPlayer(selectedFile, playerReady);
         }
+        // hide controls needed for coding
+        setMiscCodingControlVisibility(false);
     }
 
 
 
     /**********************************************************************
      * Begin Misc Coding
+     * Load audio file and create corresponding coding output file.
+     * Initialize the mediaplayer.
+     * Activate the coding controls.
      * @param actionEvent
      */
     public void mniStartCoding(ActionEvent actionEvent) {
@@ -434,14 +455,19 @@ public class MainController {
         //
         initializeMediaPlayer(audioFile, playerReadyToCode);
 
-        // TODO: finish this
-        //snCoding.setContent(new MiscTemplateView());
+        // activate the timeline display
+        snTimeline.setContent(new Timeline(this));
+        // display controls needed for coding
+        setMiscCodingControlVisibility(true);
     }
 
 
 
     /******************************************************
      * Resume Misc Coding
+     * Load coding file and corresponding audio file.
+     * Initialize mediaplayer.
+     * Activate timeline control updating it for utterance data
      * @param actionEvent
      ******************************************************/
     public void mniResumeCoding(ActionEvent actionEvent) {
@@ -457,7 +483,7 @@ public class MainController {
             return;
         filenameMisc = miscFile.getAbsolutePath();
 
-        // display path in gui
+        // display coding file path in gui
         lblCurMiscFile.setText(miscFile.getAbsolutePath());
 
         // reset some utterance accounting
@@ -470,6 +496,12 @@ public class MainController {
         if (audioFile != null) {
             initializeMediaPlayer(audioFile, playerReadyToCode);
         }
+
+        // activate the timeline display
+        snTimeline.setContent(new Timeline(this));
+
+        // display controls needed for coding
+        setMiscCodingControlVisibility(true);
     }
 
 
@@ -600,10 +632,12 @@ public class MainController {
                    because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
                  */
                 mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-                    // label
+                    // update display of current time
                     lblTimePos.setText(Utils.formatDuration(newValue));
-                    //slider
+                    // update the mediaplayer slider
                     sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
+                    // update the timeline
+                    updateTimeLineDisplay();
                 });
 
 
@@ -705,9 +739,9 @@ public class MainController {
         return getUtteranceList().last();
     }
 
+    // TODO: determine if this is necessary or can just use "updateTimeLineDisplay() on its own"
     private void utteranceListChanged() {
-        // TODO: playerView.getTimeline().repaint();
-        System.out.println("Unhandled method: utteranceListChanged()");
+        updateTimeLineDisplay();
     }
     // Get previous utterance, or null if no previous utterance exists.
     private synchronized Utterance getPreviousUtterance() {
@@ -1022,11 +1056,6 @@ public class MainController {
      */
     private synchronized void updateUtteranceDisplays() {
 
-        // update timeline display
-        // WHY is this here?? can it be moved to a more specific function?
-        //playerView.getTimeline().repaint();
-
-
         // TODO: temporarily mark if we are misc coding. later see if necessary in globals mode
         if( 1 ==1 ) {
 
@@ -1063,4 +1092,32 @@ public class MainController {
             }
         }
     }
+
+    private void updateTimeLineDisplay() {
+
+        snTimeline.getContent().repaint();
+        //playerView.getTimeline().repaint();
+/*        if (bytesPerSecond != 0) {
+            // Handles constant bit-rates only.
+
+            int bytes = player.getEncodedStreamPosition();
+            int seconds = bytes / bytesPerSecond;
+
+            playerView.setLabelTime("Time  " + TimeCode.toString(seconds));
+        } else {
+            // EXTEND: Get time based on frames rather than bytes.
+            // Need a way to determine current position based on frames.
+            // Something like getEncodedStreamPosition(),
+            // but that returns frames. This for VBR type compressions.
+        }*/
+    }
+
+
+    private void setMiscCodingControlVisibility(boolean controlVisibility) {
+        btnReplay.setVisible(controlVisibility);
+        btnUncode.setVisible(controlVisibility);
+        btnUncodeReplay.setVisible(controlVisibility);
+        pnCoding.setVisible(controlVisibility);
+    }
+
 }

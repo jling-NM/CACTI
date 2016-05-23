@@ -23,8 +23,10 @@ public class Timeline extends JPanel {
 	public Timeline( MainController control ) {
 		assert( control != null );
 		this.control = control;
-		setBorder( BorderFactory.createTitledBorder( "Timeline" ) );
+		setBorder( BorderFactory.createEmptyBorder(0, 0, 0, 0) );
+        //setOpaque(true);
 		insets = getBorder().getBorderInsets( this );
+        //dimension = getParent().getMaximumSize();
 	}
 
 	public Dimension getPreferredSize() {

@@ -29,29 +29,43 @@
       <menus>
         <Menu fx:id="mnuFile" text="%menu.title.file">
           <items>
-            <MenuItem fx:id="mniLoad" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load" />
-            <MenuItem fx:id="mniPrefs" mnemonicParsing="false" text="%menu.title.file.prefs" />
+            <MenuItem fx:id="mniLoad" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="F" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
             <MenuItem fx:id="mniExit" onAction="#mniActExit" text="%menu.title.file.exit">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
           </items>
         </Menu>
-        <Menu fx:id="mnuCodeUterrances" mnemonicParsing="false" text="%menu.title.code">
+        <Menu fx:id="mnuCodeUterrances" text="%menu.title.code">
           <items>
-            <MenuItem fx:id="mniCodeStart" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.code.start" />
-            <MenuItem fx:id="mniCodeResume" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.code.resume" />
+            <MenuItem fx:id="mniCodeStart" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.code.start">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+            <MenuItem fx:id="mniCodeResume" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.code.resume">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
           </items>
         </Menu>
-        <Menu fx:id="mnuGlobalRatings" mnemonicParsing="false" text="%menu.title.global.ratings">
+        <Menu fx:id="mnuGlobalRatings" text="%menu.title.global.ratings">
           <items>
-            <MenuItem fx:id="mniGlobalScore" mnemonicParsing="false" text="%menu.title.global.score" />
+            <MenuItem fx:id="mniGlobalScore" mnemonicParsing="false" text="%menu.title.global.score">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
           </items>
         </Menu>
-            <Menu mnemonicParsing="false" text="%menu.title.help">
+            <Menu text="%menu.title.help">
               <items>
                 <MenuItem fx:id="mniAbout" mnemonicParsing="false" onAction="#mniActAbout" text="%menu.title.help.about" />
-                  <MenuItem fx:id="mniOnlineHelp" mnemonicParsing="false" onAction="#mniActOnlineHelp" text="%menu.title.help.online" />
+                  <MenuItem fx:id="mniOnlineHelp" mnemonicParsing="false" onAction="#mniActOnlineHelp" text="%menu.title.help.online">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
               </items>
             </Menu>
       </menus>
@@ -67,29 +81,6 @@
                      <tooltip>
                         <Tooltip text="%btn.tt.PlayPause" />
                      </tooltip></Button>
-                  <Button fx:id="btnReplay" alignment="CENTER" mnemonicParsing="false" onAction="#btnActReplay" prefHeight="81.0">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.Replay" />
-                     </tooltip></Button>
-                  <Button fx:id="btnUncode" alignment="CENTER" layoutX="586.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnActUncode" prefHeight="81.0">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.Uncode" />
-                     </tooltip>
-                  </Button>
-                  <Button fx:id="btnUncodeReplay" alignment="CENTER" layoutX="586.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnActUncodeReplay" prefHeight="81.0">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.UncodeReplay" />
-                     </tooltip>
-                  </Button>
                   <Button fx:id="btnRewind" alignment="CENTER" layoutX="586.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnActRewind" prefHeight="81.0">
                      <graphic>
                         <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
@@ -98,10 +89,36 @@
                         <Tooltip text="%btn.tt.Rewind" />
                      </tooltip>
                   </Button>
+                  <Button fx:id="btnReplay" alignment="CENTER" mnemonicParsing="false" onAction="#btnActReplay" prefHeight="81.0" visible="false">
+                     <graphic>
+                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="%btn.tt.Replay" />
+                     </tooltip></Button>
+                  <Button fx:id="btnUncode" alignment="CENTER" layoutX="586.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnActUncode" prefHeight="81.0" visible="false">
+                     <graphic>
+                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="%btn.tt.Uncode" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="btnUncodeReplay" alignment="CENTER" layoutX="586.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnActUncodeReplay" prefHeight="81.0" visible="false">
+                     <graphic>
+                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="%btn.tt.UncodeReplay" />
+                     </tooltip>
+                  </Button>
               </buttons>
                <padding>
-                  <Insets bottom="4.0" right="8.0" top="4.0" />
+                  <Insets bottom="4.0" right="372.0" top="4.0" />
                </padding>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
             </ButtonBar>
          </children>
       </AnchorPane>
@@ -160,15 +177,15 @@
             <Insets bottom="12.0" />
          </padding>
       </AnchorPane>
-      <AnchorPane fx:id="pnCoding" prefHeight="480.0" prefWidth="640.0">
+      <AnchorPane fx:id="pnCoding" visible="false" prefHeight="480.0" prefWidth="640.0">
          <children>
-            <VBox prefHeight="258.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <VBox fx:id="vbPnlMiscCoding" prefHeight="258.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <TitledPane fx:id="pnlTimeline" animated="false" collapsible="false" prefHeight="90.0" text="%pnl.title.timeline">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <SwingNode fx:id="snCoding" />
+                              <SwingNode fx:id="snTimeline" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children></AnchorPane>
                     </content>
                   </TitledPane>
