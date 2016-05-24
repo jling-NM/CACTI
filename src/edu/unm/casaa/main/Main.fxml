@@ -18,7 +18,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
@@ -91,14 +90,14 @@
                   </Button>
                   <Button fx:id="btnReplay" alignment="CENTER" mnemonicParsing="false" onAction="#btnActReplay" prefHeight="81.0" visible="false">
                      <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-replay" />
                      </graphic>
                      <tooltip>
                         <Tooltip text="%btn.tt.Replay" />
                      </tooltip></Button>
                   <Button fx:id="btnUncode" alignment="CENTER" layoutX="586.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnActUncode" prefHeight="81.0" visible="false">
                      <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncode" />
                      </graphic>
                      <tooltip>
                         <Tooltip text="%btn.tt.Uncode" />
@@ -106,7 +105,7 @@
                   </Button>
                   <Button fx:id="btnUncodeReplay" alignment="CENTER" layoutX="586.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnActUncodeReplay" prefHeight="81.0" visible="false">
                      <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncodeReplay" />
                      </graphic>
                      <tooltip>
                         <Tooltip text="%btn.tt.UncodeReplay" />
@@ -257,16 +256,11 @@
                   </TitledPane>
                   <HBox VBox.vgrow="ALWAYS">
                      <children>
-                        <TitledPane animated="false" collapsible="false" text="Therapist" HBox.hgrow="ALWAYS">
+                        <TitledPane fx:id="titlePnlCodesLeft" animated="false" collapsible="false" text="" HBox.hgrow="ALWAYS">
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TilePane fx:id="pnlCodesTherapist" hgap="2.0" prefColumns="4" prefHeight="180.0" prefTileHeight="10.0" prefTileWidth="60.0" prefWidth="307.0" vgap="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                       <children>
-                                          <Button mnemonicParsing="false" onAction="#btnActCode" prefWidth="60.0" text="CQ0" />
-                                          <Button mnemonicParsing="false" onAction="#btnActCode" prefWidth="60.0" text="SR" />
-                                       </children>
-                                    </TilePane>
+                                    <GridPane fx:id="pnlCodesLeft" hgap="2.0" prefHeight="180.0" prefWidth="307.0" vgap="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                           </content>
@@ -278,7 +272,7 @@
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TilePane fx:id="pnlCodesClient" prefHeight="180.0" prefWidth="307.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <GridPane fx:id="pnlCodesRight" prefHeight="180.0" prefWidth="307.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                           </content>

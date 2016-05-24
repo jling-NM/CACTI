@@ -62,7 +62,9 @@ public class Main extends Application {
 
         // application window icon is set
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color.png")));
-        mainStage.setScene(new Scene(root));
+        Scene mainScene = new Scene(root);
+        //mainScene.getStylesheets().add("file:///edu/unm/casaa/main/Main.css");
+        mainStage.setScene(mainScene);
 
         // set volume to user prefs value
         mainController.sldVolume.adjustValue(appPrefs.getDouble("player.volume",0.5));

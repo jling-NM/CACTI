@@ -1,5 +1,6 @@
 package edu.unm.casaa.main;
 
+import edu.unm.casaa.misc.MiscAction;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.*;
@@ -13,6 +14,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
@@ -26,6 +29,7 @@ import org.xml.sax.SAXParseException;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -36,6 +40,14 @@ import java.util.ResourceBundle;
 
 public class MainController {
 
+    @FXML
+    private TitledPane titlePnlCodesLeft;
+    @FXML
+    private TitledPane titlePnlCodesRight;
+    @FXML
+    private GridPane pnlCodesLeft;
+    @FXML
+    private GridPane pnlCodesRight;
     @FXML
     private AnchorPane pnCoding;
     @FXML
@@ -337,6 +349,7 @@ public class MainController {
      *  @param actionEvent
      **********************************************************************/
     public void btnActCode(ActionEvent actionEvent) {
+        System.out.println("btnActCode Was Clicked");
         Button src = (Button) actionEvent.getSource();
         MiscCode mc = MiscCode.codeWithName(src.getText());
         handleButtonMiscCode(mc);
@@ -457,6 +470,10 @@ public class MainController {
 
         // activate the timeline display
         snTimeline.setContent(new Timeline(this));
+
+        // temp button generation
+        parseUserControls();
+
         // display controls needed for coding
         setMiscCodingControlVisibility(true);
     }
@@ -872,6 +889,8 @@ public class MainController {
 
     public synchronized void handleButtonMiscCode( MiscCode miscCode ) {
 
+        System.out.println(miscCode.isValid());
+
         assert (miscCode.isValid());
 
         // Assign code to current utterance, if one exists.
@@ -1118,6 +1137,113 @@ public class MainController {
         btnUncode.setVisible(controlVisibility);
         btnUncodeReplay.setVisible(controlVisibility);
         pnCoding.setVisible(controlVisibility);
+    }
+
+
+
+    /*************************************************************
+     * Parse user controls from XML file.
+     */
+    private void parseUserControls() {
+        File file = new File( "userConfiguration.xml" );
+
+        if( file.exists() ) {
+            try {
+                DocumentBuilderFactory  fact    = DocumentBuilderFactory.newInstance();
+                DocumentBuilder         builder = fact.newDocumentBuilder();
+                Document                doc     = builder.parse( file.getCanonicalFile());
+                Node                    root    = doc.getDocumentElement();
+
+                /* Expected format:
+                 * <userConfiguration>
+                 *   <codes>
+                 *    ...
+                 *   </codes>
+                 *   <codeControls panel="left" label="Therapist">
+                 *     ...
+                 *   </codeControls>
+                 *   <codeControls panel="right" label="Client">
+                 *     ...
+                 *   </codeControls>
+                 * </userConfiguration>
+                 */
+                for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
+                    if( node.getNodeName().equalsIgnoreCase( "codeControls" ) ) {
+                        // Get panel name.  Must be "left" or "right".
+                        NamedNodeMap    map         = node.getAttributes();
+                        String          panelName   = map.getNamedItem( "panel" ).getTextContent();
+                        String          panelLabel  = map.getNamedItem( "label" ).getTextContent();
+                        GridPane        gridpane    = null;
+                        TitledPane      titledpane   = null;
+
+                        // Lookup panel.
+                        if( panelName.equalsIgnoreCase( "left" ) ) {
+                            gridpane = pnlCodesLeft;
+                            titledpane = titlePnlCodesLeft;
+                        } else if( panelName.equalsIgnoreCase( "right" ) ) {
+                            gridpane = pnlCodesRight;
+                            titledpane = titlePnlCodesRight;
+                        }
+
+                        // Parse controls, create border with given label.
+                        if( gridpane == null ) {
+                            handleUserCodesError( file, "codeControls panel unrecognized: " + panelName );
+                        } else {
+                            parseControlColumn( node, gridpane );
+                            titledpane.setText(panelLabel);
+                        }
+                    }
+                }
+            } catch( SAXParseException e ) {
+                handleUserCodesParseException( file, e );
+            } catch( Exception e ) {
+                //handleUserCodesGenericException( file, e );
+            }
+        } else {
+            handleUserCodesMissing( file );
+        }
+    }
+
+
+
+    /*******************************************************************
+     * Parse a column of controls from given XML node.  Add buttons to given panel, and set panel layout.
+     * Each child of given node is expected to be one row of controls.
+     * @param node
+     * @param panel
+     *******************************************************************/
+    private void parseControlColumn( Node node, GridPane panel ) {
+
+        int activeRow = 0;
+        int activeCol = 0;
+
+        for( Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
+            if( row.getNodeName().equalsIgnoreCase( "row" ) ) {
+                activeRow ++;
+
+                for( Node cell = row.getFirstChild(); cell != null; cell = cell.getNextSibling() ) {
+                    if( cell.getNodeName().equalsIgnoreCase("button")) {
+                        activeCol ++;
+                        NamedNodeMap map = cell.getAttributes();
+                        String codeName = map.getNamedItem( "code" ).getTextContent();
+
+                        Button button = new Button(codeName);
+                        button.setOnAction(this::btnActCode);
+                        button.setMinWidth(64);
+                        button.setMinHeight(28);
+                        button.setMaxWidth(64);
+                        button.setMaxHeight(28);
+                        //button.setStyle("btn-misc");
+                        panel.add(button, activeCol, activeRow, 1, 1);
+                    }
+                }
+
+                activeCol = 0;
+
+            } else {
+                continue;
+            }
+        }
     }
 
 }

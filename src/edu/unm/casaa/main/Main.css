@@ -10,6 +10,15 @@
 .img-btn-rew {
     -fx-image: url("/media/btn_rew.png");
 }
+.img-btn-replay {
+    -fx-image: url("/media/btn_replay.png");
+}
+.img-btn-uncode {
+    -fx-image: url("/media/btn_uncode.png");
+}
+.img-btn-uncodeReplay {
+    -fx-image: url("/media/btn_uncodeReplay.png");
+}
 .img-volume {
     -fx-image: url("/media/img_volume.png");
 }
@@ -20,8 +29,8 @@
     -fx-padding: 0.208333em; /* 2.5 */
 }
 .slider .thumb {
-    -fx-background-color:"green";
-    -fx-background-radius: 2.5, 2.5, 1.5;
+    -fx-background-color:"blue";
+    -fx-background-radius: 2.1, 2.1, 1.1;
 }
 .btnBarPane {
     -fx-alignment: center ;
