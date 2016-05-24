@@ -222,6 +222,9 @@ public class MainController {
         updateUtteranceDisplays();
         // update timeline display as player seek doesn't update correctly on reload
         updateTimeLineDisplay();
+
+        // temp button generation
+        parseUserControls();
     };
 
 
@@ -349,7 +352,6 @@ public class MainController {
      *  @param actionEvent
      **********************************************************************/
     public void btnActCode(ActionEvent actionEvent) {
-        System.out.println("btnActCode Was Clicked");
         Button src = (Button) actionEvent.getSource();
         MiscCode mc = MiscCode.codeWithName(src.getText());
         handleButtonMiscCode(mc);
@@ -472,7 +474,8 @@ public class MainController {
         snTimeline.setContent(new Timeline(this));
 
         // temp button generation
-        parseUserControls();
+        // in callback now
+        //parseUserControls();
 
         // display controls needed for coding
         setMiscCodingControlVisibility(true);
@@ -889,8 +892,6 @@ public class MainController {
 
     public synchronized void handleButtonMiscCode( MiscCode miscCode ) {
 
-        System.out.println(miscCode.isValid());
-
         assert (miscCode.isValid());
 
         // Assign code to current utterance, if one exists.
@@ -1197,7 +1198,7 @@ public class MainController {
             } catch( SAXParseException e ) {
                 handleUserCodesParseException( file, e );
             } catch( Exception e ) {
-                //handleUserCodesGenericException( file, e );
+                handleUserCodesGenericException( file, e );
             }
         } else {
             handleUserCodesMissing( file );
