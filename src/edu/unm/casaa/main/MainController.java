@@ -122,7 +122,7 @@ public class MainController {
 
     // define lambda runnable later called by player when ready with a media loaded
     Runnable playerReady = () -> {
-        System.out.println("MEDIAPLAYER: OnReady");
+        System.out.println("playerReady: MEDIAPLAYER: OnReady");
 
         // enable all the media controls; perhaps through a single pane of some sort???
         apBtnBar.setDisable(false);
@@ -499,9 +499,25 @@ public class MainController {
 
         // user selects a casaa file or we leave
         File miscFile = selectMiscFile("");
-        if( miscFile == null )
+        if( miscFile == null ) {
+            showError("File Error", "Could not open coding file");
             return;
+        }
         filenameMisc = miscFile.getAbsolutePath();
+
+
+        // load audio file and utterancelist at same time
+        // TODO: consider clarifying this with separate class
+        // TODO: we should trap errors reading the codes here too
+        filenameAudio = getUtteranceList().loadFromFile(miscFile);
+        File audioFile = new File(filenameAudio);
+        if (audioFile.canRead()) {
+            initializeMediaPlayer(audioFile, playerReadyToCode);
+        } else {
+            showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            return;
+        }
+
 
         // display coding file path in gui
         lblCurMiscFile.setText(miscFile.getAbsolutePath());
@@ -509,13 +525,6 @@ public class MainController {
         // reset some utterance accounting
         resetUtteranceCoding();
 
-        // load audio file and utterancelist at same time
-        // TODO: consider clarifying this with separate class
-        filenameAudio = getUtteranceList().loadFromFile(miscFile);
-        File audioFile = new File(filenameAudio);
-        if (audioFile != null) {
-            initializeMediaPlayer(audioFile, playerReadyToCode);
-        }
 
         // activate the timeline display
         snTimeline.setContent(new Timeline(this));
@@ -945,10 +954,6 @@ public class MainController {
         this.showFatalWarning("Failed to load user codes", "Error loading file: " + file.getAbsolutePath() + "\n" + message);
     }
 
-    public void handleUserCodesMissing(File file) {
-        // Alert and quit.
-        this.showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
-    }
 
     // Parse user codes and globals from XML.
     private void parseUserConfig() {
@@ -957,18 +962,17 @@ public class MainController {
         if( MiscCode.numCodes() == 0 ){
 
             // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
-            File file = new File( "userConfiguration.xml" );
+            File file = new File( "userConfiguration.mac.xml" );
 
-            if( file.exists() ) {
+            if( file.canRead() ) {
                 try {
-                    DocumentBuilderFactory fact    = DocumentBuilderFactory.newInstance();
+                    DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
                     DocumentBuilder builder = fact.newDocumentBuilder();
-                    Document doc     = builder.parse( file.getCanonicalFile() );
-                    Node root    = doc.getDocumentElement();
+                    Document doc = builder.parse( file.getCanonicalPath() );
+                    Node root = doc.getDocumentElement();
 
                     // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
                     for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
-
                         if( node.getNodeName().equalsIgnoreCase( "codes" ) )
                             parseUserCodes( file, node );
                         else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
@@ -982,7 +986,8 @@ public class MainController {
                     handleUserCodesGenericException( file, e );
                 }
             } else {
-                handleUserCodesMissing( file );
+                // Alert and quit.
+                this.showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
             }
         }
     }
@@ -1115,7 +1120,11 @@ public class MainController {
 
     private void updateTimeLineDisplay() {
 
+
+        //if (snTimeline.getContent().isValid()) {
         snTimeline.getContent().repaint();
+        //}
+        //snTimeline.getContent().repaint();
         //playerView.getTimeline().repaint();
 /*        if (bytesPerSecond != 0) {
             // Handles constant bit-rates only.
@@ -1201,7 +1210,8 @@ public class MainController {
                 handleUserCodesGenericException( file, e );
             }
         } else {
-            handleUserCodesMissing( file );
+            // Alert and quit.
+            this.showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
         }
     }
 
