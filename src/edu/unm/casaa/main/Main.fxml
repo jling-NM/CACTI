@@ -268,7 +268,7 @@
                               <Insets right="2.0" />
                            </HBox.margin>
                         </TitledPane>
-                        <TitledPane animated="false" collapsible="false" text="Client" HBox.hgrow="ALWAYS">
+                        <TitledPane fx:id="titlePnlCodesRight"  animated="false" collapsible="false" text="" HBox.hgrow="ALWAYS">
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>

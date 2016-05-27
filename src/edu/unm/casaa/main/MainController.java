@@ -1,6 +1,5 @@
 package edu.unm.casaa.main;
 
-import edu.unm.casaa.misc.MiscAction;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.*;
@@ -15,28 +14,29 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
+import com.aquafx_project.AquaFx;
 
 public class MainController {
 
@@ -92,7 +92,8 @@ public class MainController {
     @FXML
     private Label lblPrevUtr;
 
-
+    // persistance
+    Preferences appPrefs;
 
     // mediaplayer attributes
     private Duration totalDuration;
@@ -114,6 +115,13 @@ public class MainController {
     @FXML
     private void initialize() {
         System.out.println("Controller Initializing...");
+
+        // persistence
+        appPrefs = Preferences.userNodeForPackage(Main.class);
+        // OSX CSS
+        if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
+            //AquaFx.style();
+        }
         // load user config file to load user specific edited codes
         parseUserConfig();
     }
@@ -152,7 +160,7 @@ public class MainController {
 
 
     // define lambda runnable later called by player when ready with a media loaded
-    Runnable playerReadyToCode = () -> {
+    private Runnable playerReadyToCode = () -> {
         System.out.println("MEDIAPLAYER: Ready for Coding");
 
         // enable all the media controls; perhaps through a single pane of some sort???
@@ -264,7 +272,7 @@ public class MainController {
      *  button event: Seek to beginning of current utterance.  Seek a little further back
      *  to ensure audio synchronization issues don't cause player to actually
      *  seek later than beginning of utterance.
-     *  @param actionEvent
+     *  @param actionEvent not used
      **********************************************************************/
     public void btnActReplay(ActionEvent actionEvent) {
 
@@ -292,7 +300,7 @@ public class MainController {
 
     /**********************************************************************
      *  button event: Uncode last utterance and replay it, i think
-     *  @param actionEvent
+     *  @param actionEvent not used
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
         uncode();
@@ -313,7 +321,7 @@ public class MainController {
 
     /**********************************************************************
      *  button event: Begin utterance coding
-     *  @param actionEvent
+     *  @param actionEvent not used
      **********************************************************************/
     public void btnActStartCoding(ActionEvent actionEvent) {
 
@@ -430,12 +438,14 @@ public class MainController {
      * @param actionEvent
      **********************************************************************/
     public void mniActOpenFile(ActionEvent actionEvent) {
+
         File selectedFile = selectAudioFile();
         if (selectedFile != null) {
             initializeMediaPlayer(selectedFile, playerReady);
         }
         // hide controls needed for coding
         setMiscCodingControlVisibility(false);
+
     }
 
 
@@ -445,7 +455,7 @@ public class MainController {
      * Load audio file and create corresponding coding output file.
      * Initialize the mediaplayer.
      * Activate the coding controls.
-     * @param actionEvent
+     * @param actionEvent event details
      */
     public void mniStartCoding(ActionEvent actionEvent) {
 
@@ -488,7 +498,7 @@ public class MainController {
      * Load coding file and corresponding audio file.
      * Initialize mediaplayer.
      * Activate timeline control updating it for utterance data
-     * @param actionEvent
+     * @param actionEvent event details
      ******************************************************/
     public void mniResumeCoding(ActionEvent actionEvent) {
 
@@ -500,7 +510,7 @@ public class MainController {
         // user selects a casaa file or we leave
         File miscFile = selectMiscFile("");
         if( miscFile == null ) {
-            showError("File Error", "Could not open coding file");
+            //showError("File Error", "Could not open coding file");
             return;
         }
         filenameMisc = miscFile.getAbsolutePath();
@@ -539,7 +549,7 @@ public class MainController {
      * sldSeek mouse event:
      * change seek time when user clicks on slid bar instead of dragging the controller
      * to change the position
-     * @param event
+     * @param event details
      **********************************************************************/
     public void sldSeekMousePressed(Event event) {
         /* if playing we first pause, seek and resume */
@@ -565,7 +575,7 @@ public class MainController {
 
 
     /************************************************************************
-     *
+     * get and persist audio file
      * @return Audio File object
      ***********************************************************************/
     private File selectAudioFile() {
@@ -574,8 +584,22 @@ public class MainController {
 
         FileChooser fc = new FileChooser();
         fc.setTitle("Open audio file");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio Files", "*.wav"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Wav Files", "*.wav"));
+
+        // set initial directory to preferences or users home directory
+        File initDir = new File(appPrefs.get("lastAudioPath", System.getProperty("user.home")));
+        // if preference path no longer exists reset to user home directory
+        if( !initDir.exists() ) {
+            initDir = new File(System.getProperty("user.home"));
+        }
+        // set chooser init directory
+        fc.setInitialDirectory(initDir);
+        // get user selection
         File selectedFile = fc.showOpenDialog(stageTheLabelBelongs);
+        // persist path for next time
+        if( selectedFile != null) {
+            appPrefs.put("lastAudioPath", selectedFile.getParent());
+        }
 
         return selectedFile;
     }
@@ -591,10 +615,20 @@ public class MainController {
 
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
 
+        // set code file chooser
         FileChooser fc = new FileChooser();
-
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CASAA files", "*.casaa"));
 
+        // set initial directory to preferences or users home directory
+        File initDir = new File(appPrefs.get("lastCasaaPath", System.getProperty("user.home")));
+        // if preference path no longer exists reset to user home directory
+        if( !initDir.exists() ) {
+            initDir = new File(System.getProperty("user.home"));
+        }
+        // set chooser init directory
+        fc.setInitialDirectory(initDir);
+
+        // get user selection
         File selectedFile;
         if (newFileName.isEmpty()) {
             fc.setTitle("Open CASAA File");
@@ -604,6 +638,12 @@ public class MainController {
             fc.setInitialFileName(newFileName);
             selectedFile = fc.showSaveDialog(stageTheLabelBelongs);
         }
+
+        // persist path for next time
+        if( selectedFile != null) {
+            appPrefs.put("lastCasaaPath", selectedFile.getParent());
+        }
+
         return selectedFile;
     }
 
@@ -611,7 +651,8 @@ public class MainController {
 
     /**********************************************************************
      * Initialize the media player state with media file
-     * @param mediaFile
+     * @param mediaFile media object used to initialize player
+     * @param onReadyMethod once player is ready which runnable will be called
      **********************************************************************/
     public void initializeMediaPlayer(File mediaFile, Runnable onReadyMethod) {
 
@@ -695,7 +736,7 @@ public class MainController {
     /**********************************************************************
      * Set mediaplayer position using bytes
      * This makes new mediaplayer compatible with legacy code
-     * @param positionInBytes
+     * @param positionInBytes provide player position in bytes
      **********************************************************************/
     private synchronized void setMediaPlayerPositionByBytes(int positionInBytes){
         double positionInSecs = positionInBytes/getBytesPerSecond();
@@ -714,8 +755,8 @@ public class MainController {
 
     /*******************************************************
      * Reusable method to display runtime errors
-     * @param title
-     * @param message
+     * @param title Window title
+     * @param message Window message
      *******************************************************/
     public static void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -729,8 +770,8 @@ public class MainController {
 
     /*******************************************************
      * Reusable method to display runtime errors
-     * @param title
-     * @param message
+     * @param title Window title
+     * @param message Window message
      *******************************************************/
     public static void showFatalWarning(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -746,7 +787,7 @@ public class MainController {
 
     /**********************************************************
      *
-     * @return
+     * @return list of utterances
      **********************************************************/
     private synchronized UtteranceList getUtteranceList() {
         if( utteranceList == null )
@@ -962,7 +1003,7 @@ public class MainController {
         if( MiscCode.numCodes() == 0 ){
 
             // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
-            File file = new File( "userConfiguration.mac.xml" );
+            File file = new File( "userConfiguration.xml" );
 
             if( file.canRead() ) {
                 try {
@@ -1153,16 +1194,12 @@ public class MainController {
 
     /*************************************************************
      * Parse user controls from XML file.
-     */
+     *************************************************************/
     private void parseUserControls() {
         File file = new File( "userConfiguration.xml" );
 
         if( file.exists() ) {
             try {
-                DocumentBuilderFactory  fact    = DocumentBuilderFactory.newInstance();
-                DocumentBuilder         builder = fact.newDocumentBuilder();
-                Document                doc     = builder.parse( file.getCanonicalFile());
-                Node                    root    = doc.getDocumentElement();
 
                 /* Expected format:
                  * <userConfiguration>
@@ -1177,32 +1214,42 @@ public class MainController {
                  *   </codeControls>
                  * </userConfiguration>
                  */
-                for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
-                    if( node.getNodeName().equalsIgnoreCase( "codeControls" ) ) {
-                        // Get panel name.  Must be "left" or "right".
-                        NamedNodeMap    map         = node.getAttributes();
-                        String          panelName   = map.getNamedItem( "panel" ).getTextContent();
-                        String          panelLabel  = map.getNamedItem( "label" ).getTextContent();
-                        GridPane        gridpane    = null;
-                        TitledPane      titledpane   = null;
 
-                        // Lookup panel.
-                        if( panelName.equalsIgnoreCase( "left" ) ) {
-                            gridpane = pnlCodesLeft;
-                            titledpane = titlePnlCodesLeft;
-                        } else if( panelName.equalsIgnoreCase( "right" ) ) {
-                            gridpane = pnlCodesRight;
-                            titledpane = titlePnlCodesRight;
-                        }
+                DocumentBuilderFactory  fact    = DocumentBuilderFactory.newInstance();
+                DocumentBuilder         builder = fact.newDocumentBuilder();
+                Document                doc     = builder.parse(file);
+                doc.getDocumentElement().normalize();
 
-                        // Parse controls, create border with given label.
-                        if( gridpane == null ) {
-                            handleUserCodesError( file, "codeControls panel unrecognized: " + panelName );
-                        } else {
-                            parseControlColumn( node, gridpane );
-                            titledpane.setText(panelLabel);
-                        }
+                // just get nodes for controls
+                NodeList controlNodeList = doc.getElementsByTagName("codeControls");
+                // iterate each child node
+                for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
+                    Node node = controlNodeList.item(cn);
+
+                    // Get panel name.  Must be "left" or "right".
+                    NamedNodeMap    map         = node.getAttributes();
+                    String          panelName   = map.getNamedItem( "panel" ).getTextContent();
+                    String          panelLabel  = map.getNamedItem( "label" ).getTextContent();
+                    GridPane        gridpane    = null;
+                    TitledPane      titledpane  = null;
+
+                    // Lookup panel.
+                    if( panelName.equalsIgnoreCase( "left" ) ) {
+                        gridpane = pnlCodesLeft;
+                        titledpane = titlePnlCodesLeft;
+                    } else if( panelName.equalsIgnoreCase( "right" ) ) {
+                        gridpane = pnlCodesRight;
+                        titledpane = titlePnlCodesRight;
                     }
+
+                    // Parse controls, create border with given label.
+                    if( gridpane == null ) {
+                        handleUserCodesError( file, "codeControls panel unrecognized: " + panelName );
+                    } else {
+                        parseControlColumn( node, gridpane );
+                        titledpane.setText(panelLabel);
+                    }
+
                 }
             } catch( SAXParseException e ) {
                 handleUserCodesParseException( file, e );
@@ -1211,7 +1258,7 @@ public class MainController {
             }
         } else {
             // Alert and quit.
-            this.showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
+            showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
         }
     }
 

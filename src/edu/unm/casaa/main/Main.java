@@ -20,8 +20,21 @@ public class Main extends Application {
 
     @Override
     public void init() throws Exception {
+
+        // get requirements
+        String javaVersionStr = System.getProperty("java.specification.version","UNKNOWN");
+        // if you need to enforce specfic 1.8 build like 4 or 6 use java.version
+        //System.getProperties().list(System.out);
+
+        Double javaVersionNum = Double.parseDouble(javaVersionStr);
+        if( javaVersionNum < 1.8 ) {
+            System.out.println("Java Version Error: " + javaVersionStr);
+            System.exit(1);
+        }
+
         // link app appPrefs
         appPrefs = Preferences.userNodeForPackage(Main.class);
+        //appPrefs = Preferences.userRoot().node(this.getClass().getName());
     }
 
 
