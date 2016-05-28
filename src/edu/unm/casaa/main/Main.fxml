@@ -34,7 +34,7 @@
                      </accelerator></MenuItem>
             <MenuItem fx:id="mniExit" onAction="#mniActExit" text="%menu.title.file.exit">
                      <accelerator>
-                        <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                        <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
           </items>
         </Menu>

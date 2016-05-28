@@ -180,7 +180,9 @@ public class MiscDataItem implements Utterance {
 	 * @return a string representation of this utterance
 	 */
 	public String toString(){
-		return isCoded() ? writeParsed() : writeCoded();
+        // 20160527 - JL - reversed logic as the original didn't make sense to me or work.
+		//return isCoded() ? writeParsed() : writeCoded();
+        return isCoded() ? writeCoded() : writeParsed();
 	}
 
 	public String writeCoded(){

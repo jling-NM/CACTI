@@ -15,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -22,21 +23,17 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
-
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-import com.aquafx_project.AquaFx;
+//import com.aquafx_project.AquaFx;
 
 public class MainController {
 
@@ -127,8 +124,10 @@ public class MainController {
     }
 
 
-
-    // define lambda runnable later called by player when ready with a media loaded
+    /*********************************************************
+     * define lambda runnable later called by player when
+     * ready with media only for playback but not coding
+     *********************************************************/
     Runnable playerReady = () -> {
         System.out.println("playerReady: MEDIAPLAYER: OnReady");
 
@@ -152,8 +151,12 @@ public class MainController {
         mediaPlayer.seek(onReadySeekDuration);
         lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
         sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+
         // update the utterance data(previous/current) displayed in the gui
-        updateUtteranceDisplays();
+        // updateUtteranceDisplays();
+
+        // hide controls needed for coding
+        setMiscCodingControlVisibility(false);
     };
 
 
@@ -163,7 +166,7 @@ public class MainController {
     private Runnable playerReadyToCode = () -> {
         System.out.println("MEDIAPLAYER: Ready for Coding");
 
-        // enable all the media controls; perhaps through a single pane of some sort???
+        // TODO: enable all the media controls; perhaps through a single pane of some sort???
         apBtnBar.setDisable(false);
         apMediaCtrls.setDisable(false);
 
@@ -183,9 +186,10 @@ public class MainController {
          * BEGIN: initialize active utterance
          * we want to initialize the active utterance record to use it to resuming coding.
          * we do so by taking the last utterance, using its end time and end bytes as the
-         * start time/start bytes of a new utterance.         *
+         * start time/start bytes of a new utterance.
          ***/
         Utterance utterance = getCurrentUtterance();
+
 
         int mediaplayerSeekBytes = 0;
 
@@ -216,9 +220,11 @@ public class MainController {
             }
 
         }
+
         /***
          * END: initialize active utterance
          ***/
+
 
 
         double positionInSecs = mediaplayerSeekBytes/getBytesPerSecond();
@@ -233,6 +239,7 @@ public class MainController {
 
         // temp button generation
         parseUserControls();
+
     };
 
 
@@ -470,6 +477,9 @@ public class MainController {
             return;
         filenameAudio = audioFile.getAbsolutePath();
 
+        // reset utteranceList to start fresh
+        utteranceList = null;
+
         // Default casaa filename to match audio file, with .casaa suffix.
         String newFileName = changeSuffix( audioFile.getName(), "casaa" );
         File miscFile = selectMiscFile(newFileName);
@@ -515,7 +525,6 @@ public class MainController {
         }
         filenameMisc = miscFile.getAbsolutePath();
 
-
         // load audio file and utterancelist at same time
         // TODO: consider clarifying this with separate class
         // TODO: we should trap errors reading the codes here too
@@ -534,7 +543,6 @@ public class MainController {
 
         // reset some utterance accounting
         resetUtteranceCoding();
-
 
         // activate the timeline display
         snTimeline.setContent(new Timeline(this));
@@ -573,7 +581,6 @@ public class MainController {
     }
 
 
-
     /************************************************************************
      * get and persist audio file
      * @return Audio File object
@@ -603,7 +610,6 @@ public class MainController {
 
         return selectedFile;
     }
-
 
 
     /************************************************************************
@@ -648,7 +654,6 @@ public class MainController {
     }
 
 
-
     /**********************************************************************
      * Initialize the media player state with media file
      * @param mediaFile media object used to initialize player
@@ -657,15 +662,13 @@ public class MainController {
     public void initializeMediaPlayer(File mediaFile, Runnable onReadyMethod) {
 
         if (mediaFile != null) {
-            final Media media = new Media(mediaFile.toURI().toString());
-
             try {
+                final Media media = new Media(mediaFile.toURI().toString());
+                mediaPlayer = new MediaPlayer(media);
 
                 // legacy TODO: notes
                 setAudioLength(mediaFile);
                 setBytesPerSecond(mediaFile);
-
-                mediaPlayer = new MediaPlayer(media);
 
                 /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(onReadyMethod);
@@ -677,7 +680,7 @@ public class MainController {
                 mediaPlayer.setOnPaused(() -> {
                     // assumes OnPlay has overlayed style class so just remove that to expose pause class
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
-                } );
+                });
 
                 /* Status Handler: OnStop */
                 mediaPlayer.setOnStopped(() -> {
@@ -725,6 +728,12 @@ public class MainController {
                 });
 
 
+            } catch ( MediaException mex ) {
+                if(mex.getType() == MediaException.Type.MEDIA_UNSUPPORTED) {
+                    showError("Error Playing Audio File", "The file you selected is not supported.\nMake sure your file is not encoded.");
+                } else {
+                    showError("Error Playing Audio File", mex.getType().toString());
+                }
             } catch (Exception ex) {
                 showError("Error Starting MediaPlayer", ex.getMessage());
             }
@@ -748,10 +757,6 @@ public class MainController {
     }
 
 
-
-    // ******************************
-    // Begin Integrate
-    // ******************************
 
     /*******************************************************
      * Reusable method to display runtime errors
@@ -785,6 +790,7 @@ public class MainController {
         System.exit(1);
     }
 
+
     /**********************************************************
      *
      * @return list of utterances
@@ -794,6 +800,7 @@ public class MainController {
             utteranceList = new UtteranceList();
         return utteranceList;
     }
+
 
     // Access utterances.
     public int numUtterances() {
@@ -821,8 +828,11 @@ public class MainController {
     }
 
 
-
-
+    /*****************************************************
+     * Store length in bytes
+     * Used for backward compatibility
+     * @param audioFile
+     *****************************************************/
     private void setAudioLength(java.io.File audioFile) {
         try {
             javax.sound.sampled.AudioInputStream as = javax.sound.sampled.AudioSystem.getAudioInputStream(audioFile);
@@ -835,6 +845,12 @@ public class MainController {
         }
     }
 
+
+    /******************************************************
+     * Store rate for audio file
+     * Used for backward compatibility
+     * @param audioFile
+     *****************************************************/
     private void setBytesPerSecond(java.io.File audioFile){
         try {
             javax.sound.sampled.AudioFileFormat m_audioFileFormat = AudioSystem.getAudioFileFormat(audioFile);
@@ -848,13 +864,13 @@ public class MainController {
 
     }
 
+
     /***********************************************
      * @return audio bytes per second.
      ***********************************************/
     public int getBytesPerSecond() {
         return bytesPerSecond;
     }
-
 
 
     /***********************************************
@@ -913,11 +929,9 @@ public class MainController {
     private synchronized void saveCurrentTextFile( boolean asBackup ) {
        // if( templateView instanceof MiscTemplateView && filenameMisc != null ) {
             String filename = filenameMisc;
+            if( asBackup ) filename += ".backup";
+            getUtteranceList().writeToFile( new File( filename ), filenameAudio );
 
-            if( asBackup ) {
-                filename += ".backup";
-                getUtteranceList().writeToFile( new File( filename ), filenameAudio );
-            }
 
         // TODO: determine how coding type will be stored and complete this
 //        } else if( templateView instanceof GlobalTemplateView ) {
@@ -946,10 +960,10 @@ public class MainController {
 
         // Assign code to current utterance, if one exists.
         Utterance utterance = getCurrentUtterance();
-
         if( utterance == null )
             return; // No current utterance.
 
+        // get current player position
         int position = streamPosition();
 
         if( position <= utterance.getStartBytes() )
@@ -957,7 +971,9 @@ public class MainController {
         if( utterance.isCoded() )
             return; // Ignore if already coded.
 
+        // assign code to utterance
         utterance.setMiscCode( miscCode );
+        // number of uncoding events goes back to zero
         numUninterruptedUncodes = 0;
 
         // End utterance.
@@ -1109,7 +1125,6 @@ public class MainController {
 
 
     private void resetUtteranceCoding() {
-        utteranceList = null;
         numUninterruptedUncodes = 0;
         // Reset save counter, so we backup on next save (i.e. as
         // soon as player saves changes to newly loaded data).
@@ -1161,7 +1176,7 @@ public class MainController {
 
     private void updateTimeLineDisplay() {
 
-
+        // TODO: this doesn't work
         //if (snTimeline.getContent().isValid()) {
         snTimeline.getContent().repaint();
         //}
@@ -1265,7 +1280,8 @@ public class MainController {
 
 
     /*******************************************************************
-     * Parse a column of controls from given XML node.  Add buttons to given panel, and set panel layout.
+     * Parse a column of controls from given XML node.
+     * Add buttons to given panel, and set panel layout.
      * Each child of given node is expected to be one row of controls.
      * @param node
      * @param panel

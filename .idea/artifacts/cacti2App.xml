@@ -8,8 +8,9 @@
         <option name="description" value="" />
         <option name="height" value="768" />
         <option name="htmlParamFile" value="" />
+        <option name="nativeBundle" value="deb" />
         <option name="paramFile" value="" />
-        <option name="title" value="" />
+        <option name="title" value="CACTI" />
         <option name="vendor" value="" />
         <option name="width" value="1024" />
       </options>
