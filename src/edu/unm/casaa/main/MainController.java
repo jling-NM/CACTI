@@ -89,44 +89,64 @@ public class MainController {
     @FXML
     private Label lblPrevUtr;
 
-    // persistance
-    Preferences appPrefs;
+
+    Preferences appPrefs;                                       // User prefs persistence
 
     // mediaplayer attributes
     private Duration totalDuration;
-    private int bytesPerSecond           = 0; // legacy Cached when we load audio file.
-    private int audioLength              = 0; // legacy to be noted later
+    private int bytesPerSecond           = 0;                   // legacy Cached when we load audio file.
+    private int audioLength              = 0;                   // legacy to be noted later
 
     // integrate
-    private int numSaves                 = 0;                // Number of times we've saved since loading current session data.
-    private int numUninterruptedUncodes  = 0;                // Number of times user has uncoded without doing anything else.
-    private String filenameMisc          = null;			 // CASAA file.
+    private int numSaves                 = 0;                   // Number of times we've saved since loading current session data.
+    private int numUninterruptedUncodes  = 0;                   // Number of times user has uncoded without doing anything else.
+    private String filenameMisc          = null;			    // CASAA file.
     private String filenameGlobals       = null;
     private String filenameAudio         = null;
     private UtteranceList utteranceList  = null;
-    private String globalsLabel          = "Global Ratings"; // Label for global template view.
+
+    // TODO: if needed move to string resource
+    private String globalsLabel          = "Global Ratings";    // Label for global template view.
+
+
+    public enum  GuiState {
+        BASE, PLAYBACK, MISC_CODING, GLOBAL_CODING
+    }
+
+    private GuiState guiState;                                          // for referencing state
 
 
 
-    /* handle controller initialization tasks */
+
+    /******************************************************************
+     * controller initialization tasks
+     ******************************************************************/
     @FXML
     private void initialize() {
-        System.out.println("Controller Initializing...");
+        //System.out.println("Controller Initializing...");
+
+        //
+        guiState = GuiState.BASE;
 
         // persistence
         appPrefs = Preferences.userNodeForPackage(Main.class);
+
         // OSX CSS
-        if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
+        //if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
             //AquaFx.style();
-        }
+        //}
+
         // load user config file to load user specific edited codes
         parseUserConfig();
     }
 
 
+
+
+
     /*********************************************************
      * define lambda runnable later called by player when
-     * ready with media only for playback but not coding
+     * ready with media
      *********************************************************/
     Runnable playerReady = () -> {
         System.out.println("playerReady: MEDIAPLAYER: OnReady");
@@ -146,101 +166,12 @@ public class MainController {
         // duration label
         lblDuration.setText(Utils.formatDuration(totalDuration));
 
-        // TODO: clear or disable or hide coding stuff check all this is here
-        Duration onReadySeekDuration = Duration.ZERO;
-        mediaPlayer.seek(onReadySeekDuration);
-        lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
-        sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
-
-        // update the utterance data(previous/current) displayed in the gui
-        // updateUtteranceDisplays();
-
-        // hide controls needed for coding
-        setMiscCodingControlVisibility(false);
-    };
-
-
-
-
-    // define lambda runnable later called by player when ready with a media loaded
-    private Runnable playerReadyToCode = () -> {
-        System.out.println("MEDIAPLAYER: Ready for Coding");
-
-        // TODO: enable all the media controls; perhaps through a single pane of some sort???
-        apBtnBar.setDisable(false);
-        apMediaCtrls.setDisable(false);
-
-        // bind the volume slider to the mediaplayer volume
-        mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
-        // bind
-        lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
-
-        // i'm not sure it is worth having this as private member unless it helps inside
-        // the listener code to avoid making the duration call repeatedly.
-        totalDuration = mediaPlayer.getTotalDuration();
-        // duration label
-        lblDuration.setText(Utils.formatDuration(totalDuration));
-
-
-        /***
-         * BEGIN: initialize active utterance
-         * we want to initialize the active utterance record to use it to resuming coding.
-         * we do so by taking the last utterance, using its end time and end bytes as the
-         * start time/start bytes of a new utterance.
-         ***/
-        Utterance utterance = getCurrentUtterance();
-
-
-        int mediaplayerSeekBytes = 0;
-
-        // We expect utterances in file to be coded.  For backwards compatibility,
-        // tolerate uncoded utterances in file.
-        if( utterance != null ) {
-            if( utterance.isCoded() ) {
-                // Start new utterance.
-                int 		position		= utterance.getEndBytes();
-                String 		positionString 	= TimeCode.toString( position / getBytesPerSecond() );
-                int         order 		  	= getUtteranceList().size();
-
-                // create new utterance from relevant last utterance data
-                Utterance   data		 	= new MiscDataItem( order, positionString, position );
-
-                // add this to our utterance listing and it is our active utterance
-                getUtteranceList().add( data );
-                // update mediaplayer position appropriately for our now active utterance
-                mediaplayerSeekBytes = utterance.getEndBytes();
-            }
-            else {
-                // Tolerate uncoded final utterance.  Strip end data, so it is consistent
-                // with how we treat current utterance.  NOTE: This does not check for
-                // uncoded utterances anywhere else in file.
-                utterance.stripEndData();
-                // update mediaplayer position appropriately for our now active utterance
-                mediaplayerSeekBytes = utterance.getStartBytes();
-            }
-
-        }
-
-        /***
-         * END: initialize active utterance
-         ***/
-
-
-
-        double positionInSecs = mediaplayerSeekBytes/getBytesPerSecond();
-        Duration onReadySeekDuration = Duration.seconds(positionInSecs);
-        mediaPlayer.seek(onReadySeekDuration);
-        lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
-        sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
-        // update the utterance data(previous/current) displayed in the gui
-        updateUtteranceDisplays();
-        // update timeline display as player seek doesn't update correctly on reload
-        updateTimeLineDisplay();
-
-        // temp button generation
-        parseUserControls();
+        // mediaPlayer is ready continue with user controls setup
+        initializeUserControls();
 
     };
+
+
 
 
 
@@ -260,6 +191,7 @@ public class MainController {
             mediaPlayer.play();
         }
     }
+
 
     /**********************************************************************
      *  button event: 5 second rewind
@@ -295,6 +227,7 @@ public class MainController {
         setMediaPlayerPositionByBytes( pos );
     }
 
+
     /**********************************************************************
      *  button event: Remove last utterance
      *  @param actionEvent
@@ -304,6 +237,7 @@ public class MainController {
         saveSession();
         incrementUncodeCount();
     }
+
 
     /**********************************************************************
      *  button event: Uncode last utterance and replay it, i think
@@ -325,6 +259,7 @@ public class MainController {
 
         setMediaPlayerPositionByBytes( pos );
     }
+
 
     /**********************************************************************
      *  button event: Begin utterance coding
@@ -446,12 +381,12 @@ public class MainController {
      **********************************************************************/
     public void mniActOpenFile(ActionEvent actionEvent) {
 
+        guiState = GuiState.BASE;
+
         File selectedFile = selectAudioFile();
         if (selectedFile != null) {
             initializeMediaPlayer(selectedFile, playerReady);
         }
-        // hide controls needed for coding
-        setMiscCodingControlVisibility(false);
 
     }
 
@@ -465,6 +400,8 @@ public class MainController {
      * @param actionEvent event details
      */
     public void mniStartCoding(ActionEvent actionEvent) {
+
+        guiState = GuiState.MISC_CODING;
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -485,20 +422,13 @@ public class MainController {
         File miscFile = selectMiscFile(newFileName);
         filenameMisc = miscFile.getAbsolutePath();
 
-        // display path in gui
-        lblCurMiscFile.setText(miscFile.getAbsolutePath());
-        //
-        initializeMediaPlayer(audioFile, playerReadyToCode);
+        if (audioFile.canRead()) {
+            initializeMediaPlayer(audioFile, playerReady);
+        } else {
+            showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            return;
+        }
 
-        // activate the timeline display
-        snTimeline.setContent(new Timeline(this));
-
-        // temp button generation
-        // in callback now
-        //parseUserControls();
-
-        // display controls needed for coding
-        setMiscCodingControlVisibility(true);
     }
 
 
@@ -511,6 +441,8 @@ public class MainController {
      * @param actionEvent event details
      ******************************************************/
     public void mniResumeCoding(ActionEvent actionEvent) {
+
+        guiState = GuiState.MISC_CODING;
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -531,24 +463,14 @@ public class MainController {
         filenameAudio = getUtteranceList().loadFromFile(miscFile);
         File audioFile = new File(filenameAudio);
         if (audioFile.canRead()) {
-            initializeMediaPlayer(audioFile, playerReadyToCode);
+            //initializeMediaPlayer(audioFile, playerReadyToCode);
+            initializeMediaPlayer(audioFile, playerReady);
         } else {
             showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
             return;
         }
 
 
-        // display coding file path in gui
-        lblCurMiscFile.setText(miscFile.getAbsolutePath());
-
-        // reset some utterance accounting
-        resetUtteranceCoding();
-
-        // activate the timeline display
-        snTimeline.setContent(new Timeline(this));
-
-        // display controls needed for coding
-        setMiscCodingControlVisibility(true);
     }
 
 
@@ -576,8 +498,9 @@ public class MainController {
         }
 
         double sec = totalDuration.multiply(sldSeek.getValue()).toSeconds();
-        System.out.println("time:"+sec);
-        System.out.println( "bytes:" + (int)(sec * getBytesPerSecond()) );
+        //System.out.println("time:"+sec);
+        //System.out.println( "bytes:" + (int)(sec * getBytesPerSecond()) );
+
     }
 
 
@@ -659,7 +582,7 @@ public class MainController {
      * @param mediaFile media object used to initialize player
      * @param onReadyMethod once player is ready which runnable will be called
      **********************************************************************/
-    public void initializeMediaPlayer(File mediaFile, Runnable onReadyMethod) {
+    private void initializeMediaPlayer(File mediaFile, Runnable onReadyMethod) {
 
         if (mediaFile != null) {
             try {
@@ -700,20 +623,6 @@ public class MainController {
 
 
 
-                /* Listener: currentTime
-                   responsible for updating gui components with current playback position
-                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
-                 */
-                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-                    // update display of current time
-                    lblTimePos.setText(Utils.formatDuration(newValue));
-                    // update the mediaplayer slider
-                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
-                    // update the timeline
-                    updateTimeLineDisplay();
-                });
-
-
                 /* Listener: Update the media position if user is dragging the slider.
                  * Otherwise, do nothing. See sldSeekMousePressed() for when slider is clicked with mouse
                  * Seems odd to bind to valueProperty and check isValueChanging
@@ -742,6 +651,159 @@ public class MainController {
     }
 
 
+    private void initializeUserControls() {
+
+        System.out.println( String.format("%s: %s","initializeUserControls", guiState.toString() ) );
+
+        // GuiState determines action
+        switch (guiState) {
+
+            case BASE:
+
+                // hide all coding controls
+                setMiscCodingControlVisibility(false);
+
+                // TODO: move to initalize controls so that timeline is not linked to seek for base and globals? That would be one solution.
+                /* Listener: currentTime
+                   responsible for updating gui components with current playback position
+                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
+                 */
+                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                    // update display of current time
+                    lblTimePos.setText(Utils.formatDuration(newValue));
+                    // update the mediaplayer slider
+                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
+                });
+
+                // resize window
+                // TODO
+
+                // update playback controls
+                Duration onReadySeekDuration = Duration.ZERO;
+                mediaPlayer.seek(onReadySeekDuration);
+                lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
+                sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+
+                break;
+
+
+            case MISC_CODING:
+
+                // hide global coding controls
+                // TODO
+
+
+
+                // activate the timeline display
+                snTimeline.setContent(new Timeline(this));
+
+
+                /* Listener: currentTime
+                   responsible for updating gui components with current playback position
+                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
+                 */
+                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                    // update display of current time
+                    lblTimePos.setText(Utils.formatDuration(newValue));
+                    // update the mediaplayer slider
+                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
+                    // update the timeline
+                    updateTimeLineDisplay();
+                });
+
+
+
+                /***
+                 * BEGIN: initialize active utterance
+                 * we want to initialize the active utterance record to use it to resuming coding.
+                 * we do so by taking the last utterance, using its end time and end bytes as the
+                 * start time/start bytes of a new utterance.
+                 ***/
+                Utterance utterance = getCurrentUtterance();
+
+
+                int mediaplayerSeekBytes = 0;
+
+                // We expect utterances in file to be coded.  For backwards compatibility,
+                // tolerate uncoded utterances in file.
+                if( utterance != null ) {
+                    if( utterance.isCoded() ) {
+                        // Start new utterance.
+                        int 		position		= utterance.getEndBytes();
+                        String 		positionString 	= TimeCode.toString( position / getBytesPerSecond() );
+                        int         order 		  	= getUtteranceList().size();
+
+                        // create new utterance from relevant last utterance data
+                        Utterance   data		 	= new MiscDataItem( order, positionString, position );
+
+                        // add this to our utterance listing and it is our active utterance
+                        getUtteranceList().add( data );
+                        // update mediaplayer position appropriately for our now active utterance
+                        mediaplayerSeekBytes = utterance.getEndBytes();
+                    }
+                    else {
+                        // Tolerate uncoded final utterance.  Strip end data, so it is consistent
+                        // with how we treat current utterance.  NOTE: This does not check for
+                        // uncoded utterances anywhere else in file.
+                        utterance.stripEndData();
+                        // update mediaplayer position appropriately for our now active utterance
+                        mediaplayerSeekBytes = utterance.getStartBytes();
+                    }
+
+                }
+
+                /***
+                 * END: initialize active utterance
+                 ***/
+
+
+
+                double positionInSecs = mediaplayerSeekBytes/getBytesPerSecond();
+                onReadySeekDuration = Duration.seconds(positionInSecs);
+                mediaPlayer.seek(onReadySeekDuration);
+                lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
+                sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+                // update the utterance data(previous/current) displayed in the gui
+                updateUtteranceDisplays();
+                // update timeline display as player seek doesn't update correctly on reload
+                updateTimeLineDisplay();
+
+                // temp button generation
+                parseUserControls();
+
+
+
+                // enable MISC coding controls
+                // display coding file path in gui
+                lblCurMiscFile.setText(filenameMisc);
+
+                // reset some utterance accounting
+                resetUtteranceCoding();
+
+                // display controls needed for coding
+                setMiscCodingControlVisibility(true);
+
+                // resize window
+                break;
+
+
+            case GLOBAL_CODING:
+
+                // hide MISC coding controls
+
+                // enable GLOBAL coding controls
+
+                // resize window
+
+                // update control state
+
+                break;
+
+
+        }
+    }
+
+
     /**********************************************************************
      * Set mediaplayer position using bytes
      * This makes new mediaplayer compatible with legacy code
@@ -755,7 +817,6 @@ public class MainController {
         mediaPlayer.seek(Duration.seconds(positionInSecs));
         mediaPlayer.play();
     }
-
 
 
     /*******************************************************
@@ -892,7 +953,9 @@ public class MainController {
     }
 
 
-    // Undo the actions of pressing a MISC code button.
+    /********************************************************
+     * Undo the actions of pressing a MISC code button.
+     ********************************************************/
     private synchronized void uncode() {
         // Remove last utterance, if uncoded (utterance was
         // generated when user coded the second-to-last utterance).
@@ -913,7 +976,10 @@ public class MainController {
     }
 
 
-    // Save current session. Periodically also save backup copy.
+
+    /*********************************************************
+     * Save current session. Periodically also save backup copy.
+     *********************************************************/
     private synchronized void saveSession() {
         // Save normal file.
         saveCurrentTextFile( false );
@@ -924,6 +990,7 @@ public class MainController {
         }
         numSaves++;
     }
+
 
 
     private synchronized void saveCurrentTextFile( boolean asBackup ) {
@@ -952,6 +1019,7 @@ public class MainController {
             numUninterruptedUncodes = 0;
         }
     }
+
 
 
     public synchronized void handleButtonMiscCode( MiscCode miscCode ) {
