@@ -654,6 +654,7 @@ public class MainController {
     private void initializeUserControls() {
 
         System.out.println( String.format("%s: %s","initializeUserControls", guiState.toString() ) );
+        Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
         // GuiState determines action
         switch (guiState) {
@@ -683,6 +684,9 @@ public class MainController {
                 mediaPlayer.seek(onReadySeekDuration);
                 lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+
+                // resize window
+                ourTown.sizeToScene();
 
                 break;
 
@@ -784,6 +788,8 @@ public class MainController {
                 setMiscCodingControlVisibility(true);
 
                 // resize window
+                ourTown.sizeToScene();
+
                 break;
 
 
@@ -793,9 +799,10 @@ public class MainController {
 
                 // enable GLOBAL coding controls
 
-                // resize window
-
                 // update control state
+
+                // resize window
+                ourTown.sizeToScene();
 
                 break;
 
