@@ -38,6 +38,8 @@ import java.util.prefs.Preferences;
 public class MainController {
 
     @FXML
+    private Label lblAudioFilename;
+    @FXML
     private TitledPane titlePnlCodesLeft;
     @FXML
     private TitledPane titlePnlCodesRight;
@@ -593,6 +595,9 @@ public class MainController {
                 setAudioLength(mediaFile);
                 setBytesPerSecond(mediaFile);
 
+                // NEED? can use getSource()
+                //filenameAudio = mediaFile.getAbsolutePath();
+
                 /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(onReadyMethod);
 
@@ -656,6 +661,10 @@ public class MainController {
         System.out.println( String.format("%s: %s","initializeUserControls", guiState.toString() ) );
         Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
+        // common control updates
+        lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
+
+
         // GuiState determines action
         switch (guiState) {
 
@@ -675,9 +684,6 @@ public class MainController {
                     // update the mediaplayer slider
                     sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
                 });
-
-                // resize window
-                // TODO
 
                 // update playback controls
                 Duration onReadySeekDuration = Duration.ZERO;

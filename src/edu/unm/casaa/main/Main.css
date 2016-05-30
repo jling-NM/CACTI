@@ -35,3 +35,12 @@
 .btnBarPane {
     -fx-alignment: center ;
 }
+.gp-player {
+    -fx-background-color:rgba(21,27,31,0.3);
+}
+.pnVolume {
+    -fx-border-color:rgba(101,101,101,1.0);
+    -fx-border-insets: 0.1, 0.1, 0.1, 0.1;
+    -fx-background-color:rgba(201,201,201,1.0);
+    -fx-border-width: 0.5;
+}

@@ -6,9 +6,21 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
+    <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="Fixes.">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/globals/GlobalCode.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/globals/GlobalCode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeCode.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeCode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/Timeline.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/Timeline.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscCode.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscCode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscDataItem.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscDataItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateView.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateView.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/utterance/Utterance.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/utterance/Utterance.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/utterance/UtteranceList.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/utterance/UtteranceList.java" />
     </list>
     <ignored path="JavaFxApplication.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -67,96 +79,7 @@
     <favorites_list name="JavaFxApplication" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MainController.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="804" column="38" selection-start-line="804" selection-start-column="38" selection-end-line="804" selection-end-column="38" />
-              <folding>
-                <element signature="class#GuiState#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActPlayPause#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActPlayPause#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActRewind#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActRewind#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActReplay#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActUncode#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActUncode#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-                <element signature="e#8855#8940#0" expanded="false" />
-                <element signature="docComment;method#btnActCode#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActCode#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#mniActAbout#0;class#MainController#0" expanded="false" />
-                <element signature="method#mniActAbout#0;class#MainController#0" expanded="false" />
-                <element signature="e#11091#11156#0" expanded="false" />
-                <element signature="docComment;method#mniActOnlineHelp#0;class#MainController#0" expanded="false" />
-                <element signature="method#mniActExit#0;class#MainController#0" expanded="false" />
-                <element signature="e#12312#12366#0" expanded="false" />
-                <element signature="method#mniActOpenFile#0;class#MainController#0" expanded="false" />
-                <element signature="method#mniStartCoding#0;class#MainController#0" expanded="false" />
-                <element signature="method#mniResumeCoding#0;class#MainController#0" expanded="false" />
-                <element signature="e#15261#15310#0" expanded="false" />
-                <element signature="docComment;method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
-                <element signature="method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
-                <element signature="e#17174#17208#0" expanded="false" />
-                <element signature="docComment;method#selectAudioFile#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#selectMiscFile#0;class#MainController#0" expanded="false" />
-                <element signature="method#selectMiscFile#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
-                <element signature="method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
-                <element signature="e#24892#24908#0" expanded="false" />
-                <element signature="e#25411#25441#0" expanded="false" />
-                <element signature="e#26864#26938#0" expanded="false" />
-                <element signature="e#27954#28027#0" expanded="false" />
-                <element signature="e#29293#29323#0" expanded="false" />
-                <element signature="docComment;method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
-                <element signature="method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#showError#0;class#MainController#0" expanded="false" />
-                <element signature="method#showError#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#showFatalWarning#0;class#MainController#0" expanded="false" />
-                <element signature="method#showFatalWarning#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#getUtteranceList#0;class#MainController#0" expanded="false" />
-                <element signature="method#getUtteranceList#0;class#MainController#0" expanded="false" />
-                <element signature="method#getPreviousUtterance#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#setAudioLength#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#setBytesPerSecond#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#getBytesPerSecond#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#getAudioLength#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#streamPosition#0;class#MainController#0" expanded="false" />
-                <element signature="method#streamPosition#0;class#MainController#0" expanded="false" />
-                <element signature="e#35440#35491#0" expanded="false" />
-                <element signature="method#saveSession#0;class#MainController#0" expanded="false" />
-                <element signature="method#saveCurrentTextFile#0;class#MainController#0" expanded="false" />
-                <element signature="e#36761#36828#0" expanded="false" />
-                <element signature="method#incrementUncodeCount#0;class#MainController#0" expanded="false" />
-                <element signature="method#handleUserCodesParseException#0;class#MainController#0" expanded="false" />
-                <element signature="method#handleUserCodesGenericException#0;class#MainController#0" expanded="false" />
-                <element signature="method#handleUserCodesError#0;class#MainController#0" expanded="false" />
-                <element signature="method#parseUserConfig#0;class#MainController#0" expanded="false" />
-                <element signature="method#parseUserCodes#0;class#MainController#0" expanded="false" />
-                <element signature="method#parseUserGlobals#0;class#MainController#0" expanded="false" />
-                <element signature="method#parseUserGlobalsBorder#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#changeSuffix#0;class#MainController#0" expanded="false" />
-                <element signature="method#changeSuffix#0;class#MainController#0" expanded="false" />
-                <element signature="method#resetUtteranceCoding#0;class#MainController#0" expanded="false" />
-                <element signature="e#45214#45271#0" expanded="false" />
-                <element signature="docComment;method#updateUtteranceDisplays#0;class#MainController#0" expanded="false" />
-                <element signature="e#47139#47165#0" expanded="false" />
-                <element signature="e#47268#47271#0" expanded="false" />
-                <element signature="method#setMiscCodingControlVisibility#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#parseUserControls#0;class#MainController#0" expanded="false" />
-                <element signature="method#parseUserControls#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#parseControlColumn#0;class#MainController#0" expanded="false" />
-                <element signature="method#parseControlColumn#0;class#MainController#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -173,12 +96,23 @@
     </FindUsagesManager>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="josef ling" />
+      </list>
+    </option>
     <option name="UPDATE_TYPE" value="MERGE" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="master" />
       </map>
+    </option>
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--follow-tags" />
+        <option name="title" value="Current Branch" />
+      </GitPushTagMode>
     </option>
   </component>
   <component name="GradleLocalSettings">
@@ -201,20 +135,22 @@
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/strings_en.properties" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/edu.unm.casaa.main/Main.java" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/edu.unm.casaa.main/Main.fxml" />
-        <option value="$PROJECT_DIR$/src/strings_en_US.properties" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/NewUtils" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Utils.java" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscCode.java" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/OldControllerAction.java" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/OldController.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/globals/GlobalCode.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateView.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeCode.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Utils.java" />
+        <option value="$PROJECT_DIR$/src/strings_en_US.properties" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Timeline.java" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" />
-        <option value="$PROJECT_DIR$/fromlinux.userConfiguration.xml" />
-        <option value="$PROJECT_DIR$/userConfiguration.xml" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java" />
+        <option value="$PROJECT_DIR$/userConfiguration.xml" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscCode.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscDataItem.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
       </list>
     </option>
@@ -222,7 +158,7 @@
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds">
     <option name="width" value="1280" />
-    <option name="height" value="800" />
+    <option name="height" value="774" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -232,12 +168,18 @@
             <id />
           </State>
           <State>
+            <id>Java</id>
+          </State>
+          <State>
+            <id>Javadoc issuesJava</id>
+          </State>
+          <State>
             <id>Spelling</id>
           </State>
         </expanded-state>
         <selected-state>
           <State>
-            <id>SpellCheckingInspection</id>
+            <id>JavaDoc</id>
           </State>
         </selected-state>
       </profile-state>
@@ -270,83 +212,67 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
-      <pane id="ProjectPane">
-        <subPane>
+      <pane id="Scope">
+        <subPane subId="Default">
           <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="cacti2">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="src">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="edu/unm/casaa">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            <PATH_ELEMENT USER_OBJECT="cacti2">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            <PATH_ELEMENT USER_OBJECT="src">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            <PATH_ELEMENT USER_OBJECT="edu/unm/casaa">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            <PATH_ELEMENT USER_OBJECT="main">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="casaa" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cacti2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="casaa" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            <PATH_ELEMENT USER_OBJECT="cacti2">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="PackagesPane" />
+      <pane id="Scratches">
+        <subPane />
+      </pane>
+      <pane id="ProjectPane">
+        <subPane />
+      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -360,12 +286,12 @@
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="dynamic.classpath" value="false" />
     <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/fromlinux.userConfiguration.xml" />
-    <property name="settings.editor.selected.configurable" value="Errors" />
-    <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/userConfiguration.xml" />
+    <property name="settings.editor.selected.configurable" value="project.propCompiler" />
+    <property name="settings.editor.splitter.proportion" value="0.2679097" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="235" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="245" />
@@ -382,13 +308,126 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1160" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
-    <property name="FullScreen" value="true" />
+    <property name="full.screen.before.presentation.mode" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/src/edu/unm/casaa/main" />
     </key>
+  </component>
+  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
+    <UpdatedFiles>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Updated from server" />
+        <option name="myStatusName" value="Changed on server" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="CHANGED_ON_SERVER" />
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated" />
+          <option name="myStatusName" value="Changed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UPDATED" />
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/misc.xml</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/workspace.xml</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/cacti2.iml</PATH>
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java</PATH>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Created" />
+          <option name="myStatusName" value="Created" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CREATED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Deleted" />
+          <option name="myStatusName" value="Deleted" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="true" />
+          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Restored" />
+          <option name="myStatusName" value="Will be restored" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="RESTORED" />
+        </FILE-GROUP>
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Modified" />
+        <option name="myStatusName" value="Modified" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MODIFIED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Skipped" />
+        <option name="myStatusName" value="Skipped" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SKIPPED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with conflicts" />
+        <option name="myStatusName" value="Will be merged with conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_CONFLICTS" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with tree conflicts" />
+        <option name="myStatusName" value="Merged with tree conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with property conflicts" />
+        <option name="myStatusName" value="Will be merged with property conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged" />
+        <option name="myStatusName" value="Will be merged" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Not in repository" />
+        <option name="myStatusName" value="Not in repository" />
+        <option name="mySupportsDeletion" value="true" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="UNKNOWN" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally added" />
+        <option name="myStatusName" value="Locally added" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_ADDED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally removed" />
+        <option name="myStatusName" value="Locally removed" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_REMOVED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Switched" />
+        <option name="myStatusName" value="Switched" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SWITCHED" />
+      </FILE-GROUP>
+    </UpdatedFiles>
   </component>
   <component name="RunManager" selected="Application.Main">
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -413,22 +452,6 @@
       <option name="PASS_PARENT_ENVS" value="true" />
       <module name="" />
       <envs />
-      <method />
-    </configuration>
-    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list />
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
       <method />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
@@ -491,31 +514,6 @@
       <option name="ENV_VARIABLES" />
       <option name="PASS_PARENT_ENVS" value="true" />
       <module name="" />
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="cacti2" />
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="filePath" />
-      <option name="vmParameters" />
-      <option name="alternativeJrePath" />
-      <option name="programParameters" />
-      <option name="passParentEnvs" value="true" />
-      <option name="workingDirectory" />
-      <option name="isAlternativeJrePathEnabled" value="false" />
       <envs />
       <method />
     </configuration>
@@ -583,22 +581,6 @@
       <listeners />
       <method />
     </configuration>
-    <configuration default="true" type="XSLT" factoryName="XSLT">
-      <option name="myOutputFile" />
-      <option name="myOpenOutputFile" value="false" />
-      <option name="myOpenInBrowser" value="false" />
-      <option name="mySmartErrorHandling" value="true" />
-      <option name="myRunnerPort" value="34873" />
-      <option name="myVmArguments" />
-      <option name="myWorkingDirectory" />
-      <option name="myModule" />
-      <option name="myJdk" />
-      <parameters />
-      <OutputType value="CONSOLE" save-to-file="false" />
-      <FileType name="XML" />
-      <JdkChoice value="FROM_MODULE" />
-      <method />
-    </configuration>
     <configuration default="false" name="Main" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -610,7 +592,7 @@
       <option name="VM_PARAMETERS" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="ALTERNATIVE_JRE_PATH" value="$USER_HOME$/apps/jdk1.8.0_74/jre" />
       <option name="ENABLE_SWING_INSPECTOR" value="false" />
       <option name="ENV_VARIABLES" />
@@ -689,66 +671,134 @@
       <option name="project" value="LOCAL" />
       <updated>1457989287935</updated>
     </task>
-    <task id="LOCAL-00007" summary="Looking at OSX.">
-      <created>1464242763982</created>
+    <task id="LOCAL-00007" summary="MediaPlayer complete though layout is still rough.">
+      <created>1463034542243</created>
       <option name="number" value="00007" />
       <option name="presentableId" value="LOCAL-00007" />
       <option name="project" value="LOCAL" />
-      <updated>1464242763982</updated>
+      <updated>1463034542243</updated>
     </task>
-    <task id="LOCAL-00008" summary="Figured out config read errors and added path persistence.">
-      <created>1464378559302</created>
+    <task id="LOCAL-00008" summary="Integrating old code well underway.">
+      <created>1463455664690</created>
       <option name="number" value="00008" />
       <option name="presentableId" value="LOCAL-00008" />
       <option name="project" value="LOCAL" />
-      <updated>1464378559302</updated>
+      <updated>1463455664690</updated>
     </task>
-    <task id="LOCAL-00009" summary="Improved state management by making it clearer and code less redundant.">
-      <created>1464480952405</created>
+    <task id="LOCAL-00009" summary="Integrating old code; Resume Coding.">
+      <created>1463728826547</created>
       <option name="number" value="00009" />
       <option name="presentableId" value="LOCAL-00009" />
       <option name="project" value="LOCAL" />
-      <updated>1464480952405</updated>
+      <updated>1463728826547</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Integrating old code; Most MISC functionality implemented.">
+      <created>1463893252479</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1463893252479</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Integrating old code; Work on MISC button panels.">
+      <created>1464050866861</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1464050866861</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Integrating old code; Work on MISC button panels.">
+      <created>1464052000810</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1464052000810</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Fixes.">
+      <created>1464420910376</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1464420910376</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
     <option name="totallyTimeSpent" value="1302000" />
   </component>
+  <component name="TodoView" selected-index="3">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1280" height="774" extended-state="6" />
+    <editor active="false" />
     <layout>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32650274" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32786885" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32957748" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32656023" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32650274" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28551912" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329235" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3352685" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28447026" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22940226" sideWeight="0.6703755" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3069467" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32956383" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30874318" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26332796" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3773585" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32957748" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4492958" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30546874" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40497077" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28654972" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2296875" sideWeight="0.6703755" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -763,26 +813,30 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="Add text resource bundles for layout." />
     <MESSAGE value="Completed layout and strings resources." />
     <MESSAGE value="Add application preferences." />
     <MESSAGE value="Main Controller event modelling." />
-    <MESSAGE value="Looking at OSX." />
-    <MESSAGE value="Figured out config read errors and added path persistence." />
-    <MESSAGE value="Improved state management by making it clearer and code less redundant." />
-    <option name="LAST_COMMIT_MESSAGE" value="Improved state management by making it clearer and code less redundant." />
+    <MESSAGE value="MediaPlayer complete though layout is still rough." />
+    <MESSAGE value="Integrating old code well underway." />
+    <MESSAGE value="Integrating old code; Resume Coding." />
+    <MESSAGE value="Integrating old code; Most MISC functionality implemented." />
+    <MESSAGE value="Integrating old code; Work on MISC button panels." />
+    <MESSAGE value="Fixes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixes." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java</url>
-          <line>1036</line>
+          <url>file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateView.java</url>
+          <line>299</line>
           <properties />
-          <option name="timeStamp" value="30" />
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="31" />
+      <option name="time" value="71" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -791,84 +845,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1080">
-          <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="990">
-          <caret line="55" column="40" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1080">
-          <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="990">
-          <caret line="55" column="40" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Utils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1080">
@@ -994,98 +970,181 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/strings_fr.properties" />
-    <entry file="file://$PROJECT_DIR$/src/strings_en_US.properties">
-      <provider editor-type-id="ResourceBundle">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="17" column="137" selection-start-line="17" selection-start-column="137" selection-end-line="17" selection-end-column="137" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/NewUtils" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateUiService.java" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/OldControllerAction.java" />
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Timeline.java" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TemplateUiService.java" />
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java" />
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateView.java" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/OldController.java" />
-    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/javafx-src.zip!/javafx/beans/value/ChangeListener.java" />
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css">
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/javafx-src.zip!/javafx/beans/value/ChangeListener.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="1" selection-start-line="0" selection-start-column="0" selection-end-line="24" selection-end-column="1" />
+        <state relative-caret-position="315">
+          <caret line="62" column="9" selection-start-line="62" selection-start-column="9" selection-end-line="62" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/globals/GlobalDataModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/globals/GlobalTemplateView.java" />
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/globals/GlobalTemplateUiService.java" />
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Version.java" />
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Style.java" />
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="314" column="0" selection-start-line="314" selection-start-column="0" selection-end-line="314" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#3786#3806#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/globals/GlobalCode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="48" column="31" selection-start-line="48" selection-start-column="29" selection-end-line="48" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="15" column="10" selection-start-line="15" selection-start-column="10" selection-end-line="15" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/src.zip!/org/xml/sax/InputSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="119" column="0" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/javafx-src.zip!/javafx/event/Event.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="198" column="0" selection-start-line="198" selection-start-column="0" selection-end-line="198" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/javafx-src.zip!/javafx/scene/Scene.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="2494" column="0" selection-start-line="2494" selection-start-column="0" selection-end-line="2494" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/javafx-src.zip!/javafx/scene/control/MenuItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="462" column="0" selection-start-line="462" selection-start-column="0" selection-end-line="462" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeCode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="23" column="13" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/javafx-src.zip!/javafx/scene/media/MediaPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="732" column="0" selection-start-line="732" selection-start-column="0" selection-end-line="732" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Utils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
+        <state relative-caret-position="252">
+          <caret line="14" column="40" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="40" />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/javafx-src.zip!/com/sun/javafx/binding/ExpressionHelper.java">
+    <entry file="file://$PROJECT_DIR$/src/strings_en_US.properties">
+      <provider editor-type-id="ResourceBundle">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="181" column="0" selection-start-line="181" selection-start-column="0" selection-end-line="181" selection-end-column="0" />
+        <state relative-caret-position="324">
+          <caret line="24" column="29" selection-start-line="24" selection-start-column="29" selection-end-line="24" selection-end-column="29" />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/javafx-src.zip!/javafx/embed/swing/SwingNode.java">
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_74/javafx-src.zip!/javafx/fxml/FXMLLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="141">
-          <caret line="202" column="0" selection-start-line="202" selection-start-column="0" selection-end-line="202" selection-end-column="0" />
-          <folding>
-            <element signature="e#6542#6543#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscCode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="48" column="46" selection-start-line="48" selection-start-column="46" selection-end-line="48" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/javafx-src.zip!/javafx/scene/control/MenuItem.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="462" column="0" selection-start-line="462" selection-start-column="0" selection-end-line="462" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/javafx-src.zip!/javafx/event/Event.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="569">
-          <caret line="197" column="0" selection-start-line="197" selection-start-column="0" selection-end-line="197" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/javafx-src.zip!/javafx/fxml/FXMLLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
+        <state relative-caret-position="234">
           <caret line="1772" column="0" selection-start-line="1772" selection-start-column="0" selection-end-line="1772" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/userConfiguration.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="1340" selection-start-line="0" selection-start-column="1340" selection-end-line="0" selection-end-column="1340" />
+        <state relative-caret-position="424">
+          <caret line="106" column="7" selection-start-line="106" selection-start-column="7" selection-end-line="106" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/apps/jdk1.8.0_91/javafx-src.zip!/javafx/fxml/FXMLLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="134">
+          <caret line="1768" column="0" selection-start-line="1768" selection-start-column="0" selection-end-line="1768" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/utterance/UtteranceList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="134">
+          <caret line="124" column="18" selection-start-line="124" selection-start-column="18" selection-end-line="124" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/utterance/Utterance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="366">
+          <caret line="53" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Timeline.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="134">
+          <caret line="156" column="0" selection-start-line="156" selection-start-column="0" selection-end-line="156" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscCode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1062">
+          <caret line="81" column="67" selection-start-line="81" selection-start-column="67" selection-end-line="81" selection-end-column="67" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscDataItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="182" column="90" selection-start-line="182" selection-start-column="90" selection-end-line="182" selection-end-column="90" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="469">
+          <caret line="65" column="10" selection-start-line="65" selection-start-column="10" selection-end-line="65" selection-end-column="10" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fromlinux.userConfiguration.xml" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="271" column="35" selection-start-line="271" selection-start-column="35" selection-end-line="271" selection-end-column="35" />
+        <state relative-caret-position="144">
+          <caret line="136" column="56" selection-start-line="136" selection-start-column="56" selection-end-line="136" selection-end-column="56" />
           <folding />
         </state>
       </provider>
@@ -1093,104 +1152,19 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="32" column="9" selection-start-line="32" selection-start-column="9" selection-end-line="32" selection-end-column="9" />
+        <state relative-caret-position="353">
+          <caret line="597" column="32" selection-start-line="597" selection-start-column="32" selection-end-line="597" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/jre/lib/rt.jar!/com/apple/eawt/_AppEventHandler.class">
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="74" column="57" selection-start-line="74" selection-start-column="57" selection-end-line="74" selection-end-column="57" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="804" column="38" selection-start-line="804" selection-start-column="38" selection-end-line="804" selection-end-column="38" />
-          <folding>
-            <element signature="class#GuiState#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#btnActPlayPause#0;class#MainController#0" expanded="false" />
-            <element signature="method#btnActPlayPause#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#btnActRewind#0;class#MainController#0" expanded="false" />
-            <element signature="method#btnActRewind#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#btnActReplay#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#btnActUncode#0;class#MainController#0" expanded="false" />
-            <element signature="method#btnActUncode#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
-            <element signature="method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-            <element signature="method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-            <element signature="e#8855#8940#0" expanded="false" />
-            <element signature="docComment;method#btnActCode#0;class#MainController#0" expanded="false" />
-            <element signature="method#btnActCode#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#mniActAbout#0;class#MainController#0" expanded="false" />
-            <element signature="method#mniActAbout#0;class#MainController#0" expanded="false" />
-            <element signature="e#11091#11156#0" expanded="false" />
-            <element signature="docComment;method#mniActOnlineHelp#0;class#MainController#0" expanded="false" />
-            <element signature="method#mniActExit#0;class#MainController#0" expanded="false" />
-            <element signature="e#12312#12366#0" expanded="false" />
-            <element signature="method#mniActOpenFile#0;class#MainController#0" expanded="false" />
-            <element signature="method#mniStartCoding#0;class#MainController#0" expanded="false" />
-            <element signature="method#mniResumeCoding#0;class#MainController#0" expanded="false" />
-            <element signature="e#15261#15310#0" expanded="false" />
-            <element signature="docComment;method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
-            <element signature="method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
-            <element signature="e#17174#17208#0" expanded="false" />
-            <element signature="docComment;method#selectAudioFile#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#selectMiscFile#0;class#MainController#0" expanded="false" />
-            <element signature="method#selectMiscFile#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
-            <element signature="method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
-            <element signature="e#24892#24908#0" expanded="false" />
-            <element signature="e#25411#25441#0" expanded="false" />
-            <element signature="e#26864#26938#0" expanded="false" />
-            <element signature="e#27954#28027#0" expanded="false" />
-            <element signature="e#29293#29323#0" expanded="false" />
-            <element signature="docComment;method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
-            <element signature="method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#showError#0;class#MainController#0" expanded="false" />
-            <element signature="method#showError#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#showFatalWarning#0;class#MainController#0" expanded="false" />
-            <element signature="method#showFatalWarning#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#getUtteranceList#0;class#MainController#0" expanded="false" />
-            <element signature="method#getUtteranceList#0;class#MainController#0" expanded="false" />
-            <element signature="method#getPreviousUtterance#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#setAudioLength#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#setBytesPerSecond#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#getBytesPerSecond#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#getAudioLength#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#streamPosition#0;class#MainController#0" expanded="false" />
-            <element signature="method#streamPosition#0;class#MainController#0" expanded="false" />
-            <element signature="e#35440#35491#0" expanded="false" />
-            <element signature="method#saveSession#0;class#MainController#0" expanded="false" />
-            <element signature="method#saveCurrentTextFile#0;class#MainController#0" expanded="false" />
-            <element signature="e#36761#36828#0" expanded="false" />
-            <element signature="method#incrementUncodeCount#0;class#MainController#0" expanded="false" />
-            <element signature="method#handleUserCodesParseException#0;class#MainController#0" expanded="false" />
-            <element signature="method#handleUserCodesGenericException#0;class#MainController#0" expanded="false" />
-            <element signature="method#handleUserCodesError#0;class#MainController#0" expanded="false" />
-            <element signature="method#parseUserConfig#0;class#MainController#0" expanded="false" />
-            <element signature="method#parseUserCodes#0;class#MainController#0" expanded="false" />
-            <element signature="method#parseUserGlobals#0;class#MainController#0" expanded="false" />
-            <element signature="method#parseUserGlobalsBorder#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#changeSuffix#0;class#MainController#0" expanded="false" />
-            <element signature="method#changeSuffix#0;class#MainController#0" expanded="false" />
-            <element signature="method#resetUtteranceCoding#0;class#MainController#0" expanded="false" />
-            <element signature="e#45214#45271#0" expanded="false" />
-            <element signature="docComment;method#updateUtteranceDisplays#0;class#MainController#0" expanded="false" />
-            <element signature="e#47139#47165#0" expanded="false" />
-            <element signature="e#47268#47271#0" expanded="false" />
-            <element signature="method#setMiscCodingControlVisibility#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#parseUserControls#0;class#MainController#0" expanded="false" />
-            <element signature="method#parseUserControls#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#parseControlColumn#0;class#MainController#0" expanded="false" />
-            <element signature="method#parseControlColumn#0;class#MainController#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="302">
+          <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1236,7 +1210,7 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.8</last-edited>
+          <last-edited>Oracle JDK 1.8_91</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -1253,6 +1227,7 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>
@@ -1260,7 +1235,6 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>aquafx-0.1</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
