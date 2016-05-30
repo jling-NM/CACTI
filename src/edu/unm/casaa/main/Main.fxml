@@ -29,10 +29,14 @@
       <menus>
         <Menu fx:id="mnuFile" text="%menu.title.file">
           <items>
-            <MenuItem fx:id="mniLoad" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load">
+            <MenuItem fx:id="mniLoadAudio" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load.audio">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="F" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
+              <MenuItem fx:id="mniLoadCasaa" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.file.load.casaa">
+                  <accelerator>
+                      <KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                  </accelerator></MenuItem>
             <MenuItem fx:id="mniExit" onAction="#mniActExit" text="%menu.title.file.exit">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
