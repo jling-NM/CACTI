@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.embed.swing.SwingNode?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<AnchorPane fx:id="pnCoding" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+   <children>
+      <VBox fx:id="vbPnlMiscCoding" prefHeight="258.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <TitledPane fx:id="pnlTimeline" animated="false" collapsible="false" prefHeight="90.0" text="%pnl.title.timeline">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <SwingNode fx:id="snTimeline" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </TitledPane>
+            <HBox alignment="CENTER_LEFT" prefHeight="30.0">
+               <children>
+                  <Button fx:id="btnStartCoding" mnemonicParsing="false" onAction="#btnActStartCoding" text="%btn.startCoding">
+                     <tooltip>
+                        <Tooltip text="%btn.tt.startCoding" />
+                     </tooltip>
+                  </Button>
+                  <Label fx:id="lblCurMiscFile" text="">
+                     <padding>
+                        <Insets left="12.0" />
+                     </padding>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </HBox>
+            <TitledPane fx:id="pnlPrevUtr" animated="false" collapsible="false" prefHeight="60.0" text="%pnl.title.prevUtr">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lblPrevUtr" prefHeight="48.0" prefWidth="620.0" text="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </TitledPane>
+            <TitledPane fx:id="pnlCurUtr" animated="false" collapsible="false" prefHeight="60.0" text="%pnl.title.currUtr">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="48.0" prefWidth="620.0" spacing="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <Label text="%lbl.enumeration" />
+                              <Label fx:id="lblCurUtrEnum" text="">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </Label>
+                              <Label text="%lbl.miscCode">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label fx:id="lblCurUtrCode" layoutX="94.0" layoutY="10.0" text="" />
+                              <Label text="%lbl.miscStartTime">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label fx:id="lblCurUtrStartTime" text="" />
+                              <Label text="%lbl.miscEndTime">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label fx:id="lblCurUtrEndTime" layoutX="94.0" layoutY="10.0" text="" />
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </HBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+               <VBox.margin>
+                  <Insets bottom="2.0" />
+               </VBox.margin>
+            </TitledPane>
+            <HBox VBox.vgrow="ALWAYS">
+               <children>
+                  <TitledPane fx:id="titlePnlCodesLeft" animated="false" collapsible="false" text="" HBox.hgrow="ALWAYS">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane fx:id="pnlCodesLeft" hgap="4.0" prefHeight="180.0" prefWidth="307.0" vgap="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                     <HBox.margin>
+                        <Insets right="2.0" />
+                     </HBox.margin>
+                  </TitledPane>
+                  <TitledPane fx:id="titlePnlCodesRight" animated="false" collapsible="false" text="" HBox.hgrow="ALWAYS">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane fx:id="pnlCodesRight" hgap="4.0" prefHeight="180.0" prefWidth="307.0" vgap="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                     <HBox.margin>
+                        <Insets left="2.0" />
+                     </HBox.margin>
+                  </TitledPane>
+               </children>
+            </HBox>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets left="12.0" right="12.0" top="12.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>
