@@ -105,6 +105,7 @@ public class MainController {
     private String filenameMisc          = null;			    // CASAA file.
     private String filenameGlobals       = null;
     private String filenameAudio         = null;
+    private File currentAudioFile        = null;
     private UtteranceList utteranceList  = null;
 
     // TODO: if needed move to string resource
@@ -410,11 +411,15 @@ public class MainController {
             mediaPlayer.pause();
         }
 
-        // Select audio file.
-        File audioFile = selectAudioFile();
-        if( audioFile == null )
-            return;
-        filenameAudio = audioFile.getAbsolutePath();
+        File audioFile = currentAudioFile;
+        // to we have an audio file already?
+        if( audioFile == null ) {
+            // Select audio file.
+            audioFile = selectAudioFile();
+            if( audioFile == null )
+                return;
+            filenameAudio = audioFile.getAbsolutePath();
+        }
 
         // reset utteranceList to start fresh
         utteranceList = null;
@@ -422,6 +427,9 @@ public class MainController {
         // Default casaa filename to match audio file, with .casaa suffix.
         String newFileName = changeSuffix( audioFile.getName(), "casaa" );
         File miscFile = selectMiscFile(newFileName);
+        if( miscFile == null ) {
+            return;
+        }
         filenameMisc = miscFile.getAbsolutePath();
 
         if (audioFile.canRead()) {
@@ -531,6 +539,7 @@ public class MainController {
         // persist path for next time
         if( selectedFile != null) {
             appPrefs.put("lastAudioPath", selectedFile.getParent());
+            currentAudioFile = selectedFile;
         }
 
         return selectedFile;
@@ -671,13 +680,12 @@ public class MainController {
             case BASE:
 
                 // hide all coding controls
-                setMiscCodingControlVisibility(false);
+                //setMiscCodingControlVisibility(false);
 
-                // TODO: move to initalize controls so that timeline is not linked to seek for base and globals? That would be one solution.
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
                    because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
-                 */
+                   NOTE: this version does not update a timeline */
                 mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
                     // update display of current time
                     lblTimePos.setText(Utils.formatDuration(newValue));
@@ -690,6 +698,9 @@ public class MainController {
                 mediaPlayer.seek(onReadySeekDuration);
                 lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+
+                // buttons available in button bar change as a function of state.
+                apBtnBar.autosize();
 
                 // resize window
                 ourTown.sizeToScene();
@@ -773,11 +784,14 @@ public class MainController {
                 mediaPlayer.seek(onReadySeekDuration);
                 lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
-                // update the utterance data(previous/current) displayed in the gui
-                updateUtteranceDisplays();
+
                 // update timeline display as player seek doesn't update correctly on reload
                 updateTimeLineDisplay();
 
+                // update the utterance data(previous/current) displayed in the gui
+                updateUtteranceDisplays();
+
+                // TODO: is this temp anymore?
                 // temp button generation
                 parseUserControls();
 
@@ -791,8 +805,10 @@ public class MainController {
                 resetUtteranceCoding();
 
                 // display controls needed for coding
-                setMiscCodingControlVisibility(true);
+                //setMiscCodingControlVisibility(true);
 
+                // buttons available in button bar change as a function of state.
+                apBtnBar.autosize();
                 // resize window
                 ourTown.sizeToScene();
 
@@ -807,6 +823,8 @@ public class MainController {
 
                 // update control state
 
+                // buttons available in button bar change as a function of state.
+                apBtnBar.autosize();
                 // resize window
                 ourTown.sizeToScene();
 
@@ -1279,6 +1297,7 @@ public class MainController {
     }
 
 
+    // TODO: functionality here should move to initUserControls
     private void setMiscCodingControlVisibility(boolean controlVisibility) {
         btnReplay.setVisible(controlVisibility);
         btnUncode.setVisible(controlVisibility);

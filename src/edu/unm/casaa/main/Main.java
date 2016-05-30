@@ -46,14 +46,6 @@ public class Main extends Application {
         // store reference
         mainStage = primaryStage;
 
-        /*
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        Locale locale = new Locale("en", "US");
-        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
-        Parent root = fxmlLoader.load(getClass().getResource("Main.fxml"), resourceStrings);
-        */
-
-
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Main.fxml"), resourceStrings);
@@ -65,8 +57,8 @@ public class Main extends Application {
         // main window position and size from preferences
         double windX = appPrefs.getDouble("main.wind.x", 0.0);
         double windY = appPrefs.getDouble("main.wind.y", 0.0);
-        double windH = appPrefs.getDouble("main.wind.h", 400.0);
-        double windW = appPrefs.getDouble("main.wind.w", 600.0);
+        double windH = appPrefs.getDouble("main.wind.h", 0.0);
+        double windW = appPrefs.getDouble("main.wind.w", 0.0);
         mainStage.setX(windX);
         mainStage.setY(windY);
         mainStage.setHeight(windH);
