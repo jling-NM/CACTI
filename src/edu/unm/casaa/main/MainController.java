@@ -10,10 +10,15 @@ import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
@@ -27,6 +32,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -37,6 +43,8 @@ import java.util.prefs.Preferences;
 
 public class MainController {
 
+    @FXML
+    private VBox vbApp;
     @FXML
     private Label lblAudioFilename;
     @FXML
@@ -708,12 +716,26 @@ public class MainController {
                 break;
 
 
+            case PLAYBACK:
+                break;
+
+
             case MISC_CODING:
 
-                // hide global coding controls
-                // TODO
+                // destroy global coding controls
+                if( vbApp.getChildren().size() == 4) {
+                    vbApp.getChildren().remove(4);
+                }
 
-
+                Locale locale = new Locale("en", "US");
+                ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("Coding.fxml"), resourceStrings);
+                loader.setController(this);
+                try {
+                    vbApp.getChildren().add(loader.load());
+                } catch (IOException ex) {
+                    System.out.println(ex);
+                }
 
                 // activate the timeline display
                 snTimeline.setContent(new Timeline(this));
@@ -795,6 +817,10 @@ public class MainController {
                 // temp button generation
                 parseUserControls();
 
+                // TODO: get this to work
+                pnlCodesLeft.autosize();
+                titlePnlCodesLeft.getContent().autosize();
+                titlePnlCodesLeft.autosize();
 
 
                 // enable MISC coding controls
@@ -809,6 +835,8 @@ public class MainController {
 
                 // buttons available in button bar change as a function of state.
                 apBtnBar.autosize();
+                vbApp.autosize();
+
                 // resize window
                 ourTown.sizeToScene();
 
@@ -1363,6 +1391,7 @@ public class MainController {
                     } else {
                         parseControlColumn( node, gridpane );
                         titledpane.setText(panelLabel);
+                        //titledpane.getContent().autosize();
                     }
 
                 }

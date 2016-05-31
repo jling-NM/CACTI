@@ -11,12 +11,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<AnchorPane fx:id="pnCoding" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<AnchorPane fx:id="pnCoding" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox fx:id="vbPnlMiscCoding" prefHeight="258.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <TitledPane fx:id="pnlTimeline" animated="false" collapsible="false" prefHeight="90.0" text="%pnl.title.timeline">
+            <TitledPane fx:id="pnlTimeline" animated="false" collapsible="false" minHeight="90.0" minWidth="200.0" prefHeight="90.0" text="%pnl.title.timeline">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -42,7 +41,7 @@
                   <Insets top="10.0" />
                </VBox.margin>
             </HBox>
-            <TitledPane fx:id="pnlPrevUtr" animated="false" collapsible="false" prefHeight="60.0" text="%pnl.title.prevUtr">
+            <TitledPane fx:id="pnlPrevUtr" animated="false" collapsible="false" minHeight="60.0" prefHeight="60.0" text="%pnl.title.prevUtr">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -51,7 +50,7 @@
                   </AnchorPane>
               </content>
             </TitledPane>
-            <TitledPane fx:id="pnlCurUtr" animated="false" collapsible="false" prefHeight="60.0" text="%pnl.title.currUtr">
+            <TitledPane fx:id="pnlCurUtr" animated="false" collapsible="false" minHeight="60.0" prefHeight="60.0" text="%pnl.title.currUtr">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -95,7 +94,7 @@
             </TitledPane>
             <HBox VBox.vgrow="ALWAYS">
                <children>
-                  <TitledPane fx:id="titlePnlCodesLeft" animated="false" collapsible="false" text="" HBox.hgrow="ALWAYS">
+                  <TitledPane fx:id="titlePnlCodesLeft" animated="false" collapsible="false" minHeight="100.0" text="" HBox.hgrow="ALWAYS">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -107,7 +106,7 @@
                         <Insets right="2.0" />
                      </HBox.margin>
                   </TitledPane>
-                  <TitledPane fx:id="titlePnlCodesRight" animated="false" collapsible="false" text="" HBox.hgrow="ALWAYS">
+                  <TitledPane fx:id="titlePnlCodesRight" animated="false" collapsible="false" minHeight="100.0" text="" HBox.hgrow="ALWAYS">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
