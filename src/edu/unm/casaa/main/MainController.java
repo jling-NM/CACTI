@@ -44,6 +44,10 @@ import java.util.prefs.Preferences;
 public class MainController {
 
     @FXML
+    private AnchorPane anchPnlCodesLeft;
+
+
+    @FXML
     private VBox vbApp;
     @FXML
     private Label lblAudioFilename;
@@ -116,15 +120,12 @@ public class MainController {
     private File currentAudioFile        = null;
     private UtteranceList utteranceList  = null;
 
-    // TODO: if needed move to string resource
-    private String globalsLabel          = "Global Ratings";    // Label for global template view.
 
-
-    public enum  GuiState {
+    private enum  GuiState {
         BASE, PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
 
-    private GuiState guiState;                                          // for referencing state
+    private GuiState guiState;                                  // for referencing state
 
 
 
@@ -460,7 +461,7 @@ public class MainController {
      ******************************************************/
     public void mniResumeCoding(ActionEvent actionEvent) {
 
-        guiState = GuiState.MISC_CODING;
+        this.guiState = GuiState.MISC_CODING;
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -481,7 +482,6 @@ public class MainController {
         filenameAudio = getUtteranceList().loadFromFile(miscFile);
         File audioFile = new File(filenameAudio);
         if (audioFile.canRead()) {
-            //initializeMediaPlayer(audioFile, playerReadyToCode);
             initializeMediaPlayer(audioFile, playerReady);
         } else {
             showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
@@ -492,6 +492,30 @@ public class MainController {
     }
 
 
+    public void mniGlobalScoring(ActionEvent actionEvent) {
+
+        guiState = GuiState.GLOBAL_CODING;
+
+        // this something be playing, stop it
+        if(mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+
+        File audioFile = currentAudioFile;
+        // to we have an audio file already?
+        if( audioFile == null ) {
+            // Select audio file.
+            audioFile = selectAudioFile();
+            if( audioFile == null )
+                return;
+            filenameAudio = audioFile.getAbsolutePath();
+        }
+
+
+        // TODO: global filenaming and initializations
+
+
+    }
 
     /**********************************************************************
      * sldSeek mouse event:
@@ -681,14 +705,19 @@ public class MainController {
         // common control updates
         lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
 
+        // destroy coding controls
+        if( vbApp.getChildren().size() == 4) {
+            vbApp.getChildren().remove(3);
+        }
+
+        Locale locale = new Locale("en", "US");
+        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+        FXMLLoader loader;
 
         // GuiState determines action
         switch (guiState) {
 
             case BASE:
-
-                // hide all coding controls
-                //setMiscCodingControlVisibility(false);
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -707,6 +736,14 @@ public class MainController {
                 lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
 
+                // display controls needed for coding
+                btnReplay.setMinWidth(0.0);
+                btnReplay.setVisible(false);
+                btnUncode.setMinWidth(0.0);
+                btnUncode.setVisible(false);
+                btnUncodeReplay.setMinWidth(0.0);
+                btnUncodeReplay.setVisible(false);
+
                 // buttons available in button bar change as a function of state.
                 apBtnBar.autosize();
 
@@ -722,24 +759,20 @@ public class MainController {
 
             case MISC_CODING:
 
-                // destroy global coding controls
-                if( vbApp.getChildren().size() == 4) {
-                    vbApp.getChildren().remove(4);
-                }
-
-                Locale locale = new Locale("en", "US");
-                ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("Coding.fxml"), resourceStrings);
+                loader = new FXMLLoader(getClass().getResource("Coding.fxml"), resourceStrings);
                 loader.setController(this);
+
                 try {
                     vbApp.getChildren().add(loader.load());
+                    // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
+                    // Therefore, i reset it.
+                    guiState = GuiState.MISC_CODING;
                 } catch (IOException ex) {
                     System.out.println(ex);
                 }
 
                 // activate the timeline display
                 snTimeline.setContent(new Timeline(this));
-
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -813,17 +846,9 @@ public class MainController {
                 // update the utterance data(previous/current) displayed in the gui
                 updateUtteranceDisplays();
 
-                // TODO: is this temp anymore?
-                // temp button generation
+                // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
 
-                // TODO: get this to work
-                pnlCodesLeft.autosize();
-                titlePnlCodesLeft.getContent().autosize();
-                titlePnlCodesLeft.autosize();
-
-
-                // enable MISC coding controls
                 // display coding file path in gui
                 lblCurMiscFile.setText(filenameMisc);
 
@@ -831,13 +856,17 @@ public class MainController {
                 resetUtteranceCoding();
 
                 // display controls needed for coding
-                //setMiscCodingControlVisibility(true);
+                btnReplay.setMinWidth(58.0);
+                btnReplay.setVisible(true);
+                btnUncode.setMinWidth(58.0);
+                btnUncode.setVisible(true);
+                btnUncodeReplay.setMinWidth(58.0);
+                btnUncodeReplay.setVisible(true);
 
                 // buttons available in button bar change as a function of state.
                 apBtnBar.autosize();
-                vbApp.autosize();
 
-                // resize window
+                // resize app window
                 ourTown.sizeToScene();
 
                 break;
@@ -845,7 +874,17 @@ public class MainController {
 
             case GLOBAL_CODING:
 
-                // hide MISC coding controls
+                loader = new FXMLLoader(getClass().getResource("Scoring.fxml"), resourceStrings);
+                loader.setController(this);
+
+                try {
+                    vbApp.getChildren().add(loader.load());
+                    // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
+                    // Therefore, i reset it.
+                    guiState = GuiState.GLOBAL_CODING;
+                } catch (IOException ex) {
+                    System.out.println(ex);
+                }
 
                 // enable GLOBAL coding controls
 
@@ -1161,8 +1200,8 @@ public class MainController {
                             parseUserCodes( file, node );
                         else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
                             parseUserGlobals( file, node );
-                        else if( node.getNodeName().equalsIgnoreCase( "globalsBorder" ) )
-                            parseUserGlobalsBorder( file, node );
+                        //else if( node.getNodeName().equalsIgnoreCase( "globalsBorder" ) )
+                        //    parseUserGlobalsBorder( file, node );
                     }
                 } catch( SAXParseException e ) {
                     handleUserCodesParseException( file, e );
@@ -1227,12 +1266,7 @@ public class MainController {
         }
     }
 
-    // Parse globalsLabel from given <globalsBorder> tag.
-    private void parseUserGlobalsBorder( File file, Node node ) {
-        NamedNodeMap    map = node.getAttributes();
 
-        globalsLabel = map.getNamedItem( "label" ).getTextContent();
-    }
 
     /***********************************************************
      *
@@ -1339,6 +1373,9 @@ public class MainController {
      * Parse user controls from XML file.
      *************************************************************/
     private void parseUserControls() {
+
+        System.out.println(guiState.name());
+
         File file = new File( "userConfiguration.xml" );
 
         if( file.exists() ) {
@@ -1363,38 +1400,51 @@ public class MainController {
                 Document                doc     = builder.parse(file);
                 doc.getDocumentElement().normalize();
 
-                // just get nodes for controls
-                NodeList controlNodeList = doc.getElementsByTagName("codeControls");
-                // iterate each child node
-                for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
-                    Node node = controlNodeList.item(cn);
 
-                    // Get panel name.  Must be "left" or "right".
-                    NamedNodeMap    map         = node.getAttributes();
-                    String          panelName   = map.getNamedItem( "panel" ).getTextContent();
-                    String          panelLabel  = map.getNamedItem( "label" ).getTextContent();
-                    GridPane        gridpane    = null;
-                    TitledPane      titledpane  = null;
 
-                    // Lookup panel.
-                    if( panelName.equalsIgnoreCase( "left" ) ) {
-                        gridpane = pnlCodesLeft;
-                        titledpane = titlePnlCodesLeft;
-                    } else if( panelName.equalsIgnoreCase( "right" ) ) {
-                        gridpane = pnlCodesRight;
-                        titledpane = titlePnlCodesRight;
-                    }
+                switch (guiState) {
 
-                    // Parse controls, create border with given label.
-                    if( gridpane == null ) {
-                        handleUserCodesError( file, "codeControls panel unrecognized: " + panelName );
-                    } else {
-                        parseControlColumn( node, gridpane );
-                        titledpane.setText(panelLabel);
-                        //titledpane.getContent().autosize();
-                    }
+                    case MISC_CODING:
 
+                        // just get nodes for controls
+                        NodeList controlNodeList = doc.getElementsByTagName("codeControls");
+                        // iterate each child node
+                        for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
+                            Node node = controlNodeList.item(cn);
+
+                            // Get panel name.  Must be "left" or "right".
+                            NamedNodeMap map = node.getAttributes();
+                            String panelName = map.getNamedItem("panel").getTextContent();
+                            String panelLabel = map.getNamedItem("label").getTextContent();
+                            GridPane gridpane = null;
+                            TitledPane titledpane = null;
+
+                            // Lookup panel.
+                            if (panelName.equalsIgnoreCase("left")) {
+                                gridpane = pnlCodesLeft;
+                                titledpane = titlePnlCodesLeft;
+                            } else if (panelName.equalsIgnoreCase("right")) {
+                                gridpane = pnlCodesRight;
+                                titledpane = titlePnlCodesRight;
+                            }
+
+                            // Parse controls, create border with given label.
+                            if (gridpane == null) {
+                                handleUserCodesError(file, "codeControls panel unrecognized: " + panelName);
+                            } else {
+                                parseControlColumn(node, gridpane);
+                                titledpane.setText(panelLabel);
+                            }
+                        }
+
+                        break;
+
+
+                    case GLOBAL_CODING:
+                        break;
                 }
+
+
             } catch( SAXParseException e ) {
                 handleUserCodesParseException( file, e );
             } catch( Exception e ) {
@@ -1433,10 +1483,10 @@ public class MainController {
                         Button button = new Button(codeName);
                         button.setOnAction(this::btnActCode);
                         button.setMinWidth(64);
-                        button.setMinHeight(28);
+                        button.setMinHeight(24);
                         button.setMaxWidth(64);
-                        button.setMaxHeight(28);
-                        //button.setStyle("btn-misc");
+                        button.setMaxHeight(24);
+                        button.getStyleClass().add("btn-dark-blue");
                         panel.add(button, activeCol, activeRow, 1, 1);
                     }
                 }

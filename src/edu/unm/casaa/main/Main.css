@@ -1,6 +1,8 @@
 .menuBar {
     -fx-font-size: 12;
 }
+
+/* for button bar images */
 .img-btn-play {
     -fx-image: url("/media/btn_play.png");
 }
@@ -19,6 +21,18 @@
 .img-btn-uncodeReplay {
     -fx-image: url("/media/btn_uncodeReplay.png");
 }
+
+
+/* don't think this is working */
+.btnBarPane {
+    -fx-alignment: center ;
+    -fx-background-color:rgba(21,27,31,0.3);
+}
+
+
+/**********************************************
+ * player style classes
+ **********************************************/
 .img-volume {
     -fx-image: url("/media/img_volume.png");
 }
@@ -32,15 +46,34 @@
     -fx-background-color:"blue";
     -fx-background-radius: 2.1, 2.1, 1.1;
 }
-.btnBarPane {
-    -fx-alignment: center ;
-}
 .gp-player {
-    -fx-background-color:rgba(21,27,31,0.3);
+    -fx-background-color:rgba(21,27,31,0.5);
 }
 .pnVolume {
     -fx-border-color:rgba(101,101,101,1.0);
     -fx-border-insets: 0.1, 0.1, 0.1, 0.1;
     -fx-background-color:rgba(201,201,201,1.0);
     -fx-border-width: 0.5;
+}
+
+
+/* thinking of using this for coding and scoring background */
+.controlsWin {
+    -fx-background-color:rgba(21,27,31,0.3);
+}
+
+
+/* coding buttons */
+.btn-dark-blue {
+    -fx-background-color: #090a0c, linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%), linear-gradient(#20262b, #191d22), radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));
+    -fx-background-radius: 5,4,3,5;
+    -fx-background-insets: 0,1,2,0;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-text-fill: linear-gradient(white, #d0d0d0);
+    -fx-font-size: 12px;
+    -fx-padding: 5 10 5 10;
+}
+.btn-dark-blue Text {
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );
 }

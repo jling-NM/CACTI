@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="pnCoding" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="pnCoding" styleClass="controlsWin" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox fx:id="vbPnlMiscCoding" prefHeight="258.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox fx:id="vbPnlMiscCoding" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <TitledPane fx:id="pnlTimeline" animated="false" collapsible="false" minHeight="90.0" minWidth="200.0" prefHeight="90.0" text="%pnl.title.timeline">
               <content>
@@ -23,10 +23,13 @@
                      </children>
                   </AnchorPane>
               </content>
+               <VBox.margin>
+                  <Insets top="12.0" />
+               </VBox.margin>
             </TitledPane>
             <HBox alignment="CENTER_LEFT" prefHeight="30.0">
                <children>
-                  <Button fx:id="btnStartCoding" mnemonicParsing="false" onAction="#btnActStartCoding" text="%btn.startCoding">
+                  <Button fx:id="btnStartCoding" mnemonicParsing="false" onAction="#btnActStartCoding" styleClass="btn-dark-blue" text="%btn.startCoding">
                      <tooltip>
                         <Tooltip text="%btn.tt.startCoding" />
                      </tooltip>
@@ -49,6 +52,9 @@
                      </children>
                   </AnchorPane>
               </content>
+               <VBox.margin>
+                  <Insets bottom="2.0" top="4.0" />
+               </VBox.margin>
             </TitledPane>
             <TitledPane fx:id="pnlCurUtr" animated="false" collapsible="false" minHeight="60.0" prefHeight="60.0" text="%pnl.title.currUtr">
               <content>
@@ -96,26 +102,26 @@
                <children>
                   <TitledPane fx:id="titlePnlCodesLeft" animated="false" collapsible="false" minHeight="100.0" text="" HBox.hgrow="ALWAYS">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <AnchorPane fx:id="anchPnlCodesLeft" minWidth="-Infinity" prefWidth="200.0">
                            <children>
-                              <GridPane fx:id="pnlCodesLeft" hgap="4.0" prefHeight="180.0" prefWidth="307.0" vgap="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <GridPane fx:id="pnlCodesLeft" hgap="4.0" prefWidth="307.0" vgap="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                     </content>
                      <HBox.margin>
-                        <Insets right="2.0" />
+                        <Insets bottom="12.0" right="2.0" />
                      </HBox.margin>
                   </TitledPane>
                   <TitledPane fx:id="titlePnlCodesRight" animated="false" collapsible="false" minHeight="100.0" text="" HBox.hgrow="ALWAYS">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="200.0">
                            <children>
-                              <GridPane fx:id="pnlCodesRight" hgap="4.0" prefHeight="180.0" prefWidth="307.0" vgap="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <GridPane fx:id="pnlCodesRight" hgap="4.0" prefWidth="307.0" vgap="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                     </content>
                      <HBox.margin>
-                        <Insets left="2.0" />
+                        <Insets bottom="12.0" left="2.0" />
                      </HBox.margin>
                   </TitledPane>
                </children>
@@ -125,7 +131,7 @@
             <Insets />
          </VBox.margin>
          <padding>
-            <Insets left="12.0" right="12.0" top="12.0" />
+            <Insets left="12.0" right="12.0" />
          </padding>
       </VBox>
    </children>

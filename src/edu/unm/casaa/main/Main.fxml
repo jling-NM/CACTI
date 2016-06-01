@@ -20,7 +20,7 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbApp" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<VBox fx:id="vbApp" maxWidth="-Infinity" minHeight="135.0" minWidth="-Infinity" prefWidth="640" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>
@@ -54,7 +54,7 @@
         </Menu>
         <Menu fx:id="mnuGlobalRatings" text="%menu.title.global.ratings">
           <items>
-            <MenuItem fx:id="mniGlobalScore" mnemonicParsing="false" text="%menu.title.global.score">
+            <MenuItem fx:id="mniGlobalScore" mnemonicParsing="false" onAction="#mniGlobalScoring" text="%menu.title.global.score">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
@@ -73,7 +73,7 @@
     </MenuBar>
       <AnchorPane fx:id="apBtnBar" disable="true" prefHeight="46.0" prefWidth="571.0" styleClass="btnBarPane">
          <children>
-            <ToolBar fx:id="tbPlayer" minWidth="400.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ToolBar fx:id="tbPlayer" minWidth="400.0" prefWidth="400.0" styleClass="btnBarPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <items>
                 <Button fx:id="btnPlayPause" mnemonicParsing="false" onAction="#btnActPlayPause">
                      <graphic>
@@ -117,9 +117,9 @@
             </ToolBar>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="apMediaCtrls" disable="true" prefHeight="77.0" prefWidth="571.0">
+      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="571.0">
          <children>
-            <GridPane fx:id="gpMediaPlayer" minHeight="58.0" minWidth="400.0" prefHeight="58.0" prefWidth="400.0" styleClass="gp-player" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <GridPane fx:id="gpMediaPlayer" minHeight="58.0" minWidth="400.0" prefHeight="58.0" prefWidth="400.0" styleClass="gp-player" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="1225.0" minWidth="10.0" prefWidth="1225.0" />
                 <ColumnConstraints hgrow="ALWAYS" />
@@ -182,9 +182,6 @@
                </children>
             </GridPane>
          </children>
-         <padding>
-            <Insets bottom="12.0" />
-         </padding>
       </AnchorPane>
   </children>
 </VBox>
