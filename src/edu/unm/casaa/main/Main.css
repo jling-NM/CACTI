@@ -49,10 +49,18 @@
 .gp-player {
     -fx-background-color:rgba(21,27,31,0.5);
 }
+.ap-player {
+    -fx-border-color:rgba(101,101,101,1.0);
+    -fx-border-insets: 12.0, 0.1, 0.1, 0.1;
+    -fx-background-color:rgba(201,201,201,1.0);
+    -fx-background-radius: 5,4,3,5;
+    -fx-border-width: 0.5;
+}
 .pnVolume {
     -fx-border-color:rgba(101,101,101,1.0);
     -fx-border-insets: 0.1, 0.1, 0.1, 0.1;
     -fx-background-color:rgba(201,201,201,1.0);
+    -fx-background-radius: 5,4,3,5;
     -fx-border-width: 0.5;
 }
 
@@ -73,6 +81,10 @@
     -fx-text-fill: linear-gradient(white, #d0d0d0);
     -fx-font-size: 12px;
     -fx-padding: 5 10 5 10;
+}
+.btn-dark-blue:hover {
+    -fx-background-color: transparent, linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%), linear-gradient(#20262b, #191d22), radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));
+    /*-fx-text-fill: #38424b; */
 }
 .btn-dark-blue Text {
     -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );

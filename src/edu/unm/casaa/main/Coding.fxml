@@ -29,7 +29,7 @@
             </TitledPane>
             <HBox alignment="CENTER_LEFT" prefHeight="30.0">
                <children>
-                  <Button fx:id="btnStartCoding" mnemonicParsing="false" onAction="#btnActStartCoding" styleClass="btn-dark-blue" text="%btn.startCoding">
+                  <Button fx:id="btnStartCoding" mnemonicParsing="false" onAction="#btnActStartCoding" styleClass="btn-dark-blue" stylesheets="@Main.css" text="%btn.startCoding">
                      <tooltip>
                         <Tooltip text="%btn.tt.startCoding" />
                      </tooltip>

@@ -501,6 +501,7 @@ public class MainController {
             mediaPlayer.pause();
         }
 
+        // determine audio file
         File audioFile = currentAudioFile;
         // to we have an audio file already?
         if( audioFile == null ) {
@@ -513,6 +514,15 @@ public class MainController {
 
 
         // TODO: global filenaming and initializations
+
+
+        // load audio file
+        if (audioFile.canRead()) {
+            initializeMediaPlayer(audioFile, playerReady);
+        } else {
+            showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            return;
+        }
 
 
     }
@@ -874,6 +884,35 @@ public class MainController {
 
             case GLOBAL_CODING:
 
+
+                /* Listener: currentTime
+                   responsible for updating gui components with current playback position
+                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
+                   NOTE: this version does not update a timeline */
+                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                    // update display of current time
+                    lblTimePos.setText(Utils.formatDuration(newValue));
+                    // update the mediaplayer slider
+                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
+                });
+
+
+                // reset playback controls to zero
+                onReadySeekDuration = Duration.ZERO;
+                mediaPlayer.seek(onReadySeekDuration);
+                lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
+                sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+
+                // hide controls needed for coding
+                // TODO like other duplicate code this can go into supporting member later
+                btnReplay.setMinWidth(0.0);
+                btnReplay.setVisible(false);
+                btnUncode.setMinWidth(0.0);
+                btnUncode.setVisible(false);
+                btnUncodeReplay.setMinWidth(0.0);
+                btnUncodeReplay.setVisible(false);
+
+                // enable GLOBAL coding controls
                 loader = new FXMLLoader(getClass().getResource("Scoring.fxml"), resourceStrings);
                 loader.setController(this);
 
@@ -886,9 +925,13 @@ public class MainController {
                     System.out.println(ex);
                 }
 
-                // enable GLOBAL coding controls
 
                 // update control state
+                // load coding buttons from userConfiguration.xml appropriate for GuiState
+                parseUserControls();
+
+                // TODO: this would involve reading from *.globals file
+
 
                 // buttons available in button bar change as a function of state.
                 apBtnBar.autosize();
@@ -1441,6 +1484,26 @@ public class MainController {
 
 
                     case GLOBAL_CODING:
+
+                        // TODO: see old code and parseUserGlobals() to save time
+
+                        // just get nodes for controls
+                        controlNodeList = doc.getElementsByTagName("globalControls");
+                        // iterate each child node
+                        for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
+                            Node node = controlNodeList.item(cn);
+
+                            NamedNodeMap map = node.getAttributes();
+                            String name = map.getNamedItem("name").getNodeValue();
+                            String label = map.getNamedItem("label").getNodeValue();
+                            int value = Integer.getInteger(map.getNamedItem("value").getNodeValue());
+
+                            System.out.println(String.format("Name:%s; Value:%s", label, value));
+
+                            // TODO
+                            //parseUserGlobals();
+                        }
+
                         break;
                 }
 

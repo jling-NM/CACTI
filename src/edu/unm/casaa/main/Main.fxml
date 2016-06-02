@@ -117,12 +117,13 @@
             </ToolBar>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="571.0">
+      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="571.0" styleClass="ap-player">
          <children>
             <GridPane fx:id="gpMediaPlayer" minHeight="58.0" minWidth="400.0" prefHeight="58.0" prefWidth="400.0" styleClass="gp-player" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="1225.0" minWidth="10.0" prefWidth="1225.0" />
                 <ColumnConstraints hgrow="ALWAYS" />
+                  <ColumnConstraints hgrow="ALWAYS" />
               </columnConstraints>
               <rowConstraints>
                   <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="BOTTOM" vgrow="SOMETIMES" />
@@ -179,6 +180,26 @@
                         </Label>
                      </children>
                   </AnchorPane>
+                  <Pane layoutX="563.0" layoutY="12.0" minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="2" GridPane.rowSpan="2147483647">
+                     <children>
+                        <Label fx:id="lblVolume1" contentDisplay="TOP" text="0.0">
+                           <graphic>
+                              <ImageView fx:id="imgvwVolume1" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="img-volume" />
+                           </graphic>
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="sldVolume1" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" value="0.5">
+                           <padding>
+                              <Insets left="36.0" />
+                           </padding>
+                        </Slider>
+                     </children>
+                     <GridPane.margin>
+                        <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
+                     </GridPane.margin>
+                  </Pane>
                </children>
             </GridPane>
          </children>
