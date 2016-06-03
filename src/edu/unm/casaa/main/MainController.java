@@ -18,6 +18,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -45,8 +46,8 @@ public class MainController {
 
     @FXML
     private AnchorPane anchPnlCodesLeft;
-
-
+    @FXML
+    private GridPane gpGlobalControls; // TODO: describe these and eliminate unused
     @FXML
     private VBox vbApp;
     @FXML
@@ -930,6 +931,9 @@ public class MainController {
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
 
+
+
+
                 // TODO: this would involve reading from *.globals file
 
 
@@ -1243,8 +1247,6 @@ public class MainController {
                             parseUserCodes( file, node );
                         else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
                             parseUserGlobals( file, node );
-                        //else if( node.getNodeName().equalsIgnoreCase( "globalsBorder" ) )
-                        //    parseUserGlobalsBorder( file, node );
                     }
                 } catch( SAXParseException e ) {
                     handleUserCodesParseException( file, e );
@@ -1402,14 +1404,6 @@ public class MainController {
     }
 
 
-    // TODO: functionality here should move to initUserControls
-    private void setMiscCodingControlVisibility(boolean controlVisibility) {
-        btnReplay.setVisible(controlVisibility);
-        btnUncode.setVisible(controlVisibility);
-        btnUncodeReplay.setVisible(controlVisibility);
-        pnCoding.setVisible(controlVisibility);
-    }
-
 
 
     /*************************************************************
@@ -1442,8 +1436,6 @@ public class MainController {
                 DocumentBuilder         builder = fact.newDocumentBuilder();
                 Document                doc     = builder.parse(file);
                 doc.getDocumentElement().normalize();
-
-
 
                 switch (guiState) {
 
@@ -1487,21 +1479,65 @@ public class MainController {
 
                         // TODO: see old code and parseUserGlobals() to save time
 
+                        // track if left or right side
+                        int gridColIndx = 0;
+                        int gridRowIndx = 0;
+
                         // just get nodes for controls
                         controlNodeList = doc.getElementsByTagName("globalControls");
-                        // iterate each child node
+                        // iterate each child node ("left" or "right")
                         for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
                             Node node = controlNodeList.item(cn);
 
                             NamedNodeMap map = node.getAttributes();
-                            String name = map.getNamedItem("name").getNodeValue();
-                            String label = map.getNamedItem("label").getNodeValue();
-                            int value = Integer.getInteger(map.getNamedItem("value").getNodeValue());
+                            String panelSide = map.getNamedItem("panel").getTextContent();
+                            if (panelSide.equalsIgnoreCase("left")) {
+                                gridColIndx = 0;
+                                gridRowIndx = 0;
+                            } else if (panelSide.equalsIgnoreCase("right")) {
+                                gridColIndx = 1;
+                                gridRowIndx = 0;
+                            }
 
-                            System.out.println(String.format("Name:%s; Value:%s", label, value));
 
-                            // TODO
-                            //parseUserGlobals();
+                            for( Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
+
+                                if( row.getNodeName().equals("slider")){
+                                    NamedNodeMap rowMap = row.getAttributes();
+                                    String globalName = rowMap.getNamedItem("global").getNodeValue();
+
+                                    // create togglegroup
+                                    ToggleGroup tg1 = new ToggleGroup();
+                                    // create 5 radio buttons with values
+                                    RadioButton rb1 = new RadioButton("1");
+                                    rb1.setToggleGroup(tg1);
+                                    RadioButton rb2 = new RadioButton("2");
+                                    rb2.setToggleGroup(tg1);
+                                    RadioButton rb3 = new RadioButton("3");
+                                    rb3.setToggleGroup(tg1);
+                                    RadioButton rb4 = new RadioButton("4");
+                                    rb4.setToggleGroup(tg1);
+                                    RadioButton rb5 = new RadioButton("5");
+                                    rb5.setToggleGroup(tg1);
+                                    // set selected value
+                                    tg1.selectToggle(rb1);
+                                    // place in HBox for spacing
+                                    HBox hb1 = new HBox(6.0, rb1, rb2, rb3, rb4, rb5);
+                                    // group label
+                                    Label lbl1 = new Label(globalName);
+                                    // vbox for label and controls
+                                    VBox vb1 = new VBox(4.0, lbl1, hb1);
+                                    // drop VBox into GridPane
+                                    gpGlobalControls.add(vb1, gridColIndx, gridRowIndx);
+
+                                    gridRowIndx++;
+
+                                } else if( row.getNodeName().equals("spacer")) {
+                                    gridRowIndx++;
+                                }
+
+                            }
+
                         }
 
                         break;
