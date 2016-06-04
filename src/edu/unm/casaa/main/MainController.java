@@ -48,6 +48,10 @@ import static java.lang.String.format;
 public class MainController {
 
     @FXML
+    private Label lblRate;
+    @FXML
+    private Slider sldRate;
+    @FXML
     private AnchorPane anchPnlCodesLeft;
     @FXML
     private GridPane gpGlobalControls; // TODO: describe these and eliminate unused
@@ -173,8 +177,12 @@ public class MainController {
 
         // bind the volume slider to the mediaplayer volume
         mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
-        // bind
+        // bind display playback volume label with volume slider value
         lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
+        // bind display playback rate with rate slider value
+        lblRate.textProperty().bind(sldRate.valueProperty().asString("%.1f"));
+        // set mediaplayer rate with slider value
+        mediaPlayer.setRate(sldRate.getValue());
 
         // i'm not sure it is worth having this as private member unless it helps inside
         // the listener code to avoid making the duration call repeatedly.
@@ -736,7 +744,14 @@ public class MainController {
                     /* if dragging slider, update media position */
                     if (sldSeek.isValueChanging()) {
                         // multiply duration by percentage calculated by slider position
-                        mediaPlayer.seek(totalDuration.multiply((Double) newValue));
+                        mediaPlayer.seek(totalDuration.multiply(newValue.doubleValue()));
+                    }
+                });
+
+                sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                    /* if dragging slider, update media playback rate */
+                    if (sldRate.isValueChanging()) {
+                        mediaPlayer.setRate(newValue.doubleValue());
                     }
                 });
 
@@ -787,6 +802,7 @@ public class MainController {
                     // update the mediaplayer slider
                     sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
                 });
+
 
                 // update playback controls
                 Duration onReadySeekDuration = Duration.ZERO;

@@ -182,15 +182,15 @@
                   </AnchorPane>
                   <Pane layoutX="563.0" layoutY="12.0" minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="2" GridPane.rowSpan="2147483647">
                      <children>
-                        <Label fx:id="lblVolume1" contentDisplay="TOP" text="0.0">
+                        <Label fx:id="lblRate" contentDisplay="TOP" text="0.0">
                            <graphic>
-                              <ImageView fx:id="imgvwVolume1" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="img-volume" />
+                              <ImageView fx:id="imgvwRate" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="img-rate" />
                            </graphic>
                            <font>
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="sldVolume1" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" value="0.5">
+                        <Slider fx:id="sldRate" blockIncrement="0.5" majorTickUnit="10" max="4.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" value="1.0">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
