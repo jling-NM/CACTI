@@ -5,6 +5,7 @@ import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.*;
 import edu.unm.casaa.globals.*;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
@@ -39,6 +40,8 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
+
+import static java.lang.String.format;
 
 //import com.aquafx_project.AquaFx;
 
@@ -445,7 +448,7 @@ public class MainController {
         if (audioFile.canRead()) {
             initializeMediaPlayer(audioFile, playerReady);
         } else {
-            showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
             return;
         }
 
@@ -485,7 +488,7 @@ public class MainController {
         if (audioFile.canRead()) {
             initializeMediaPlayer(audioFile, playerReady);
         } else {
-            showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
             return;
         }
 
@@ -502,6 +505,14 @@ public class MainController {
             mediaPlayer.pause();
         }
 
+        // user selects a globals file or we leave
+        File globalsFile = selectGlobalsFile();
+        if( globalsFile == null ) {
+            //showError("File Error", "Could not open coding file");
+            return;
+        }
+        filenameGlobals = globalsFile.getAbsolutePath();
+
         // determine audio file
         File audioFile = currentAudioFile;
         // to we have an audio file already?
@@ -513,15 +524,11 @@ public class MainController {
             filenameAudio = audioFile.getAbsolutePath();
         }
 
-
-        // TODO: global filenaming and initializations
-
-
         // load audio file
         if (audioFile.canRead()) {
             initializeMediaPlayer(audioFile, playerReady);
         } else {
-            showError("File Error", String.format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
             return;
         }
 
@@ -631,6 +638,46 @@ public class MainController {
     }
 
 
+    /************************************************************************
+     * Specify a Globals code file for coding
+     * @return Globals File object
+     ************************************************************************/
+    private File selectGlobalsFile() {
+
+        Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
+
+        // set code file chooser
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("GLOBALS files", "*.global"));
+
+        // set initial directory to preferences or users home directory
+        File initDir = new File(appPrefs.get("lastGlobalsPath", System.getProperty("user.home")));
+        // if preference path no longer exists reset to user home directory
+        if( !initDir.exists() ) {
+            initDir = new File(System.getProperty("user.home"));
+        }
+        // set chooser init directory
+        fc.setInitialDirectory(initDir);
+
+        // get user selection
+        File selectedFile;
+        fc.setTitle("Name New GLOBALS File");
+        selectedFile = fc.showSaveDialog(stageTheLabelBelongs);
+        // persist path for next time
+        if( selectedFile != null) {
+            // update persistence
+            appPrefs.put("lastGlobalsPath", selectedFile.getParent());
+            // make sure file has proper extension
+            String newFile = selectedFile.getAbsolutePath();
+            if( !newFile.toLowerCase().endsWith(".global")) {
+                selectedFile = new File(newFile + ".global");
+            }
+        }
+
+        return selectedFile;
+    }
+
+
     /**********************************************************************
      * Initialize the media player state with media file
      * @param mediaFile media object used to initialize player
@@ -710,7 +757,7 @@ public class MainController {
 
     private void initializeUserControls() {
 
-        System.out.println( String.format("%s: %s","initializeUserControls", guiState.toString() ) );
+        System.out.println( format("%s: %s","initializeUserControls", guiState.toString() ) );
         Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
         // common control updates
@@ -1139,20 +1186,25 @@ public class MainController {
 
 
     private synchronized void saveCurrentTextFile( boolean asBackup ) {
-       // if( templateView instanceof MiscTemplateView && filenameMisc != null ) {
-            String filename = filenameMisc;
-            if( asBackup ) filename += ".backup";
-            getUtteranceList().writeToFile( new File( filename ), filenameAudio );
 
+        String filename;
 
-        // TODO: determine how coding type will be stored and complete this
-//        } else if( templateView instanceof GlobalTemplateView ) {
-//            String filename = filenameGlobals;
-//
-//            if( asBackup )
-//                filename += ".backup";
-//            ((GlobalTemplateUiService) templateUI).writeGlobalsToFile( new File( filename ), filenameAudio );
-//        }
+        switch (guiState) {
+
+            case MISC_CODING:
+                filename = filenameMisc;
+                if( asBackup ) { filename += ".backup"; }
+                getUtteranceList().writeToFile( new File( filename ), filenameAudio );
+                break;
+
+            case GLOBAL_CODING:
+                filename = filenameGlobals;
+                if( asBackup ) { filename += ".backup"; }
+                //writeGlobalsToFile( new File( filename ), filenameAudio );
+
+                System.out.println("Write Globals to File");
+                break;
+        }
     }
 
 
@@ -1505,29 +1557,38 @@ public class MainController {
                                 if( row.getNodeName().equals("slider")){
                                     NamedNodeMap rowMap = row.getAttributes();
                                     String globalName = rowMap.getNamedItem("global").getNodeValue();
+                                    // get code by name
+                                    GlobalCode code = GlobalCode.codeWithName( globalName );
 
+                                    // use HBox node for spacing
+                                    HBox hb = new HBox(6.0);
                                     // create togglegroup
-                                    ToggleGroup tg1 = new ToggleGroup();
-                                    // create 5 radio buttons with values
-                                    RadioButton rb1 = new RadioButton("1");
-                                    rb1.setToggleGroup(tg1);
-                                    RadioButton rb2 = new RadioButton("2");
-                                    rb2.setToggleGroup(tg1);
-                                    RadioButton rb3 = new RadioButton("3");
-                                    rb3.setToggleGroup(tg1);
-                                    RadioButton rb4 = new RadioButton("4");
-                                    rb4.setToggleGroup(tg1);
-                                    RadioButton rb5 = new RadioButton("5");
-                                    rb5.setToggleGroup(tg1);
-                                    // set selected value
-                                    tg1.selectToggle(rb1);
-                                    // place in HBox for spacing
-                                    HBox hb1 = new HBox(6.0, rb1, rb2, rb3, rb4, rb5);
-                                    // group label
-                                    Label lbl1 = new Label(globalName);
-                                    // vbox for label and controls
-                                    VBox vb1 = new VBox(4.0, lbl1, hb1);
-                                    // drop VBox into GridPane
+                                    ToggleGroup tg = new ToggleGroup();
+
+                                    // create radio buttons with values and defaults
+                                    // do this after radio buttons added
+                                    // here i'm just using this to fire a save of globals data
+                                    // right away instead of as previously where we waited until
+                                    // user left scene
+                                    for( int i = code.minRating; i <= code.maxRating; i++) {
+                                        RadioButton rb = createRadioButton(i, tg);
+                                        // set selected value
+                                        if( i == code.defaultRating ) {
+                                            tg.selectToggle(rb);
+                                        }
+                                        hb.getChildren().add(rb);
+                                    }
+
+                                    // handle toggle value changes
+                                    tg.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) -> {
+                                        System.out.println("Toggle: " + newValue);
+                                    });
+
+                                    // set toggle group label
+                                    Label lbl1 = new Label(code.label);
+                                    // use vbox node for label and controls
+                                    VBox vb1 = new VBox(4.0, lbl1, hb);
+                                    // drop VBox into GridPane node
                                     gpGlobalControls.add(vb1, gridColIndx, gridRowIndx);
 
                                     gridRowIndx++;
@@ -1598,4 +1659,14 @@ public class MainController {
         }
     }
 
+    private RadioButton createRadioButton( int buttonValue, ToggleGroup tg) {
+        RadioButton rb = new RadioButton(Integer.toString(buttonValue));
+        rb.setToggleGroup(tg);
+        return rb;
+    }
+
+    // TODO: rethink?
+    public void actGlobalNotesChanged(ActionEvent actionEvent) {
+        System.out.println("textfield change");
+    }
 }

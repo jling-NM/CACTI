@@ -21,6 +21,11 @@ package edu.unm.casaa.globals;
 import java.util.Vector;
 
 import edu.unm.casaa.main.MainController;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class GlobalCode { 
     private static final long           serialVersionUID = 1L;
@@ -107,4 +112,5 @@ public class GlobalCode {
     public String toDisplayString() {
         return "(label: " + label + ", value: " + value + ")";
     }
+
 };

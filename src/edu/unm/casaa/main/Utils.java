@@ -15,4 +15,5 @@ public class Utils {
     public static int convertTimeToBytes( int bytesPerSecond, Duration time ) {
         return ((int) time.toSeconds()) * bytesPerSecond;
     }
+
 }
