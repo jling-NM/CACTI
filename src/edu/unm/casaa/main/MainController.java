@@ -5,7 +5,6 @@ import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.*;
 import edu.unm.casaa.globals.*;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
@@ -34,7 +33,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -48,17 +46,15 @@ import static java.lang.String.format;
 public class MainController {
 
     @FXML
-    private Label lblRate;
+    private Label lblRate;                              // display current playback rate
     @FXML
-    private Slider sldRate;
+    private Slider sldRate;                             // playback rate control
     @FXML
-    private AnchorPane anchPnlCodesLeft;
+    private GridPane gpGlobalControls;                  // control containing globals controls
     @FXML
-    private GridPane gpGlobalControls; // TODO: describe these and eliminate unused
+    private VBox vbApp;                                 // control holding non-playback controls (misc/globals)
     @FXML
-    private VBox vbApp;
-    @FXML
-    private Label lblAudioFilename;
+    private Label lblAudioFilename;                     //
     @FXML
     private TitledPane titlePnlCodesLeft;
     @FXML
@@ -67,8 +63,6 @@ public class MainController {
     private GridPane pnlCodesLeft;
     @FXML
     private GridPane pnlCodesRight;
-    @FXML
-    private AnchorPane pnCoding;
     @FXML
     private Button btnReplay;
     @FXML
@@ -112,28 +106,27 @@ public class MainController {
     private Label lblPrevUtr;
 
 
-    Preferences appPrefs;                                       // User prefs persistence
+    Preferences appPrefs;                               // User prefs persistence
 
     // mediaplayer attributes
-    private Duration totalDuration;
-    private int bytesPerSecond           = 0;                   // legacy Cached when we load audio file.
-    private int audioLength              = 0;                   // legacy to be noted later
+    private Duration totalDuration;                     // duration of active media
+    private int bytesPerSecond           = 0;           // legacy Cached when we load audio file.
+    private int audioLength              = 0;           // legacy to be noted later
 
     // integrate
-    private int numSaves                 = 0;                   // Number of times we've saved since loading current session data.
-    private int numUninterruptedUncodes  = 0;                   // Number of times user has uncoded without doing anything else.
-    private String filenameMisc          = null;			    // CASAA file.
-    private String filenameGlobals       = null;
-    private String filenameAudio         = null;
-    private File currentAudioFile        = null;
-    private UtteranceList utteranceList  = null;
+    private int numSaves                 = 0;           // Number of times we've saved since loading current session data.
+    private int numUninterruptedUncodes  = 0;           // Number of times user has uncoded without doing anything else.
+    private String filenameMisc          = null;        // name of active CASAA data file.
+    private String filenameGlobals       = null;        // name of active globals data file
+    private String filenameAudio         = null;        // name of active media file
+    private File currentAudioFile        = null;        // active media file
+    private UtteranceList utteranceList  = null;        // MISC coding data
 
 
-    private enum  GuiState {
-        BASE, PLAYBACK, MISC_CODING, GLOBAL_CODING
+    private enum  GuiState {                            // available gui states
+        PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
-
-    private GuiState guiState;                                  // for referencing state
+    private GuiState guiState;                          // for referencing state
 
 
 
@@ -143,12 +136,10 @@ public class MainController {
      ******************************************************************/
     @FXML
     private void initialize() {
-        //System.out.println("Controller Initializing...");
-
         //
-        guiState = GuiState.BASE;
+        setGuiState(GuiState.PLAYBACK);
 
-        // persistence
+        // initialize app persistence
         appPrefs = Preferences.userNodeForPackage(Main.class);
 
         // OSX CSS
@@ -169,7 +160,6 @@ public class MainController {
      * ready with media
      *********************************************************/
     Runnable playerReady = () -> {
-        System.out.println("playerReady: MEDIAPLAYER: OnReady");
 
         // enable all the media controls; perhaps through a single pane of some sort???
         apBtnBar.setDisable(false);
@@ -293,7 +283,7 @@ public class MainController {
 
         // Cache stream position, as it may change over repeated queries (because it advances
         // with player thread).
-        int position = streamPosition();
+        int position = getStreamPosition();
 
         // Start/resume playback.
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
@@ -405,7 +395,7 @@ public class MainController {
      **********************************************************************/
     public void mniActOpenFile(ActionEvent actionEvent) {
 
-        guiState = GuiState.BASE;
+        setGuiState(GuiState.PLAYBACK);
 
         File selectedFile = selectAudioFile();
         if (selectedFile != null) {
@@ -425,7 +415,7 @@ public class MainController {
      */
     public void mniStartCoding(ActionEvent actionEvent) {
 
-        guiState = GuiState.MISC_CODING;
+        setGuiState(GuiState.MISC_CODING);
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -446,7 +436,7 @@ public class MainController {
         utteranceList = null;
 
         // Default casaa filename to match audio file, with .casaa suffix.
-        String newFileName = changeSuffix( audioFile.getName(), "casaa" );
+        String newFileName = Utils.changeSuffix( audioFile.getName(), "casaa" );
         File miscFile = selectMiscFile(newFileName);
         if( miscFile == null ) {
             return;
@@ -473,7 +463,7 @@ public class MainController {
      ******************************************************/
     public void mniResumeCoding(ActionEvent actionEvent) {
 
-        this.guiState = GuiState.MISC_CODING;
+        setGuiState(GuiState.MISC_CODING);
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -504,9 +494,10 @@ public class MainController {
     }
 
 
+
     public void mniGlobalScoring(ActionEvent actionEvent) {
 
-        guiState = GuiState.GLOBAL_CODING;
+        setGuiState(GuiState.GLOBAL_CODING);
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -542,6 +533,7 @@ public class MainController {
 
 
     }
+
 
     /**********************************************************************
      * sldSeek mouse event:
@@ -772,7 +764,6 @@ public class MainController {
 
     private void initializeUserControls() {
 
-        System.out.println( format("%s: %s","initializeUserControls", guiState.toString() ) );
         Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
         // common control updates
@@ -788,9 +779,9 @@ public class MainController {
         FXMLLoader loader;
 
         // GuiState determines action
-        switch (guiState) {
+        switch (getGuiState()) {
 
-            case BASE:
+            case PLAYBACK:
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -827,10 +818,6 @@ public class MainController {
                 break;
 
 
-            case PLAYBACK:
-                break;
-
-
             case MISC_CODING:
 
                 loader = new FXMLLoader(getClass().getResource("Coding.fxml"), resourceStrings);
@@ -840,7 +827,7 @@ public class MainController {
                     vbApp.getChildren().add(loader.load());
                     // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
                     // Therefore, i reset it.
-                    guiState = GuiState.MISC_CODING;
+                    setGuiState(GuiState.MISC_CODING);
                 } catch (IOException ex) {
                     System.out.println(ex);
                 }
@@ -984,7 +971,7 @@ public class MainController {
                     vbApp.getChildren().add(loader.load());
                     // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
                     // Therefore, i reset it.
-                    guiState = GuiState.GLOBAL_CODING;
+                    setGuiState(GuiState.GLOBAL_CODING);
                 } catch (IOException ex) {
                     System.out.println(ex);
                 }
@@ -1085,10 +1072,7 @@ public class MainController {
         return getUtteranceList().last();
     }
 
-    // TODO: determine if this is necessary or can just use "updateTimeLineDisplay() on its own"
-    private void utteranceListChanged() {
-        updateTimeLineDisplay();
-    }
+
     // Get previous utterance, or null if no previous utterance exists.
     private synchronized Utterance getPreviousUtterance() {
         int count = getUtteranceList().size();
@@ -1153,7 +1137,7 @@ public class MainController {
     /***********************************************
      * @return current playback position, in bytes.
      ***********************************************/
-    public int streamPosition() {
+    public int getStreamPosition() {
 
         int position = Utils.convertTimeToBytes(getBytesPerSecond(), mediaPlayer.getCurrentTime());
         return position;
@@ -1184,7 +1168,6 @@ public class MainController {
     }
 
 
-
     /*********************************************************
      * Save current session. Periodically also save backup copy.
      *********************************************************/
@@ -1205,7 +1188,7 @@ public class MainController {
 
         String filename;
 
-        switch (guiState) {
+        switch (getGuiState()) {
 
             case MISC_CODING:
                 filename = filenameMisc;
@@ -1245,7 +1228,7 @@ public class MainController {
             return; // No current utterance.
 
         // get current player position
-        int position = streamPosition();
+        int position = getStreamPosition();
 
         if( position <= utterance.getStartBytes() )
             return; // Ignore when playback is outside utterance.
@@ -1276,9 +1259,13 @@ public class MainController {
 
 
 
-    // Handle errors re: user codes XML file. We must be able to find and parse
-    // this file
-    // successfully, so all of these errors are fatal.
+
+    /*********************************************************************
+     * Handle errors re: user codes XML file. We must be able to find and parse
+     * this file successfully, so all of these errors are fatal.
+     * @param file
+     * @param e
+     *********************************************************************/
     public void handleUserCodesParseException(File file, SAXParseException e) {
         // Alert and quit.
         this.showFatalWarning("Failed to load user codes","Parse error in " + file.getAbsolutePath() + " (line " + e.getLineNumber() + "):\n" + e.getMessage());
@@ -1381,22 +1368,6 @@ public class MainController {
 
 
 
-    /***********************************************************
-     *
-     * @param filename
-     * @param newSuffix Suffixes should be specified without leading period.
-     * @return copy of filename with oldSuffix (if present) removed, and newSuffix added.
-     */
-    private String changeSuffix( String filename, String newSuffix ) {
-        String	result 	= filename;
-        int		index 	= filename.lastIndexOf( '.' );
-
-        if( index > 0 ) {
-            result = result.substring( 0, index );
-        }
-        return result + "." + newSuffix;
-    }
-
 
     private void resetUtteranceCoding() {
         numUninterruptedUncodes = 0;
@@ -1440,7 +1411,7 @@ public class MainController {
                 lblCurUtrEndTime.setText( current.getEndTime() );
 
                 // Visual indication when in between utterances.
-                if( streamPosition() < current.getStartBytes() )
+                if( getStreamPosition() < current.getStartBytes() )
                     lblCurUtrStartTime.setStyle("-fx-text-fill: 'Red';");
                 else
                     lblCurUtrStartTime.setStyle("-fx-text-fill: 'Black';");
@@ -1472,14 +1443,10 @@ public class MainController {
     }
 
 
-
-
     /*************************************************************
      * Parse user controls from XML file.
      *************************************************************/
     private void parseUserControls() {
-
-        System.out.println(guiState.name());
 
         File file = new File( "userConfiguration.xml" );
 
@@ -1505,7 +1472,7 @@ public class MainController {
                 Document                doc     = builder.parse(file);
                 doc.getDocumentElement().normalize();
 
-                switch (guiState) {
+                switch (getGuiState()) {
 
                     case MISC_CODING:
 
@@ -1633,7 +1600,6 @@ public class MainController {
     }
 
 
-
     /*******************************************************************
      * Parse a column of controls from given XML node.
      * Add buttons to given panel, and set panel layout.
@@ -1684,5 +1650,25 @@ public class MainController {
     // TODO: rethink?
     public void actGlobalNotesChanged(ActionEvent actionEvent) {
         System.out.println("textfield change");
+    }
+
+
+    private void setGuiState( GuiState gs) {
+
+        if( guiState != null ) {
+
+            // do stuff before changing state
+            if (getGuiState().equals(GuiState.GLOBAL_CODING)) {
+                System.out.println("Save Globals shit...");
+            }
+
+        }
+
+        // change state
+        guiState = gs;
+    }
+
+    private GuiState getGuiState() {
+        return guiState;
     }
 }

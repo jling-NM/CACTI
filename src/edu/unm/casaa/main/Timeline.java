@@ -91,7 +91,7 @@ public class Timeline extends JPanel {
 
 		// Scroll display to keep current time marker centered on screen
 		// (except when we're at beginning/end).
-		int playbackPosition	= control.streamPosition();
+		int playbackPosition	= control.getStreamPosition();
 		int displayedBytes		= innerWidth * bytesPerPixel;
 		int halfDisplayedBytes	= displayedBytes / 2;
 		int scrollX				= 0;

@@ -13,7 +13,7 @@ import java.util.prefs.Preferences;
 
 public class Main extends Application {
 
-    public Preferences appPrefs;           // reference for user preferences
+    private Preferences appPrefs;           // reference for user preferences
     private Stage mainStage;
     private MainController mainController; // reference for the controller
 
@@ -34,7 +34,6 @@ public class Main extends Application {
 
         // link app appPrefs
         appPrefs = Preferences.userNodeForPackage(Main.class);
-        //appPrefs = Preferences.userRoot().node(this.getClass().getName());
     }
 
 

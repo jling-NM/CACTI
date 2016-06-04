@@ -16,4 +16,19 @@ public class Utils {
         return ((int) time.toSeconds()) * bytesPerSecond;
     }
 
+    /***********************************************************
+     *
+     * @param filename
+     * @param newSuffix Suffixes should be specified without leading period.
+     * @return copy of filename with oldSuffix (if present) removed, and newSuffix added.
+     */
+    public static String changeSuffix( String filename, String newSuffix ) {
+        String	result 	= filename;
+        int		index 	= filename.lastIndexOf( '.' );
+
+        if( index > 0 ) {
+            result = result.substring( 0, index );
+        }
+        return result + "." + newSuffix;
+    }
 }
