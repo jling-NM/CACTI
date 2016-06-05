@@ -144,7 +144,7 @@ public class MainController {
 
         // OSX CSS
         //if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
-            //AquaFx.style();
+        //    AquaFx.style();
         //}
 
         // load user config file to load user specific edited codes
