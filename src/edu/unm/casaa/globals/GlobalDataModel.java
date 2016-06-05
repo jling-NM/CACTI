@@ -24,32 +24,43 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
-import edu.unm.casaa.globals.GlobalCode;
-
 /**
  * Stores globals data.
  * @author amanuel
  */
 public class GlobalDataModel {
 
-	// Map of GlobalCode value (i.e. identifier) to rating.
+	// Map of GlobalCode id (i.e. identifier) to rating.
 	private HashMap< Integer, Integer > ratings = new HashMap< Integer, Integer >();
+	//
+	private File globalsFile = null;
+    //
+    private String filenameAudio = null;
+    //
+    private String notes = "";
 
-	public GlobalDataModel() {
+
+
+	public GlobalDataModel(File globalsFile, String filenameAudio) {
+
+        this.globalsFile = globalsFile;
+        this.filenameAudio = filenameAudio;
+
+
 		// Initialize to default ratings as defined by GlobalCode.
 	    for( int i = 0; i < GlobalCode.numCodes(); i++ ) {
 	        GlobalCode code = GlobalCode.codeAtIndex( i );
 
-	        ratings.put( code.value, code.defaultRating );
+	        ratings.put( code.id, code.defaultRating );
 		}
 	}
 
 	public int getRating( GlobalCode code ) {
-		return ratings.get( code.value ).intValue();
+		return ratings.get( code.id).intValue();
 	}
 
 	public void	setRating( GlobalCode code, int rating ) {
-		ratings.put( new Integer( code.value ), rating );
+		ratings.put( new Integer( code.id), rating );
 	}
 
 	public String toString() {
@@ -63,10 +74,19 @@ public class GlobalDataModel {
 		return result;
 	}
 
-	public void writeToFile( File file, String filenameAudio, String notes ) {
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+	public void writeToFile() {
+
 		PrintWriter writer = null;
 		try {
-			writer = new PrintWriter( new FileWriter( file, false ) );
+			writer = new PrintWriter( new FileWriter( globalsFile, false ) );
 			writer.println( "Global Ratings\n" );
 			writer.println( "Audio File:\t" + filenameAudio );
 			writer.println( toString() );
@@ -78,5 +98,6 @@ public class GlobalDataModel {
 		} finally {
 			writer.close();
 		}
+
 	}
 }

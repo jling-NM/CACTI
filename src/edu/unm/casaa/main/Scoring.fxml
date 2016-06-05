@@ -32,7 +32,7 @@
                   </GridPane>
                   <AnchorPane prefHeight="120.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                      <children>
-                        <TextField alignment="TOP_LEFT" onAction="#actGlobalNotesChanged" onInputMethodTextChanged="#actGlobalNotesChanged" promptText="Enter scoring comments" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <TextField fx:id="tfGlobalsNotes" alignment="TOP_LEFT" onAction="#actGlobalNotesChanged" onInputMethodTextChanged="#actGlobalNotesChanged" promptText="Enter scoring comments" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                </children>

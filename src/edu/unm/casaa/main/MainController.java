@@ -12,9 +12,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
@@ -45,6 +42,8 @@ import static java.lang.String.format;
 
 public class MainController {
 
+    @FXML
+    private TextField tfGlobalsNotes;
     @FXML
     private Label lblRate;                              // display current playback rate
     @FXML
@@ -91,7 +90,6 @@ public class MainController {
     private ImageView btnPlayImgVw;
     @FXML
     private SwingNode snTimeline;
-
     @FXML
     private Label lblCurMiscFile;
     @FXML
@@ -106,7 +104,7 @@ public class MainController {
     private Label lblPrevUtr;
 
 
-    Preferences appPrefs;                               // User prefs persistence
+    private Preferences appPrefs;                       // User prefs persistence
 
     // mediaplayer attributes
     private Duration totalDuration;                     // duration of active media
@@ -121,7 +119,7 @@ public class MainController {
     private String filenameAudio         = null;        // name of active media file
     private File currentAudioFile        = null;        // active media file
     private UtteranceList utteranceList  = null;        // MISC coding data
-
+    private GlobalDataModel globalsData  = null;        // GLOBALS scoring data
 
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
@@ -159,7 +157,7 @@ public class MainController {
      * define lambda runnable later called by player when
      * ready with media
      *********************************************************/
-    Runnable playerReady = () -> {
+    private final Runnable playerReady = () -> {
 
         // enable all the media controls; perhaps through a single pane of some sort???
         apBtnBar.setDisable(false);
@@ -167,11 +165,11 @@ public class MainController {
 
         // bind the volume slider to the mediaplayer volume
         mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
-        // bind display playback volume label with volume slider value
+        // bind display playback volume label with volume slider id
         lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
-        // bind display playback rate with rate slider value
+        // bind display playback rate with rate slider id
         lblRate.textProperty().bind(sldRate.valueProperty().asString("%.1f"));
-        // set mediaplayer rate with slider value
+        // set mediaplayer rate with slider id
         mediaPlayer.setRate(sldRate.getValue());
 
         // i'm not sure it is worth having this as private member unless it helps inside
@@ -198,7 +196,7 @@ public class MainController {
      * @param actionEvent
      * button event: play media
      **********************************************************************/
-    public void btnActPlayPause(ActionEvent actionEvent) {
+    public void btnActPlayPause(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
@@ -209,8 +207,8 @@ public class MainController {
 
     /**********************************************************************
      *  button event: 5 second rewind
-     *  @param actionEvent
      **********************************************************************/
+    @SuppressWarnings("UnusedParameters")
     public void btnActRewind(ActionEvent actionEvent) {
         /* specific rewind button back 5 seconds */
         if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
@@ -227,6 +225,7 @@ public class MainController {
      *  seek later than beginning of utterance.
      *  @param actionEvent not used
      **********************************************************************/
+    @SuppressWarnings("UnusedParameters")
     public void btnActReplay(ActionEvent actionEvent) {
 
         Utterance   utterance   = getCurrentUtterance();
@@ -244,8 +243,8 @@ public class MainController {
 
     /**********************************************************************
      *  button event: Remove last utterance
-     *  @param actionEvent
      **********************************************************************/
+    @SuppressWarnings("UnusedParameters")
     public void btnActUncode(ActionEvent actionEvent) {
         uncode();
         saveSession();
@@ -313,9 +312,8 @@ public class MainController {
 
     /**********************************************************************
      *  button event: Apply utterance code
-     *  @param actionEvent
      **********************************************************************/
-    public void btnActCode(ActionEvent actionEvent) {
+    private void btnActCode(ActionEvent actionEvent) {
         Button src = (Button) actionEvent.getSource();
         MiscCode mc = MiscCode.codeWithName(src.getText());
         handleButtonMiscCode(mc);
@@ -331,7 +329,6 @@ public class MainController {
 
     /**********************************************************************
      * menu selection event: About
-     * @param actionEvent
      **********************************************************************/
     public void mniActAbout(ActionEvent actionEvent) {
 
@@ -354,7 +351,6 @@ public class MainController {
 
     /**********************************************************************
      * menu selection event: Help
-     * @param actionEvent
      **********************************************************************/
     public void mniActOnlineHelp(ActionEvent actionEvent) {
 
@@ -374,7 +370,6 @@ public class MainController {
 
     /**********************************************************************
      * menu selection event: Exit
-     * @param actionEvent
      **********************************************************************/
     public void mniActExit(ActionEvent actionEvent) {
 
@@ -391,7 +386,6 @@ public class MainController {
     /**********************************************************************
      * menu selection event: Open Audio File to listen independently of
      * coding
-     * @param actionEvent
      **********************************************************************/
     public void mniActOpenFile(ActionEvent actionEvent) {
 
@@ -447,7 +441,6 @@ public class MainController {
             initializeMediaPlayer(audioFile, playerReady);
         } else {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
-            return;
         }
 
     }
@@ -487,7 +480,6 @@ public class MainController {
             initializeMediaPlayer(audioFile, playerReady);
         } else {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
-            return;
         }
 
 
@@ -525,10 +517,14 @@ public class MainController {
 
         // load audio file
         if (audioFile.canRead()) {
+
+            // initialize globals data model
+            globalsData = new GlobalDataModel(globalsFile, filenameAudio);
+            // take care of media player
             initializeMediaPlayer(audioFile, playerReady);
+
         } else {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
-            return;
         }
 
 
@@ -556,11 +552,6 @@ public class MainController {
             mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
             lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
         }
-
-        double sec = totalDuration.multiply(sldSeek.getValue()).toSeconds();
-        //System.out.println("time:"+sec);
-        //System.out.println( "bytes:" + (int)(sec * getBytesPerSecond()) );
-
     }
 
 
@@ -598,7 +589,7 @@ public class MainController {
 
     /************************************************************************
      * Specify a Misc code file for coding
-     * @param newFileName
+     * @param newFileName filename to seed filechooser
      * @return Misc Codes File object
      ************************************************************************/
     private File selectMiscFile(String newFileName) {
@@ -648,7 +639,7 @@ public class MainController {
 
         // set code file chooser
         FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("GLOBALS files", "*.global"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("GLOBALS files", "*.globals"));
 
         // set initial directory to preferences or users home directory
         File initDir = new File(appPrefs.get("lastGlobalsPath", System.getProperty("user.home")));
@@ -669,8 +660,8 @@ public class MainController {
             appPrefs.put("lastGlobalsPath", selectedFile.getParent());
             // make sure file has proper extension
             String newFile = selectedFile.getAbsolutePath();
-            if( !newFile.toLowerCase().endsWith(".global")) {
-                selectedFile = new File(newFile + ".global");
+            if( !newFile.toLowerCase().endsWith(".globals")) {
+                selectedFile = new File(newFile + ".globals");
             }
         }
 
@@ -829,7 +820,7 @@ public class MainController {
                     // Therefore, i reset it.
                     setGuiState(GuiState.MISC_CODING);
                 } catch (IOException ex) {
-                    System.out.println(ex);
+                    showError("Error", ex.toString());
                 }
 
                 // activate the timeline display
@@ -973,19 +964,13 @@ public class MainController {
                     // Therefore, i reset it.
                     setGuiState(GuiState.GLOBAL_CODING);
                 } catch (IOException ex) {
-                    System.out.println(ex);
+                    showError("Error", ex.toString());
                 }
 
 
                 // update control state
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
-
-
-
-
-                // TODO: this would involve reading from *.globals file
-
 
                 // buttons available in button bar change as a function of state.
                 apBtnBar.autosize();
@@ -1084,16 +1069,14 @@ public class MainController {
     /*****************************************************
      * Store length in bytes
      * Used for backward compatibility
-     * @param audioFile
+     * @param audioFile file to inspect
      *****************************************************/
     private void setAudioLength(java.io.File audioFile) {
         try {
             javax.sound.sampled.AudioInputStream as = javax.sound.sampled.AudioSystem.getAudioInputStream(audioFile);
             audioLength = as.available();
 
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (UnsupportedAudioFileException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -1102,17 +1085,15 @@ public class MainController {
     /******************************************************
      * Store rate for audio file
      * Used for backward compatibility
-     * @param audioFile
+     * @param audioFile file to inspect
      *****************************************************/
     private void setBytesPerSecond(java.io.File audioFile){
         try {
             javax.sound.sampled.AudioFileFormat m_audioFileFormat = AudioSystem.getAudioFileFormat(audioFile);
             bytesPerSecond = (m_audioFileFormat.getFormat().getFrameSize() * (new Float(m_audioFileFormat.getFormat().getFrameRate()).intValue()));
 
-        } catch (UnsupportedAudioFileException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (UnsupportedAudioFileException | IOException e) {
+            showError("Error", e.toString());
         }
 
     }
@@ -1138,10 +1119,7 @@ public class MainController {
      * @return current playback position, in bytes.
      ***********************************************/
     public int getStreamPosition() {
-
-        int position = Utils.convertTimeToBytes(getBytesPerSecond(), mediaPlayer.getCurrentTime());
-        return position;
-
+        return Utils.convertTimeToBytes(getBytesPerSecond(), mediaPlayer.getCurrentTime());
     }
 
 
@@ -1218,7 +1196,7 @@ public class MainController {
 
 
 
-    public synchronized void handleButtonMiscCode( MiscCode miscCode ) {
+    private synchronized void handleButtonMiscCode(MiscCode miscCode) {
 
         assert (miscCode.isValid());
 
@@ -1263,20 +1241,20 @@ public class MainController {
     /*********************************************************************
      * Handle errors re: user codes XML file. We must be able to find and parse
      * this file successfully, so all of these errors are fatal.
-     * @param file
-     * @param e
+     * @param file what was being parsed
+     * @param e the Error
      *********************************************************************/
     public void handleUserCodesParseException(File file, SAXParseException e) {
         // Alert and quit.
-        this.showFatalWarning("Failed to load user codes","Parse error in " + file.getAbsolutePath() + " (line " + e.getLineNumber() + "):\n" + e.getMessage());
+        showFatalWarning("Failed to load user codes","Parse error in " + file.getAbsolutePath() + " (line " + e.getLineNumber() + "):\n" + e.getMessage());
     }
 
     public void handleUserCodesGenericException(File file, Exception e) {
-        this.showFatalWarning("Failed to load user codes","Unknown error parsing file: " + file.getAbsolutePath() + "\n" + e.toString());
+        showFatalWarning("Failed to load user codes","Unknown error parsing file: " + file.getAbsolutePath() + "\n" + e.toString());
     }
 
     public void handleUserCodesError(File file, String message) {
-        this.showFatalWarning("Failed to load user codes", "Error loading file: " + file.getAbsolutePath() + "\n" + message);
+        showFatalWarning("Failed to load user codes", "Error loading file: " + file.getAbsolutePath() + "\n" + message);
     }
 
 
@@ -1310,7 +1288,7 @@ public class MainController {
                 }
             } else {
                 // Alert and quit.
-                this.showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
+                showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
             }
         }
     }
@@ -1320,7 +1298,7 @@ public class MainController {
         for( Node n = codes.getFirstChild(); n != null; n = n.getNextSibling() ) {
             if( n.getNodeName().equalsIgnoreCase( "code" ) ) {
                 NamedNodeMap map         = n.getAttributes();
-                Node            nodeValue   = map.getNamedItem( "value" );
+                Node            nodeValue   = map.getNamedItem( "id" );
                 int             value       = Integer.parseInt( nodeValue.getTextContent() );
                 String          name        = map.getNamedItem( "name" ).getTextContent();
 
@@ -1335,7 +1313,7 @@ public class MainController {
         for( Node n = globals.getFirstChild(); n != null; n = n.getNextSibling() ) {
             if( n.getNodeName().equalsIgnoreCase( "global" ) ) {
                 NamedNodeMap    map         = n.getAttributes();
-                Node            nodeValue   = map.getNamedItem( "value" );
+                Node            nodeValue   = map.getNamedItem( "id" );
                 int             value       = Integer.parseInt( nodeValue.getTextContent() );
                 Node            nodeDefaultRating   = map.getNamedItem( "defaultRating" );
                 Node            nodeMinRating       = map.getNamedItem( "minRating" );
@@ -1382,42 +1360,39 @@ public class MainController {
      */
     private synchronized void updateUtteranceDisplays() {
 
-        // TODO: temporarily mark if we are misc coding. later see if necessary in globals mode
-        if( 1 ==1 ) {
-
-            // display full string of previous utterance
-            Utterance        prev    = getPreviousUtterance();
-            if( prev == null )
-                lblPrevUtr.setText( "" );
-            else
-                lblPrevUtr.setText( prev.toString() );
+        // display full string of previous utterance
+        Utterance        prev    = getPreviousUtterance();
+        if( prev == null )
+            lblPrevUtr.setText( "" );
+        else
+            lblPrevUtr.setText( prev.toString() );
 
 
-            // display individual fields of the active utterance
-            Utterance        current = getCurrentUtterance();
-            if( current == null ) {
-                lblCurUtrEnum.setText( "" );
+        // display individual fields of the active utterance
+        Utterance        current = getCurrentUtterance();
+        if( current == null ) {
+            lblCurUtrEnum.setText( "" );
+            lblCurUtrCode.setText( "" );
+            lblCurUtrStartTime.setText( "" );
+            lblCurUtrEndTime.setText( "" );
+        } else {
+            lblCurUtrEnum.setText( "" + current.getEnum() );
+            if( current.getMiscCode().value == MiscCode.INVALID )
                 lblCurUtrCode.setText( "" );
-                lblCurUtrStartTime.setText( "" );
-                lblCurUtrEndTime.setText( "" );
-            } else {
-                lblCurUtrEnum.setText( "" + current.getEnum() );
-                if( current.getMiscCode().value == MiscCode.INVALID )
-                    lblCurUtrCode.setText( "" );
-                else
-                    lblCurUtrCode.setText( current.getMiscCode().name );
+            else
+                lblCurUtrCode.setText( current.getMiscCode().name );
 
-                lblCurUtrStartTime.setText( current.getStartTime() );
-                lblCurUtrEndTime.setText( current.getEndTime() );
+            lblCurUtrStartTime.setText( current.getStartTime() );
+            lblCurUtrEndTime.setText( current.getEndTime() );
 
-                // Visual indication when in between utterances.
-                if( getStreamPosition() < current.getStartBytes() )
-                    lblCurUtrStartTime.setStyle("-fx-text-fill: 'Red';");
-                else
-                    lblCurUtrStartTime.setStyle("-fx-text-fill: 'Black';");
-            }
+            // Visual indication when in between utterances.
+            if( getStreamPosition() < current.getStartBytes() )
+                lblCurUtrStartTime.setStyle("-fx-text-fill: 'Red';");
+            else
+                lblCurUtrStartTime.setStyle("-fx-text-fill: 'Black';");
         }
     }
+
 
     private void updateTimeLineDisplay() {
 
@@ -1543,39 +1518,59 @@ public class MainController {
                                     // get code by name
                                     GlobalCode code = GlobalCode.codeWithName( globalName );
 
-                                    // use HBox node for spacing
-                                    HBox hb = new HBox(6.0);
-                                    // create togglegroup
-                                    ToggleGroup tg = new ToggleGroup();
+                                    if( code != null ) {
 
-                                    // create radio buttons with values and defaults
-                                    // do this after radio buttons added
-                                    // here i'm just using this to fire a save of globals data
-                                    // right away instead of as previously where we waited until
-                                    // user left scene
-                                    for( int i = code.minRating; i <= code.maxRating; i++) {
-                                        RadioButton rb = createRadioButton(i, tg);
-                                        // set selected value
-                                        if( i == code.defaultRating ) {
-                                            tg.selectToggle(rb);
+                                        // use HBox node for spacing
+                                        HBox hb = new HBox(6.0);
+                                        // create togglegroup
+                                        ToggleGroup tg = new ToggleGroup();
+                                        tg.setUserData(code.name);
+
+                                        // create radio buttons with values and defaults
+                                        // do this after radio buttons added
+                                        // here i'm just using this to fire a save of globals data
+                                        // right away instead of as previously where we waited until
+                                        // user left scene
+                                        for(int i = code.minRating; i <= code.maxRating; i++) {
+                                            RadioButton rb = createRadioButton(i, tg);
+                                            // set selected id
+                                            if( i == code.defaultRating ) {
+                                                tg.selectToggle(rb);
+                                            }
+                                            hb.getChildren().add(rb);
                                         }
-                                        hb.getChildren().add(rb);
+
+                                        // handle toggle id changes
+                                        tg.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) -> {
+
+                                            // get code name stored in toggle group userdata
+                                            String codeName = newValue.getToggleGroup().getUserData().toString();
+                                            // get code by that name from globals data model
+                                            GlobalCode gc = GlobalCode.codeWithName(codeName);
+                                            // cast Toggle to source class to get selected id
+                                            RadioButton rb = (RadioButton) newValue;
+                                            // update code with new id
+                                            //gc.id = Integer.getInteger(rb.getText());
+                                            // update code in data model
+                                            //globalsData.setRating(gc, Integer.getInteger(rb.getText(), gc.defaultRating));
+                                            globalsData.setRating(gc, Integer.valueOf(rb.getText()));
+                                            // TODO: textarea instead of textfield for events?
+                                            if( !tfGlobalsNotes.getText().isEmpty() ) {
+                                                globalsData.setNotes(tfGlobalsNotes.getText());
+                                            }
+                                            globalsData.writeToFile();
+                                        });
+
+                                        // set toggle group label
+                                        Label lbl1 = new Label(code.label);
+                                        // use vbox node for label and controls
+                                        VBox vb1 = new VBox(4.0, lbl1, hb);
+                                        // drop VBox into GridPane node
+                                        gpGlobalControls.add(vb1, gridColIndx, gridRowIndx);
+
+                                        gridRowIndx++;
+
                                     }
-
-                                    // handle toggle value changes
-                                    tg.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) -> {
-                                        System.out.println("Toggle: " + newValue);
-                                    });
-
-                                    // set toggle group label
-                                    Label lbl1 = new Label(code.label);
-                                    // use vbox node for label and controls
-                                    VBox vb1 = new VBox(4.0, lbl1, hb);
-                                    // drop VBox into GridPane node
-                                    gpGlobalControls.add(vb1, gridColIndx, gridRowIndx);
-
-                                    gridRowIndx++;
-
                                 } else if( row.getNodeName().equals("spacer")) {
                                     gridRowIndx++;
                                 }
@@ -1604,8 +1599,8 @@ public class MainController {
      * Parse a column of controls from given XML node.
      * Add buttons to given panel, and set panel layout.
      * Each child of given node is expected to be one row of controls.
-     * @param node
-     * @param panel
+     * @param node xml node
+     * @param panel parent fxml node
      *******************************************************************/
     private void parseControlColumn( Node node, GridPane panel ) {
 
@@ -1635,8 +1630,6 @@ public class MainController {
 
                 activeCol = 0;
 
-            } else {
-                continue;
             }
         }
     }

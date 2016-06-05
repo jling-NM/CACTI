@@ -21,11 +21,6 @@ package edu.unm.casaa.globals;
 import java.util.Vector;
 
 import edu.unm.casaa.main.MainController;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 public class GlobalCode { 
     private static final long           serialVersionUID = 1L;
@@ -33,7 +28,7 @@ public class GlobalCode {
     // List of available codes. Built when we parse XML file.
     private static Vector< GlobalCode > list             = new Vector< GlobalCode >();
 
-    public int                          value            = 0;
+    public int                          id               = 0;
     public String                       name;                                         // Name for use in file. Ex: "ACCEPTANCE".
     public String                       label;                                        // Human-readable label for use in UI. Ex: "Acceptance".
     public int                          defaultRating    = 1;
@@ -44,11 +39,11 @@ public class GlobalCode {
 
     // Add new code.  Returns true on success, shows warning dialog on failure.
     public static boolean   addCode( GlobalCode newCode ) {
-        // Check that we're not duplicating an existing value or label.
+        // Check that we're not duplicating an existing id or label.
         for( int i = 0; i < list.size(); i++ ) {
             GlobalCode code = list.get( i );
 
-            if( code.value == newCode.value || code.name.equals( newCode.name ) ) {
+            if( code.id == newCode.id || code.name.equals( newCode.name ) ) {
                 MainController.showFatalWarning(
                         "User Code Error",
                         "New global code " + 
@@ -69,17 +64,17 @@ public class GlobalCode {
         return list.get( index );
     }
 
-    // PRE: code exists with given value.
-    public static GlobalCode codeWithValue( int value ) {
+    // PRE: code exists with given id.
+    public static GlobalCode codeWithId(int value ) {
         // Check user codes.
         for( int i = 0; i < list.size(); i++ ) {
             GlobalCode code = list.get( i );
 
-            if( code.value == value ) {
+            if( code.id == value ) {
                 return code;
             }
         }
-        assert false : "Global code with given value not found: " + value;
+        assert false : "Global code with given id not found: " + value;
         return null;
     }
 
@@ -99,8 +94,8 @@ public class GlobalCode {
 
     // Instance:
 
-    public GlobalCode( int value, String name, String label ) {
-        this.value  = value;
+    public GlobalCode(int id, String name, String label ) {
+        this.id     = id;
         this.name   = name;
         this.label  = label;
     }
@@ -110,7 +105,7 @@ public class GlobalCode {
 
     // Get string representation for use in user dialogs.
     public String toDisplayString() {
-        return "(label: " + label + ", value: " + value + ")";
+        return "(label: " + label + ", id: " + id + ")";
     }
 
 };
