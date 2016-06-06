@@ -1297,8 +1297,8 @@ public class MainController {
     private void parseUserCodes( File file, Node codes ) {
         for( Node n = codes.getFirstChild(); n != null; n = n.getNextSibling() ) {
             if( n.getNodeName().equalsIgnoreCase( "code" ) ) {
-                NamedNodeMap map         = n.getAttributes();
-                Node            nodeValue   = map.getNamedItem( "id" );
+                NamedNodeMap    map         = n.getAttributes();
+                Node            nodeValue   = map.getNamedItem( "value" );
                 int             value       = Integer.parseInt( nodeValue.getTextContent() );
                 String          name        = map.getNamedItem( "name" ).getTextContent();
 
@@ -1313,7 +1313,7 @@ public class MainController {
         for( Node n = globals.getFirstChild(); n != null; n = n.getNextSibling() ) {
             if( n.getNodeName().equalsIgnoreCase( "global" ) ) {
                 NamedNodeMap    map         = n.getAttributes();
-                Node            nodeValue   = map.getNamedItem( "id" );
+                Node            nodeValue   = map.getNamedItem( "value" );
                 int             value       = Integer.parseInt( nodeValue.getTextContent() );
                 Node            nodeDefaultRating   = map.getNamedItem( "defaultRating" );
                 Node            nodeMinRating       = map.getNamedItem( "minRating" );
