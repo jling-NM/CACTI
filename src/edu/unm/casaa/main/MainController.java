@@ -69,6 +69,8 @@ public class MainController {
     @FXML
     private Button btnUncodeReplay;
     @FXML
+    private ToggleButton btnStartCoding;
+    @FXML
     private Label lblTimePos;
     @FXML
     private Label lblVolume;
@@ -199,6 +201,10 @@ public class MainController {
     public void btnActPlayPause(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
+            // if coding, make sure to deselect "Coding..." toggle button.
+            if( (getGuiState().equals(GuiState.MISC_CODING)) && (btnStartCoding != null) )  {
+                btnStartCoding.setSelected(false);
+            }
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
             mediaPlayer.play();
         }
@@ -275,7 +281,7 @@ public class MainController {
 
 
     /**********************************************************************
-     *  button event: Begin utterance coding
+     *  button event: Begin coding on a new utterance session
      *  @param actionEvent not used
      **********************************************************************/
     public void btnActStartCoding(ActionEvent actionEvent) {
@@ -285,6 +291,8 @@ public class MainController {
         int position = getStreamPosition();
 
         // Start/resume playback.
+        // TODO: change back to original functionality and make button toggle??
+        // that is more work and my way seems more intuitive
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
@@ -295,9 +303,6 @@ public class MainController {
             return; // Parsing starts only once.
 
         // Record start data.
-        if (bytesPerSecond > 0) {
-            return;
-        }
         String startString = TimeCode.toString( position / bytesPerSecond );
 
         // Create first utterance.
@@ -458,7 +463,7 @@ public class MainController {
 
         setGuiState(GuiState.MISC_CODING);
 
-        // this something be playing, stop it
+        // if something be playing, stop it
         if(mediaPlayer != null) {
             mediaPlayer.pause();
         }
@@ -768,6 +773,7 @@ public class MainController {
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
         FXMLLoader loader;
+
 
         // GuiState determines action
         switch (getGuiState()) {
