@@ -65,7 +65,10 @@ public class Main extends Application {
         mainStage.setTitle(resourceStrings.getString("wind.title.main"));
 
         // application window icon is set
-        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_32.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_48.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_64.png")));
+
         Scene mainScene = new Scene(root);
         //mainScene.getStylesheets().add("file:///edu/unm/casaa/main/Main.css");
         mainStage.setScene(mainScene);
