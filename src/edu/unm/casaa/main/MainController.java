@@ -43,7 +43,7 @@ import static java.lang.String.format;
 public class MainController {
 
     @FXML
-    private TextField tfGlobalsNotes;
+    private TextArea tfGlobalsNotes;
     @FXML
     private Label lblRate;                              // display current playback rate
     @FXML
@@ -817,11 +817,13 @@ public class MainController {
                 try {
                     vbApp.getChildren().add(loader.load());
                     // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
+                    // if i set controller in coding.fxml then it has not reference to local members down below
                     // Therefore, i reset it.
                     setGuiState(GuiState.MISC_CODING);
                 } catch (IOException ex) {
                     showError("Error", ex.toString());
                 }
+
 
                 // activate the timeline display
                 snTimeline.setContent(new Timeline(this));
@@ -959,9 +961,11 @@ public class MainController {
                 loader.setController(this);
 
                 try {
+                    System.out.println("Before load:"+getGuiState());
                     vbApp.getChildren().add(loader.load());
                     // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
                     // Therefore, i reset it.
+                    System.out.println("After load:"+getGuiState());
                     setGuiState(GuiState.GLOBAL_CODING);
                 } catch (IOException ex) {
                     showError("Error", ex.toString());
@@ -1487,8 +1491,6 @@ public class MainController {
 
                     case GLOBAL_CODING:
 
-                        // TODO: see old code and parseUserGlobals() to save time
-
                         // track if left or right side
                         int gridColIndx = 0;
                         int gridRowIndx = 0;
@@ -1554,7 +1556,7 @@ public class MainController {
                                             // update code in data model
                                             //globalsData.setRating(gc, Integer.getInteger(rb.getText(), gc.defaultRating));
                                             globalsData.setRating(gc, Integer.valueOf(rb.getText()));
-                                            // TODO: textarea instead of textfield for events?
+                                            // TODO: duplicate code alert!!! see setGuiState()
                                             if( !tfGlobalsNotes.getText().isEmpty() ) {
                                                 globalsData.setNotes(tfGlobalsNotes.getText());
                                             }
@@ -1640,10 +1642,6 @@ public class MainController {
         return rb;
     }
 
-    // TODO: rethink?
-    public void actGlobalNotesChanged(ActionEvent actionEvent) {
-        System.out.println("textfield change");
-    }
 
 
     private void setGuiState( GuiState gs) {
@@ -1652,7 +1650,13 @@ public class MainController {
 
             // do stuff before changing state
             if (getGuiState().equals(GuiState.GLOBAL_CODING)) {
-                System.out.println("Save Globals shit...");
+                if( globalsData != null ) {
+                    System.out.println("Save Globals data.");
+                    if( !tfGlobalsNotes.getText().isEmpty() ) {
+                        globalsData.setNotes(tfGlobalsNotes.getText());
+                    }
+                    globalsData.writeToFile();
+                }
             }
 
         }
