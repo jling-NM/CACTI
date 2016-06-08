@@ -79,8 +79,6 @@ public class MainController {
     @FXML
     private AnchorPane apMediaCtrls;
     @FXML
-    private AnchorPane apBtnBar;
-    @FXML
     private MenuBar menuBar;
     @FXML
     private MediaPlayer mediaPlayer;
@@ -161,8 +159,7 @@ public class MainController {
      *********************************************************/
     private final Runnable playerReady = () -> {
 
-        // enable all the media controls; perhaps through a single pane of some sort???
-        apBtnBar.setDisable(false);
+        // enable all the media controls
         apMediaCtrls.setDisable(false);
 
         // bind the volume slider to the mediaplayer volume
@@ -220,7 +217,8 @@ public class MainController {
         if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
 
-            updateUtteranceDisplays();
+            // TODO: i don't know why this was here as it was firing in playback state. Find out by checking original maybe.
+            //updateUtteranceDisplays();
         }
     }
 
@@ -806,9 +804,6 @@ public class MainController {
                 btnUncodeReplay.setMinWidth(0.0);
                 btnUncodeReplay.setVisible(false);
 
-                // buttons available in button bar change as a function of state.
-                apBtnBar.autosize();
-
                 // resize window
                 ourTown.sizeToScene();
 
@@ -923,9 +918,6 @@ public class MainController {
                 btnUncodeReplay.setMinWidth(58.0);
                 btnUncodeReplay.setVisible(true);
 
-                // buttons available in button bar change as a function of state.
-                apBtnBar.autosize();
-
                 // resize app window
                 ourTown.sizeToScene();
 
@@ -982,8 +974,6 @@ public class MainController {
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
 
-                // buttons available in button bar change as a function of state.
-                apBtnBar.autosize();
                 // resize window
                 ourTown.sizeToScene();
 

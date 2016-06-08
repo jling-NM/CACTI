@@ -71,78 +71,33 @@
             </Menu>
       </menus>
     </MenuBar>
-      <AnchorPane fx:id="apBtnBar" disable="true" prefHeight="46.0" prefWidth="571.0" styleClass="btnBarPane">
-         <children>
-            <ToolBar fx:id="tbPlayer" minWidth="400.0" prefWidth="400.0" styleClass="btnBarPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <items>
-                <Button fx:id="btnPlayPause" mnemonicParsing="false" onAction="#btnActPlayPause">
-                     <graphic>
-                        <ImageView fx:id="btnPlayImgVw" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-play" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.PlayPause" />
-                     </tooltip></Button>
-                  <Button fx:id="btnReplay" alignment="CENTER" minWidth="0.0" mnemonicParsing="false" onAction="#btnActReplay" prefWidth="0.0" visible="false">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-replay" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.Replay" />
-                     </tooltip></Button>
-                  <Button fx:id="btnUncode" alignment="CENTER" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncode" prefWidth="0.0" visible="false">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncode" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.Uncode" />
-                     </tooltip>
-                  </Button>
-                  <Button fx:id="btnUncodeReplay" alignment="CENTER" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeReplay" prefWidth="0.0" visible="false">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncodeReplay" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.UncodeReplay" />
-                     </tooltip>
-                  </Button>
-                  <Button fx:id="btnRewind" alignment="CENTER" mnemonicParsing="false" onAction="#btnActRewind">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
-                     </graphic>
-                     <tooltip>
-                        <Tooltip text="%btn.tt.Rewind" />
-                     </tooltip>
-                  </Button>
-               </items>
-            </ToolBar>
-         </children>
-      </AnchorPane>
       <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="571.0" styleClass="ap-player">
          <children>
-            <GridPane fx:id="gpMediaPlayer" minHeight="58.0" minWidth="400.0" prefHeight="58.0" prefWidth="400.0" styleClass="gp-player" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <GridPane fx:id="gpMediaPlayer" layoutX="25.5" layoutY="76.5" minHeight="37.0" minWidth="400.0" prefHeight="96.0" prefWidth="615.0" styleClass="gp-player" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="1225.0" minWidth="10.0" prefWidth="1225.0" />
                 <ColumnConstraints hgrow="ALWAYS" />
                   <ColumnConstraints hgrow="ALWAYS" />
               </columnConstraints>
               <rowConstraints>
+                  <RowConstraints valignment="BOTTOM" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="BOTTOM" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="22.0" minHeight="22.0" prefHeight="22.0" valignment="CENTER" vgrow="NEVER" />
                   <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="TOP" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" GridPane.rowIndex="1">
+                  <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="12.0" />
                      </GridPane.margin>
                   </Slider>
-                  <MediaView fx:id="mediaView" fitHeight="10.0" fitWidth="10.0" GridPane.rowIndex="1" />
-                  <Label fx:id="lblAudioFilename" GridPane.rowIndex="2" GridPane.valignment="TOP">
+                  <MediaView fx:id="mediaView" fitHeight="10.0" fitWidth="10.0" GridPane.rowIndex="2" />
+                  <Label fx:id="lblAudioFilename" GridPane.rowIndex="3" GridPane.valignment="TOP">
                      <GridPane.margin>
                         <Insets left="12.0" />
                      </GridPane.margin>
                   </Label>
-                  <Pane minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="1" GridPane.rowSpan="2147483647">
+                  <Pane minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
                      <children>
                         <Label fx:id="lblVolume" contentDisplay="TOP" text="0.0">
                            <graphic>
@@ -152,7 +107,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" id="0.5">
+                        <Slider id="0.5" fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
@@ -162,7 +117,7 @@
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </GridPane.margin>
                   </Pane>
-                  <AnchorPane GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.valignment="BOTTOM">
+                  <AnchorPane GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
                      <children>
                         <Label fx:id="lblTimePos" text="00:00:00" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <padding>
@@ -171,7 +126,7 @@
                         </Label>
                      </children>
                   </AnchorPane>
-                  <AnchorPane GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.valignment="BOTTOM">
+                  <AnchorPane GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
                      <children>
                         <Label fx:id="lblDuration" alignment="BASELINE_CENTER" text="00:00:00" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <padding>
@@ -180,7 +135,7 @@
                         </Label>
                      </children>
                   </AnchorPane>
-                  <Pane layoutX="563.0" layoutY="12.0" minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="2" GridPane.rowSpan="2147483647">
+                  <Pane layoutX="563.0" layoutY="12.0" minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
                      <children>
                         <Label fx:id="lblRate" contentDisplay="TOP" text="0.0">
                            <graphic>
@@ -190,7 +145,7 @@
                               <Font size="10.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" id="1.0">
+                        <Slider id="1.0" fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
@@ -200,6 +155,50 @@
                         <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
                      </GridPane.margin>
                   </Pane>
+                  <ToolBar fx:id="tbPlayer" styleClass="btnBarPane" GridPane.columnSpan="2147483647">
+                     <items>
+                      <Button fx:id="btnPlayPause" mnemonicParsing="false" onAction="#btnActPlayPause">
+                           <graphic>
+                              <ImageView fx:id="btnPlayImgVw" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-play" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.PlayPause" />
+                           </tooltip>
+                        </Button>
+                        <Button fx:id="btnReplay" alignment="CENTER" minWidth="0.0" mnemonicParsing="false" onAction="#btnActReplay" prefWidth="0.0" visible="false">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-replay" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.Replay" />
+                           </tooltip>
+                        </Button>
+                        <Button fx:id="btnUncode" alignment="CENTER" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncode" prefWidth="0.0" visible="false">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncode" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.Uncode" />
+                           </tooltip>
+                        </Button>
+                        <Button fx:id="btnUncodeReplay" alignment="CENTER" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeReplay" prefWidth="0.0" visible="false">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncodeReplay" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.UncodeReplay" />
+                           </tooltip>
+                        </Button>
+                        <Button fx:id="btnRewind" alignment="CENTER" mnemonicParsing="false" onAction="#btnActRewind">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.Rewind" />
+                           </tooltip>
+                        </Button>
+                     </items>
+                  </ToolBar>
                </children>
             </GridPane>
          </children>
