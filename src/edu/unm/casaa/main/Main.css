@@ -92,7 +92,7 @@
 
 /* thinking of using this for coding and scoring background */
 .controlsWin {
-    -fx-background-color:rgba(21,27,31,0.3);
+    -fx-background-color:rgba(201,201,201,1.0);
 }
 
 
@@ -116,5 +116,10 @@
 }
 .toggle-button:selected {
     -fx-effect: null;
-    -fx-text-fill: gray;
+    -fx-text-fill: red;
+}
+.timeline {
+    -fx-background-insets: 0,0,0,0;
+    -fx-padding: 0 0 0 0;
+    -fx-border-width: 0.5;
 }

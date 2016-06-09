@@ -64,6 +64,8 @@ public class MainController {
     @FXML
     private GridPane pnlCodesRight;
     @FXML
+    private Button btnPlayPause;
+    @FXML
     private Button btnReplay;
     @FXML
     private Button btnUncode;
@@ -804,12 +806,7 @@ public class MainController {
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
 
                 // display controls needed for coding
-                btnReplay.setMinWidth(0.0);
-                btnReplay.setVisible(false);
-                btnUncode.setMinWidth(0.0);
-                btnUncode.setVisible(false);
-                btnUncodeReplay.setMinWidth(0.0);
-                btnUncodeReplay.setVisible(false);
+                setPlayerButtonState();
 
                 // resize window
                 ourTown.sizeToScene();
@@ -845,12 +842,7 @@ public class MainController {
                     snTimeline.setContent(new Timeline(this));
 
                     // display controls needed for coding
-                    btnReplay.setMinWidth(58.0);
-                    btnReplay.setVisible(true);
-                    btnUncode.setMinWidth(58.0);
-                    btnUncode.setVisible(true);
-                    btnUncodeReplay.setMinWidth(58.0);
-                    btnUncodeReplay.setVisible(true);
+                    setPlayerButtonState();
 
                     // load coding buttons from userConfiguration.xml appropriate for GuiState
                     parseUserControls();
@@ -968,13 +960,7 @@ public class MainController {
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
 
                 // hide controls needed for coding
-                // TODO like other duplicate code this can go into supporting member later
-                btnReplay.setMinWidth(0.0);
-                btnReplay.setVisible(false);
-                btnUncode.setMinWidth(0.0);
-                btnUncode.setVisible(false);
-                btnUncodeReplay.setMinWidth(0.0);
-                btnUncodeReplay.setVisible(false);
+                setPlayerButtonState();
 
                 // enable GLOBAL coding controls
                 loader = new FXMLLoader(getClass().getResource("GLOBAL_CODING.fxml"), resourceStrings);
@@ -1696,4 +1682,48 @@ public class MainController {
             vbApp.getChildren().remove(2);
         }
     }
+
+    private void setPlayerButtonState(){
+
+        // display controls needed for coding
+        switch (getGuiState()) {
+
+            case PLAYBACK:
+
+                btnPlayPause.setMinWidth(58.0);
+                btnPlayPause.setVisible(true);
+                btnReplay.setMinWidth(0.0);
+                btnReplay.setVisible(false);
+                btnUncode.setMinWidth(0.0);
+                btnUncode.setVisible(false);
+                btnUncodeReplay.setMinWidth(0.0);
+                btnUncodeReplay.setVisible(false);
+                break;
+
+            case MISC_CODING:
+
+                btnPlayPause.setMinWidth(0.0);
+                btnPlayPause.setVisible(false);
+                btnReplay.setMinWidth(58.0);
+                btnReplay.setVisible(true);
+                btnUncode.setMinWidth(58.0);
+                btnUncode.setVisible(true);
+                btnUncodeReplay.setMinWidth(58.0);
+                btnUncodeReplay.setVisible(true);
+                break;
+
+            case GLOBAL_CODING:
+
+                btnPlayPause.setMinWidth(58.0);
+                btnPlayPause.setVisible(true);
+                btnReplay.setMinWidth(0.0);
+                btnReplay.setVisible(false);
+                btnUncode.setMinWidth(0.0);
+                btnUncode.setVisible(false);
+                btnUncodeReplay.setMinWidth(0.0);
+                btnUncodeReplay.setVisible(false);
+                break;
+        }
+    }
+
 }

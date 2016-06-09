@@ -10,7 +10,6 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -20,58 +19,37 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="640" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>
         <Menu fx:id="mnuFile" text="%menu.title.file">
           <items>
-            <MenuItem fx:id="mniLoadAudio" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load.audio">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="F" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
-              <MenuItem fx:id="mniLoadCasaa" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.file.load.casaa">
-                  <accelerator>
-                      <KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                  </accelerator></MenuItem>
-            <MenuItem fx:id="mniExit" onAction="#mniActExit" text="%menu.title.file.exit">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
+            <MenuItem fx:id="mniLoadAudio" accelerator="Shortcut+F" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load.audio" />
+              <MenuItem fx:id="mniLoadCasaa" accelerator="Shortcut+C" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.file.load.casaa" />
+            <MenuItem fx:id="mniExit" accelerator="Shortcut+Q" onAction="#mniActExit" text="%menu.title.file.exit" />
           </items>
         </Menu>
         <Menu fx:id="mnuCodeUterrances" text="%menu.title.code">
           <items>
-            <MenuItem fx:id="mniCodeStart" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.code.start">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
-            <MenuItem fx:id="mniCodeResume" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.code.resume">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
+            <MenuItem fx:id="mniCodeStart" accelerator="Shortcut+S" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.code.start" />
+            <MenuItem fx:id="mniCodeResume" accelerator="Shortcut+R" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.code.resume" />
           </items>
         </Menu>
         <Menu fx:id="mnuGlobalRatings" text="%menu.title.global.ratings">
           <items>
-            <MenuItem fx:id="mniGlobalScore" mnemonicParsing="false" onAction="#mniGlobalScoring" text="%menu.title.global.score">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
+            <MenuItem fx:id="mniGlobalScore" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoring" text="%menu.title.global.score" />
           </items>
         </Menu>
             <Menu text="%menu.title.help">
               <items>
                 <MenuItem fx:id="mniAbout" mnemonicParsing="false" onAction="#mniActAbout" text="%menu.title.help.about" />
-                  <MenuItem fx:id="mniOnlineHelp" mnemonicParsing="false" onAction="#mniActOnlineHelp" text="%menu.title.help.online">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
+                  <MenuItem fx:id="mniOnlineHelp" mnemonicParsing="false" onAction="#mniActOnlineHelp" text="%menu.title.help.online" />
               </items>
             </Menu>
       </menus>
     </MenuBar>
-      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="571.0" styleClass="player">
+      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="780.0" styleClass="player">
          <children>
             <GridPane fx:id="gpMediaPlayer" layoutX="25.5" layoutY="76.5" minWidth="400.0" prefWidth="615.0" styleClass="gp-player" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columnConstraints>
