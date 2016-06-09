@@ -20,7 +20,7 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbApp" maxWidth="-Infinity" minHeight="135.0" minWidth="-Infinity" prefWidth="640" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="640" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>
@@ -71,9 +71,9 @@
             </Menu>
       </menus>
     </MenuBar>
-      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="571.0" styleClass="ap-player">
+      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="571.0" styleClass="player">
          <children>
-            <GridPane fx:id="gpMediaPlayer" layoutX="25.5" layoutY="76.5" minHeight="37.0" minWidth="400.0" prefHeight="96.0" prefWidth="615.0" styleClass="gp-player" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <GridPane fx:id="gpMediaPlayer" layoutX="25.5" layoutY="76.5" minWidth="400.0" prefWidth="615.0" styleClass="gp-player" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="1225.0" minWidth="10.0" prefWidth="1225.0" />
                 <ColumnConstraints hgrow="ALWAYS" />
@@ -86,73 +86,71 @@
                   <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="TOP" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" GridPane.rowIndex="2">
+                  <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" styleClass="slider-main" stylesheets="@Main.css" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="12.0" />
                      </GridPane.margin>
                   </Slider>
                   <MediaView fx:id="mediaView" fitHeight="10.0" fitWidth="10.0" GridPane.rowIndex="2" />
-                  <Label fx:id="lblAudioFilename" GridPane.rowIndex="3" GridPane.valignment="TOP">
+                  <Label fx:id="lblAudioFilename" styleClass="player-text" GridPane.rowIndex="3" GridPane.valignment="TOP">
                      <GridPane.margin>
                         <Insets left="12.0" />
                      </GridPane.margin>
                   </Label>
-                  <Pane minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
+                  <Pane minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="3">
                      <children>
-                        <Label fx:id="lblVolume" contentDisplay="TOP" text="0.0">
+                        <Label fx:id="lblVolume" alignment="CENTER" contentDisplay="TOP" prefHeight="52.0" prefWidth="30.0" text="0.0">
                            <graphic>
                               <ImageView fx:id="imgvwVolume" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="img-volume" />
                            </graphic>
                            <font>
-                              <Font size="10.0" />
+                              <Font size="12.0" />
                            </font>
                         </Label>
-                        <Slider id="0.5" fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0">
+                        <Slider fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-inset">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
                         </Slider>
                      </children>
                      <GridPane.margin>
-                        <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
+                        <Insets bottom="4.0" left="2.0" right="4.0" top="2.0" />
                      </GridPane.margin>
                   </Pane>
                   <AnchorPane GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
                      <children>
-                        <Label fx:id="lblTimePos" text="00:00:00" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <padding>
-                              <Insets left="10.0" />
-                           </padding>
-                        </Label>
+                        <Label fx:id="lblTimePos" alignment="BASELINE_CENTER" styleClass="player-text" text="00:00:00" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
+                     <GridPane.margin>
+                        <Insets left="10.0" />
+                     </GridPane.margin>
                   </AnchorPane>
                   <AnchorPane GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
                      <children>
-                        <Label fx:id="lblDuration" alignment="BASELINE_CENTER" text="00:00:00" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <padding>
-                              <Insets right="6.0" />
-                           </padding>
-                        </Label>
+                        <Label fx:id="lblDuration" alignment="BASELINE_CENTER" styleClass="player-text" text="00:00:00" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
+                     <GridPane.margin>
+                        <Insets right="10.0" />
+                     </GridPane.margin>
                   </AnchorPane>
                   <Pane layoutX="563.0" layoutY="12.0" minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
                      <children>
-                        <Label fx:id="lblRate" contentDisplay="TOP" text="0.0">
+                        <Label fx:id="lblRate" alignment="CENTER" contentDisplay="TOP" prefHeight="52.0" prefWidth="30.0" text="0.0">
                            <graphic>
                               <ImageView fx:id="imgvwRate" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="img-rate" />
                            </graphic>
                            <font>
-                              <Font size="10.0" />
+                              <Font size="12.0" />
                            </font>
                         </Label>
-                        <Slider id="1.0" fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0">
+                        <Slider fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-inset">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
                         </Slider>
                      </children>
                      <GridPane.margin>
-                        <Insets bottom="2.0" left="2.0" right="4.0" top="2.0" />
+                        <Insets bottom="4.0" left="2.0" right="4.0" top="2.0" />
                      </GridPane.margin>
                   </Pane>
                   <ToolBar fx:id="tbPlayer" styleClass="btnBarPane" GridPane.columnSpan="2147483647">
@@ -200,6 +198,9 @@
                      </items>
                   </ToolBar>
                </children>
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
             </GridPane>
          </children>
       </AnchorPane>

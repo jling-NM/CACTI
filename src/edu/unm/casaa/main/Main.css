@@ -1,3 +1,4 @@
+
 .menuBar {
     -fx-font-size: 12;
 }
@@ -23,9 +24,10 @@
 }
 
 
+/* */
 .btnBarPane {
     -fx-alignment: center ;
-    /*-fx-background-color:rgba(21,27,31,0.3);*/
+    -fx-background-color:none;
 }
 
 
@@ -39,39 +41,52 @@
     -fx-image: url("/media/img_rate.png");
 }
 
-.slider .track {
+.slider-main .track {
     -fx-background-color:rgba(255,0,0,0.3);
     -fx-background-insets: 1 0 -1 0, 0, 1;
     -fx-background-radius: 2.5, 2.5, 1.5;
     -fx-padding: 0.208333em; /* 2.5 */
 }
-.slider .thumb {
-    -fx-background-color:"blue";
-    -fx-background-radius: 2.1, 2.1, 1.1;
+.slider-main .thumb {
+    -fx-background-color:rgba(0,0,0,0.8);
+    -fx-background-radius: 4.1;
+}
+.slider-inset .track {
+    -fx-background-color:rgba(255,0,0,0.9);
+    -fx-background-insets: 1 0 -1 0, 0, 1;
+    -fx-background-radius: 2.5, 2.5, 1.5;
+    -fx-padding: 0.208333em; /* 2.5 */
+}
+.slider-inset .thumb {
+    -fx-background-color:rgba(0,0,0,0.8);
+    -fx-background-insets: 1 0 -1 0, 0, 1;
+    -fx-background-radius: 4.1;
+    -fx-border-width: 0.0;
+}
+.player {
+    -fx-border-color:rgba(201,201,201,1.0);
+    -fx-background-color:rgba(201,201,201,1.0);
+    -fx-border-width: 12.0;
 }
 .gp-player {
-    /*-fx-background-color:rgba(21,27,31,0.5);*/
-    -fx-border-color:rgba(101,101,101,1.0);
-    -fx-border-insets: 12.0, 0.1, 0.1, 0.1;
-    -fx-background-color:rgba(201,201,201,1.0);
-    -fx-background-radius: 5,4,3,5;
-    -fx-border-width: 0.5;
+    -fx-border-color:rgba(201,201,201,1.0);
+    -fx-border-insets: 0.1, 0.1, 0.1, 0.1;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, red 33%, darkred 80%);
+    -fx-background-radius: 7,4,3,5;
+    -fx-border-width: 1.5;
 }
-/*
-.ap-player {
-    -fx-border-color:rgba(101,101,101,1.0);
-    -fx-border-insets: 12.0, 0.1, 0.1, 0.1;
-    -fx-background-color:rgba(201,201,201,1.0);
-    -fx-background-radius: 5,4,3,5;
-    -fx-border-width: 0.5;
-}*/
-
 .pnVolume {
     -fx-border-color:rgba(101,101,101,1.0);
     -fx-border-insets: 0.1, 0.1, 0.1, 0.1;
-    -fx-background-color:rgba(187,187,187,1.0);
+    /*-fx-background-color:rgba(255,255,255,0.2);*/
+    -fx-background-color: rgba(255,0,0,0.4);
     -fx-background-radius: 5,4,3,5;
     -fx-border-width: 0.5;
+}
+.player-text {
+    -fx-text-fill: linear-gradient(white, #d0d0d0);
+    -fx-font-weight: bold;
+    /*-fx-background-color: rgba(0,0,0,0.2);*/
 }
 
 
@@ -99,7 +114,6 @@
 .btn-dark-blue Text {
     -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );
 }
-
 .toggle-button:selected {
     -fx-effect: null;
     -fx-text-fill: gray;

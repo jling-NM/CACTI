@@ -764,8 +764,8 @@ public class MainController {
         lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
 
         // destroy coding controls
-        if( vbApp.getChildren().size() == 4) {
-            vbApp.getChildren().remove(3);
+        if( vbApp.getChildren().size() == 3) {
+            vbApp.getChildren().remove(2);
         }
 
         Locale locale = new Locale("en", "US");
