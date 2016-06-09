@@ -42,6 +42,7 @@ import static java.lang.String.format;
 
 public class MainController {
 
+    // TODO group by screen
     @FXML
     private TextArea tfGlobalsNotes;
     @FXML
@@ -147,6 +148,7 @@ public class MainController {
 
         // load user config file to load user specific edited codes
         parseUserConfig();
+
     }
 
 
@@ -216,9 +218,6 @@ public class MainController {
         /* specific rewind button back 5 seconds */
         if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
-
-            // TODO: i don't know why this was here as it was firing in playback state. Find out by checking original maybe.
-            //updateUtteranceDisplays();
         }
     }
 
@@ -758,14 +757,19 @@ public class MainController {
 
     private void initializeUserControls() {
 
+        // save this window's stage for resizing new controls
         Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
-        // common control updates
+        // common control updates; file name in mediaplayer
         lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
 
-        // destroy coding controls
-        if( vbApp.getChildren().size() == 3) {
-            vbApp.getChildren().remove(2);
+        // this will store name of loaded set of controls; defaults to PLAYBACK
+        String currentUserControls = GuiState.PLAYBACK.name();
+
+        // if we have more than 2 we have user controls
+        if( vbApp.getChildren().size() > 2 ) {
+            // get usercontrols content node name
+            currentUserControls = vbApp.getChildren().get(2).getId();
         }
 
         Locale locale = new Locale("en", "US");
@@ -777,6 +781,9 @@ public class MainController {
         switch (getGuiState()) {
 
             case PLAYBACK:
+
+                // clean up non-playback controls
+                resetUserControlsContainer();
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -812,26 +819,52 @@ public class MainController {
 
             case MISC_CODING:
 
-                loader = new FXMLLoader(getClass().getResource("Coding.fxml"), resourceStrings);
-                loader.setController(this);
+                /*
+                   detect if already in MISC_CODING
+                   Somethings will not have to be reloaded and make user experience snappier
+                 */
+                if( ! currentUserControls.equals(getGuiState().name()) ) {
 
-                try {
-                    vbApp.getChildren().add(loader.load());
-                    // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
-                    // if i set controller in coding.fxml then it has not reference to local members down below
-                    // Therefore, i reset it.
-                    setGuiState(GuiState.MISC_CODING);
-                } catch (IOException ex) {
-                    showError("Error", ex.toString());
+                    resetUserControlsContainer();
+
+                    // load new controls
+                    loader = new FXMLLoader(getClass().getResource("MISC_CODING.fxml"), resourceStrings);
+                    loader.setController(this);
+                    try {
+                        vbApp.getChildren().add(loader.load());
+                        // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
+                        // if i set controller in coding.fxml then it has not reference to local members down below
+                        // Therefore, i reset it.
+                        setGuiState(GuiState.MISC_CODING);
+                    } catch (IOException ex) {
+                        showError("Error", ex.toString());
+                    }
+
+
+                    // activate the timeline display
+                    snTimeline.setContent(new Timeline(this));
+
+                    // display controls needed for coding
+                    btnReplay.setMinWidth(58.0);
+                    btnReplay.setVisible(true);
+                    btnUncode.setMinWidth(58.0);
+                    btnUncode.setVisible(true);
+                    btnUncodeReplay.setMinWidth(58.0);
+                    btnUncodeReplay.setVisible(true);
+
+                    // load coding buttons from userConfiguration.xml appropriate for GuiState
+                    parseUserControls();
+
+                    // resize app window
+                    ourTown.sizeToScene();
+
                 }
-
-
-                // activate the timeline display
-                snTimeline.setContent(new Timeline(this));
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
                    because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
+                   NOTE: It is important to bind property listeners before changing utterance data
+                   and adjusting the mediaplayer position below
                  */
                 mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
                     // update display of current time
@@ -841,7 +874,6 @@ public class MainController {
                     // update the timeline
                     updateTimeLineDisplay();
                 });
-
 
 
                 /***
@@ -888,21 +920,20 @@ public class MainController {
                  ***/
 
 
-
+                /**
+                 * adjust player position
+                 */
                 double positionInSecs = mediaplayerSeekBytes/getBytesPerSecond();
                 onReadySeekDuration = Duration.seconds(positionInSecs);
                 mediaPlayer.seek(onReadySeekDuration);
                 lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
 
-                // update timeline display as player seek doesn't update correctly on reload
-                updateTimeLineDisplay();
-
                 // update the utterance data(previous/current) displayed in the gui
                 updateUtteranceDisplays();
 
-                // load coding buttons from userConfiguration.xml appropriate for GuiState
-                parseUserControls();
+                // update timeline display as player seek doesn't update correctly on reload
+                updateTimeLineDisplay();
 
                 // display coding file path in gui
                 lblCurMiscFile.setText(filenameMisc);
@@ -910,22 +941,14 @@ public class MainController {
                 // reset some utterance accounting
                 resetUtteranceCoding();
 
-                // display controls needed for coding
-                btnReplay.setMinWidth(58.0);
-                btnReplay.setVisible(true);
-                btnUncode.setMinWidth(58.0);
-                btnUncode.setVisible(true);
-                btnUncodeReplay.setMinWidth(58.0);
-                btnUncodeReplay.setVisible(true);
-
-                // resize app window
-                ourTown.sizeToScene();
 
                 break;
 
 
             case GLOBAL_CODING:
 
+                // always reset for globals
+                resetUserControlsContainer();
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -937,7 +960,6 @@ public class MainController {
                     // update the mediaplayer slider
                     sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
                 });
-
 
                 // reset playback controls to zero
                 onReadySeekDuration = Duration.ZERO;
@@ -955,15 +977,13 @@ public class MainController {
                 btnUncodeReplay.setVisible(false);
 
                 // enable GLOBAL coding controls
-                loader = new FXMLLoader(getClass().getResource("Scoring.fxml"), resourceStrings);
+                loader = new FXMLLoader(getClass().getResource("GLOBAL_CODING.fxml"), resourceStrings);
                 loader.setController(this);
 
                 try {
-                    System.out.println("Before load:"+getGuiState());
                     vbApp.getChildren().add(loader.load());
                     // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
                     // Therefore, i reset it.
-                    System.out.println("After load:"+getGuiState());
                     setGuiState(GuiState.GLOBAL_CODING);
                 } catch (IOException ex) {
                     showError("Error", ex.toString());
@@ -981,6 +1001,7 @@ public class MainController {
 
 
         }
+
     }
 
 
@@ -1178,7 +1199,7 @@ public class MainController {
                 filename = filenameGlobals;
                 if( asBackup ) { filename += ".backup"; }
                 //writeGlobalsToFile( new File( filename ), filenameAudio );
-
+                // TODO why no save when save works
                 System.out.println("Write Globals to File");
                 break;
         }
@@ -1663,5 +1684,16 @@ public class MainController {
 
     private GuiState getGuiState() {
         return guiState;
+    }
+
+    /**
+     *
+     */
+    private void resetUserControlsContainer() {
+        // check length again before removing
+        if( vbApp.getChildren().size() > 2 ) {
+            // remove usercontrols content node. At some point i determined that remove add worked better than setContent()
+            vbApp.getChildren().remove(2);
+        }
     }
 }
