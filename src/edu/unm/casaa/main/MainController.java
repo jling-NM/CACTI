@@ -42,27 +42,16 @@ import static java.lang.String.format;
 
 public class MainController {
 
-    // TODO group by screen
-    @FXML
-    private TextArea tfGlobalsNotes;
+
+    // PLAYBACK
     @FXML
     private Label lblRate;                              // display current playback rate
     @FXML
     private Slider sldRate;                             // playback rate control
     @FXML
-    private GridPane gpGlobalControls;                  // control containing globals controls
-    @FXML
     private VBox vbApp;                                 // control holding non-playback controls (misc/globals)
     @FXML
     private Label lblAudioFilename;                     //
-    @FXML
-    private TitledPane titlePnlCodesLeft;
-    @FXML
-    private TitledPane titlePnlCodesRight;
-    @FXML
-    private GridPane pnlCodesLeft;
-    @FXML
-    private GridPane pnlCodesRight;
     @FXML
     private Button btnPlayPause;
     @FXML
@@ -71,8 +60,6 @@ public class MainController {
     private Button btnUncode;
     @FXML
     private Button btnUncodeReplay;
-    @FXML
-    private ToggleButton btnStartCoding;
     @FXML
     private Label lblTimePos;
     @FXML
@@ -91,6 +78,19 @@ public class MainController {
     public Slider sldVolume;
     @FXML
     private ImageView btnPlayImgVw;
+
+
+    // MISC_CODING
+    @FXML
+    private TitledPane titlePnlCodesLeft;
+    @FXML
+    private TitledPane titlePnlCodesRight;
+    @FXML
+    private GridPane pnlCodesLeft;
+    @FXML
+    private GridPane pnlCodesRight;
+    @FXML
+    private ToggleButton btnStartCoding;
     @FXML
     private SwingNode snTimeline;
     @FXML
@@ -105,6 +105,15 @@ public class MainController {
     private Label lblCurUtrEndTime;
     @FXML
     private Label lblPrevUtr;
+
+
+    // GLOBALS_CODING
+    @FXML
+    private TextArea tfGlobalsNotes;
+    @FXML
+    private GridPane gpGlobalControls;                  // control containing globals controls
+
+
 
 
     private Preferences appPrefs;                       // User prefs persistence
@@ -314,6 +323,7 @@ public class MainController {
     }
 
 
+
     /**********************************************************************
      *  button event: Apply utterance code
      **********************************************************************/
@@ -343,12 +353,8 @@ public class MainController {
         alert.setTitle(resourceStrings.getString("wind.title.about"));
         alert.setHeaderText(null);
         alert.setContentText(resourceStrings.getString("txt.about"));
-        //alert.setHeight(800); //TODO: this doesn't give proper size yet
-        //alert.setWidth(600);
-        //alert.setX(400);
         alert.initStyle(StageStyle.UTILITY);
         alert.showAndWait();
-
     }
 
 
@@ -397,6 +403,9 @@ public class MainController {
 
         File selectedFile = selectAudioFile();
         if (selectedFile != null) {
+            currentAudioFile = selectedFile;
+            filenameAudio = selectedFile.getAbsolutePath();
+
             initializeMediaPlayer(selectedFile, playerReady);
         }
 
@@ -688,9 +697,6 @@ public class MainController {
                 // legacy TODO: notes
                 setAudioLength(mediaFile);
                 setBytesPerSecond(mediaFile);
-
-                // NEED? can use getSource()
-                //filenameAudio = mediaFile.getAbsolutePath();
 
                 /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(onReadyMethod);
@@ -1654,7 +1660,6 @@ public class MainController {
             // do stuff before changing state
             if (getGuiState().equals(GuiState.GLOBAL_CODING)) {
                 if( globalsData != null ) {
-                    System.out.println("Save Globals data.");
                     if( !tfGlobalsNotes.getText().isEmpty() ) {
                         globalsData.setNotes(tfGlobalsNotes.getText());
                     }
@@ -1668,12 +1673,18 @@ public class MainController {
         guiState = gs;
     }
 
+
+    /**
+     *
+     * @return
+     */
     private GuiState getGuiState() {
         return guiState;
     }
 
+
     /**
-     *
+     * TODO
      */
     private void resetUserControlsContainer() {
         // check length again before removing
@@ -1683,6 +1694,10 @@ public class MainController {
         }
     }
 
+
+    /**
+     * TODO
+     */
     private void setPlayerButtonState(){
 
         // display controls needed for coding
@@ -1703,6 +1718,7 @@ public class MainController {
             case MISC_CODING:
 
                 btnPlayPause.setMinWidth(0.0);
+                btnPlayPause.setMaxWidth(0.0);
                 btnPlayPause.setVisible(false);
                 btnReplay.setMinWidth(58.0);
                 btnReplay.setVisible(true);
@@ -1710,6 +1726,7 @@ public class MainController {
                 btnUncode.setVisible(true);
                 btnUncodeReplay.setMinWidth(58.0);
                 btnUncodeReplay.setVisible(true);
+                btnReplay.getParent().autosize();
                 break;
 
             case GLOBAL_CODING:
@@ -1717,10 +1734,13 @@ public class MainController {
                 btnPlayPause.setMinWidth(58.0);
                 btnPlayPause.setVisible(true);
                 btnReplay.setMinWidth(0.0);
+                btnReplay.setMaxWidth(0.0);
                 btnReplay.setVisible(false);
                 btnUncode.setMinWidth(0.0);
+                btnUncode.setMaxWidth(0.0);
                 btnUncode.setVisible(false);
                 btnUncodeReplay.setMinWidth(0.0);
+                btnUncodeReplay.setMaxWidth(0.0);
                 btnUncodeReplay.setVisible(false);
                 break;
         }

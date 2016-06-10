@@ -19,7 +19,7 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>
@@ -64,7 +64,7 @@
                   <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="TOP" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" styleClass="slider-main" stylesheets="@Main.css" GridPane.rowIndex="2">
+                  <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" styleClass="slider" stylesheets="@Main.css" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets left="12.0" />
                      </GridPane.margin>
@@ -85,7 +85,7 @@
                               <Font size="12.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-inset">
+                        <Slider fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
@@ -121,7 +121,7 @@
                               <Font size="12.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-inset">
+                        <Slider fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
