@@ -61,6 +61,8 @@ public class MainController {
     @FXML
     private Button btnUncodeReplay;
     @FXML
+    private Button btnRewind;
+    @FXML
     private Label lblTimePos;
     @FXML
     private Label lblVolume;
@@ -299,12 +301,26 @@ public class MainController {
         int position = getStreamPosition();
 
         // Start/resume playback.
-        // TODO: change back to original functionality and make button toggle??
-        // that is more work and my way seems more intuitive
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+
             mediaPlayer.pause();
+            sldSeek.setDisable(true);
+            btnStartCoding.setText("Start Coding");
+            btnUncodeReplay.setDisable(true);
+            btnUncode.setDisable(true);
+            btnReplay.setDisable(true);
+            btnRewind.setDisable(true);
+
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
+
             mediaPlayer.play();
+            sldSeek.setDisable(false);
+            btnStartCoding.setText("Stop Coding");
+            btnUncodeReplay.setDisable(false);
+            btnUncode.setDisable(false);
+            btnReplay.setDisable(false);
+            btnRewind.setDisable(false);
+
         }
 
         if( getUtteranceList().size() > 0 )
@@ -400,6 +416,11 @@ public class MainController {
     public void mniActOpenFile(ActionEvent actionEvent) {
 
         setGuiState(GuiState.PLAYBACK);
+
+        // if something be playing, stop it
+        if(mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
 
         File selectedFile = selectAudioFile();
         if (selectedFile != null) {
@@ -1705,34 +1726,48 @@ public class MainController {
 
             case PLAYBACK:
 
+                sldSeek.setDisable(false);
                 btnPlayPause.setMinWidth(58.0);
                 btnPlayPause.setVisible(true);
+                btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(0.0);
                 btnReplay.setVisible(false);
+                btnReplay.setDisable(true);
                 btnUncode.setMinWidth(0.0);
                 btnUncode.setVisible(false);
+                btnUncode.setDisable(true);
                 btnUncodeReplay.setMinWidth(0.0);
                 btnUncodeReplay.setVisible(false);
+                btnUncodeReplay.setDisable(true);
+                btnRewind.setDisable(false);
                 break;
 
             case MISC_CODING:
 
+                sldSeek.setDisable(true);
                 btnPlayPause.setMinWidth(0.0);
                 btnPlayPause.setMaxWidth(0.0);
                 btnPlayPause.setVisible(false);
+                btnPlayPause.setDisable(true);
                 btnReplay.setMinWidth(58.0);
                 btnReplay.setVisible(true);
+                btnReplay.setDisable(true);
                 btnUncode.setMinWidth(58.0);
                 btnUncode.setVisible(true);
+                btnUncode.setDisable(true);
                 btnUncodeReplay.setMinWidth(58.0);
                 btnUncodeReplay.setVisible(true);
+                btnUncodeReplay.setDisable(true);
+                btnRewind.setDisable(true);
                 btnReplay.getParent().autosize();
                 break;
 
             case GLOBAL_CODING:
 
+                sldSeek.setDisable(false);
                 btnPlayPause.setMinWidth(58.0);
                 btnPlayPause.setVisible(true);
+                btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(0.0);
                 btnReplay.setMaxWidth(0.0);
                 btnReplay.setVisible(false);
@@ -1742,6 +1777,7 @@ public class MainController {
                 btnUncodeReplay.setMinWidth(0.0);
                 btnUncodeReplay.setMaxWidth(0.0);
                 btnUncodeReplay.setVisible(false);
+                btnRewind.setDisable(false);
                 break;
         }
     }
