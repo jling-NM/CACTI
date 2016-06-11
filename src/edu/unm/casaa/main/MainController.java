@@ -24,6 +24,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import javafx.util.Duration;
 import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
@@ -163,61 +164,15 @@ public class MainController {
         //    AquaFx.style();
         //}
 
+
         // check for required config to offer generation
-        checkUserConfig();
+        verifyUserConfig();
 
         // load user config file to load user specific edited codes
         parseUserConfig();
 
     }
 
-    private void checkUserConfig() {
-
-        String configFilePath = appPrefs.get("configFilePath","");
-
-        File file = new File(configFilePath);
-
-        if( ! file.canRead() ) {
-
-            Locale locale = new Locale("en", "US");
-            ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
-
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Missing File");
-            String s = "The file UserConfiguration.xml cannot be found\nIf you would like to use a file from a different location click 'Locate'. If you would like to generate a default click 'New'\n";
-            alert.setContentText(s);
-
-            ButtonType buttonTypeOne = new ButtonType("New");
-            ButtonType buttonTypeTwo = new ButtonType("Locate");
-            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-            alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonTypeOne){
-                // generate default
-
-                File config = new File(configFilePath);
-                PrintWriter writer = null;
-                try {
-                    writer = new PrintWriter( new FileWriter( config, false ) );
-                    writer.print( '<userConfiguration><codes><!-- Therapist codes --><code name="C1" value="1"/><code name="C2" value="2"/><code name="SR-" value="18"/><code name="SR0" value="19"/><code name="SR+" value="20"/><code name="SR+/-" value="51"/><code name="CR-" value="21"/><code name="CR0" value="22"/><code name="CR+" value="23"/><code name="CR+/-" value="52"/><code name="ADP" value="1"/><code name="AF" value="3"/><code name="EC" value="6"/><code name="RCP" value="16"/><code name="RF" value="24"/><code name="SU" value="25"/><code name="ADW" value="2"/><code name="CO" value="4"/><code name="DI" value="5"/><code name="RCW" value="17"/><code name="WA" value="27"/><code name="FA" value="7"/><code name="FI" value="8"/><code name="GI" value="9"/><!-- Client codes --><code name="D+" value="34"/><code name="D-" value="35"/><code name="A+" value="36"/><code name="A-" value="37"/><code name="R+" value="32"/><code name="R-" value="33"/><code name="N+" value="38"/><code name="N-" value="39"/><code name="C+" value="30"/><code name="C-" value="31"/><code name="TS+" value="40"/><code name="TS-" value="41"/><code name="O+" value="42"/><code name="O-" value="43"/><code name="FN" value="44"/><code name="NC" value="50"/><!-- Example codes to use in a group --><code name="Z+" value="100"/><code name="Z-" value="101"/><code name="Z+/-" value="102"/></codes><codeControls panel="left" label="Therapist"><row><button code="CQ0"/><button code="OQ0"/></row><row><button code="SR-"/><button code="SR0"/><button code="SR+"/><button code="SR+/-"/></row><row><button code="CR-"/><button code="CR0"/><button code="CR+"/><button code="CR+/-"/></row><row><button code="ADP"/><button code="AF"/><button code="EC"/><button code="RCP"/></row><row><button code="RF"/><button code="SU"/></row><row><button code="ADW"/><button code="CO"/><button code="DI"/><button code="RCW"/></row><row><button code="WA"/></row><row><button code="FA"/><button code="FI"/><button code="GI"/></row></codeControls><codeControls panel="right" label="Client"><row><button code="D+"/><button code="D-"/></row><row><button code="A+"/><button code="A-"/></row><row><button code="R+"/><button code="R-"/></row><row><button code="N+"/><button code="N-"/></row><row><button code="C+"/><button code="C-"/></row><row><button code="TS+"/><button code="TS-"/></row><row><button code="O+"/><button code="O-"/></row><row><button code="FN"/><button code="NC"/></row><!-- Example row with group<row><group label="Group Z"><button code="Z+" key="X"/><button code="Z-" key="C"/><button code="Z+/-" key="Z"/></group></row>--></codeControls>');
-                            writer.print( '<globals><global name="ACCEPTANCE" label="Acceptance" value="0"/><global name="EMPATHY" label="Empathy" value="1"/><global name="DIRECTION" label="Direction" value="2"/><global name="AUTONOMY" label="Autonomy Support" value="3"/><global name="COLLABORATION" label="Collaboration" value="4"/><global name="EVOCATION" label="Evocation" value="5"/><global name="SELF_EXPLORATION" label="Self Exploration" value="6" defaultRating="3"/></globals><globalControls panel="left"><slider global="ACCEPTANCE"/><slider global="EMPATHY"/><slider global="DIRECTION"/><slider global="AUTONOMY"/></globalControls><globalControls panel="right"><slider global="COLLABORATION"/><slider global="EVOCATION"/><spacer/><slider global="SELF_EXPLORATION"/></globalControls><globalsBorder label="Global Ratings"/></userConfiguration>' );
-                } catch( IOException e ) {
-                    e.printStackTrace();
-                } finally {
-                    writer.close();
-                }
-
-            } else if (result.get() == buttonTypeTwo) {
-                //
-                System.out.println("find");
-            } else {
-                System.exit(0);
-            }
-
-        }
-    }
 
 
     /*********************************************************
@@ -753,6 +708,47 @@ public class MainController {
 
         return selectedFile;
     }
+
+
+
+
+    private void selectConfigFile(String newFileName) {
+
+        // set code file chooser
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CACTI Config files", "*.xml"));
+        // set chooser init file
+        System.out.println(UserConfig.getPath());
+
+
+        // get user selection
+        File selectedFile;
+        if (newFileName.isEmpty()) {
+            // seed path empty; select existing
+            File initDir = new File(System.getProperty("user.home"));
+            fc.setTitle("Open Config File");
+            fc.setInitialDirectory(initDir);
+            selectedFile = fc.showOpenDialog(null);
+        } else {
+            // create new file
+            fc.setTitle("Create New Config File");
+            File initFile = new File(newFileName);
+            fc.setInitialDirectory(initFile.getParentFile());
+            fc.setInitialFileName(initFile.getName());
+            selectedFile = fc.showSaveDialog(null);
+        }
+
+        // persist path for next time
+        if( selectedFile != null) {
+            UserConfig.setPath(selectedFile.getAbsolutePath());
+        } else {
+            System.exit(0);
+        }
+
+    }
+
+
+
 
 
     /**********************************************************************
@@ -1351,7 +1347,7 @@ public class MainController {
         if( MiscCode.numCodes() == 0 ){
 
             // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
-            File file = new File("userConfiguration.xml");
+            File file = new File(UserConfig.getPath());
 
             if( file.canRead() ) {
                 try {
@@ -1509,7 +1505,7 @@ public class MainController {
      *************************************************************/
     private void parseUserControls() {
 
-        File file = new File("userConfiguration.xml");
+        File file = new File(UserConfig.getPath());
 
         if( file.exists() ) {
             try {
@@ -1834,4 +1830,36 @@ public class MainController {
         }
     }
 
+
+    private void verifyUserConfig() {
+
+        if( ! UserConfig.exists() ) {
+
+            Locale locale = new Locale("en", "US");
+            ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(resourceStrings.getString("alert.config.title"));
+            alert.setContentText(resourceStrings.getString("alert.config.text"));
+
+            ButtonType buttonTypeOne = new ButtonType(resourceStrings.getString("alert.config.btn1.text"));
+            ButtonType buttonTypeTwo = new ButtonType(resourceStrings.getString("alert.config.btn2.text"));
+            ButtonType buttonTypeCancel = new ButtonType(resourceStrings.getString("alert.config.btn3.text"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == buttonTypeOne){
+                // create new using default path
+                selectConfigFile(UserConfig.getPath());
+                UserConfig.writeDefault();
+            } else if (result.get() == buttonTypeTwo) {
+                // select existing by sending no path
+                selectConfigFile("");
+            } else {
+                System.exit(0);
+            }
+
+        }
+    }
 }
