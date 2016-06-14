@@ -66,7 +66,9 @@ public class MiscCode {
 	}
 
 	// PRE: code exists with given value.
-	public static MiscCode codeWithValue( int value ) {
+	public static MiscCode codeWithValue( int value ) throws NullPointerException {
+
+        // TODO: this doesn't work. catches everything
 		// Check known codes.
 		if( value == INVALID_CODE.value ) {
 			return INVALID_CODE;
@@ -77,9 +79,10 @@ public class MiscCode {
 
 			if( code.value == value ) {
 				return code;
+			} else {
+				throw new NullPointerException("Code with given value not found: " + value);
 			}
 		}
-		assert false : "Code with given value not found: " + value;
 		return null;
 	}
 

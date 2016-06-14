@@ -122,7 +122,7 @@ public class UtteranceList {
 	 * @param file
 	 * @return filenameAudio
 	 */
-	public String loadFromFile( File file ) {
+	public void loadFromFile( File file ) throws Exception {
 		list.clear(); // Clear existing contents.
 
 		Scanner in = null;
@@ -130,20 +130,15 @@ public class UtteranceList {
 		try {
 			in = new Scanner(file);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			throw e;
 		}
-		if( !in.hasNext() ){
-			return ("ERROR: No Audio File Listed");
-		}
+
 		// Eat the audio filename line.
 		String 			filenameAudio 	= in.nextLine();
 		StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
 
 		headReader.nextToken(); // Eat line heading "Audio Filename:"
-		filenameAudio = headReader.nextToken();
-		if( (filenameAudio.trim()).equalsIgnoreCase("") ){
-			return ("ERROR: No Audio File Listed");
-		}
+
 		while( in.hasNextLine() ){
 			// NOTE: MISC is hard-coded
 			// MISC format: int order, String startTime, String EndTime,
@@ -161,15 +156,56 @@ public class UtteranceList {
 			int 			endBytes 	= Integer.parseInt(st.nextToken());
 			MiscDataItem 	item 		= new MiscDataItem(order, start, stBytes);
 
+
 			item.setEndTime(end);
 			item.setEndBytes(endBytes);
 			if( lineSize == 7 ){
-				item.setMiscCodeByValue( Integer.parseInt( st.nextToken() ) );
+
+                // TODO: this doesn't work. catches everything
+                // look up parsed code in user config codes loaded at init
+                try {
+                    item.setMiscCodeByValue( Integer.parseInt( st.nextToken() ) );
+                } catch (Exception e) {
+                    // if lookup failed there is a possible disconnect between codes in casaa file
+                    // and codes in user config file
+                    throw new Exception("Code in casaa file not found in user configuration file");
+                }
 				st.nextToken(); //throw away the code string
 			}
 			add(item);
 		}
-		return filenameAudio;
+
 	}
 
+
+    /**
+     * Separate function for reading audio filename from code file
+     * @param file
+     * @return filenameAudio
+     */
+    public static String getAudioFilename( File file ) throws IOException {
+
+        Scanner in;
+        try {
+            in = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            throw e;
+        }
+
+        if( !in.hasNext() ){
+            throw new IOException("No Audio File Listed in code file");
+        }
+
+        // Eat the audio filename line.
+        String 			filenameAudio 	= in.nextLine();
+        StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+        headReader.nextToken(); // Eat line heading "Audio Filename:"
+        filenameAudio = headReader.nextToken();
+        if( (filenameAudio.trim()).equalsIgnoreCase("") ){
+            throw new IOException("No Audio File Listed in code file");
+        }
+
+        return filenameAudio;
+    }
 }

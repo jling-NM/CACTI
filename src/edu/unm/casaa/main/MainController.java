@@ -512,10 +512,24 @@ public class MainController {
         }
         filenameMisc = miscFile.getAbsolutePath();
 
-        // load audio file and utterancelist at same time
-        // TODO: consider clarifying this with separate class
-        // TODO: we should trap errors reading the codes here too
-        filenameAudio = getUtteranceList().loadFromFile(miscFile);
+        // get audio file name from code file
+        try {
+            filenameAudio = UtteranceList.getAudioFilename(miscFile);
+
+        } catch (IOException e) {
+            showError("Error Loading Code File", e.getMessage());
+        }
+
+        // now get utterances from code file
+        // TODO: this doesn't work. catches everything
+        try {
+            getUtteranceList().loadFromFile(miscFile);
+        } catch (Exception e) {
+            showError("Error Loading Code File", e.getMessage());
+            return;
+        }
+
+        // load the audio and start the player
         File audioFile = new File(filenameAudio);
         if (audioFile.canRead()) {
             initializeMediaPlayer(audioFile, playerReady);
@@ -1862,4 +1876,6 @@ public class MainController {
 
         }
     }
+
+
 }
