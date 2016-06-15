@@ -31,17 +31,15 @@ import edu.unm.casaa.misc.MiscDataItem;
 
 /**
  * A vector of utterances, stored in their recorded order.
- * @author Alex Manuel
- *
  */
 public class UtteranceList {
 
 	private static final long serialVersionUID 	= 1L;
-	private Vector< Utterance >	list 			= new Vector< Utterance >();
+	private Vector< Utterance >	list 			= new Vector<>();
 
 	/**
 	 * Append utterance.
-	 * @param data
+	 * @param data new utterance
 	 */
 	public void	add( Utterance data ){
 		list.add( data );
@@ -58,7 +56,7 @@ public class UtteranceList {
 
 	/**
 	 * Return utterance at given index, or null is index is out of bounds.
-	 * @param index
+	 * @param index utterance position
 	 * @return the utterance at given index, or null if index is out of bounds
 	 */
 	public Utterance get(int index){
@@ -87,45 +85,43 @@ public class UtteranceList {
 
 	/**
 	 * Write to file.
-	 * @param file
-	 * @param filenameAudio
+	 * @param file casaa file
+	 * @param filenameAudio audio filename
 	 */
-	public void writeToFile( File file, String filenameAudio ) {
-		PrintWriter writer = null;
+	public void writeToFile( File file, String filenameAudio ) throws IOException {
 
-		try {
-			writer = new PrintWriter( new FileWriter( file, false ) );
-			writer.println( "Audio File:\t" + filenameAudio );
-			for( int i = 0; i < list.size(); i++ ) {
-				Utterance utterance = list.get( i );
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file, false))) {
 
-				if( utterance.isCoded() ) {
-					writer.println( utterance.writeCoded() );
-				} else if( utterance.isParsed() ) {
-					writer.println( utterance.writeParsed() );
-				} else {
-					// If not coded or parsed, utterance is incomplete.  This should
-					// only happen if we're on the last utterance in list.
-					assert( i + 1 == list.size() );
-					break;
-				}
-			}
-		} catch( IOException e ) {
-			e.printStackTrace();
-		} finally {
-			writer.close();
-		}
+            writer.println("Audio File:\t" + filenameAudio);
+            for (int i = 0; i < list.size(); i++) {
+                Utterance utterance = list.get(i);
+
+                if (utterance.isCoded()) {
+                    writer.println(utterance.writeCoded());
+                } else if (utterance.isParsed()) {
+                    writer.println(utterance.writeParsed());
+                } else {
+                    // If not coded or parsed, utterance is incomplete.  This should
+                    // only happen if we're on the last utterance in list.
+                    assert (i + 1 == list.size());
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            throw e;
+        }
 	}
 
-	/**
-	 * Load from file.  Overwrites any existing contents.
-	 * @param file
-	 * @return filenameAudio
-	 */
+
+    /**
+     * Load from file.  Overwrites any existing contents.
+     * @param file casaa file
+     * @throws Exception
+     */
 	public void loadFromFile( File file ) throws Exception {
 		list.clear(); // Clear existing contents.
 
-		Scanner in = null;
+		Scanner in;
 
 		try {
 			in = new Scanner(file);
@@ -161,17 +157,18 @@ public class UtteranceList {
 			item.setEndBytes(endBytes);
 			if( lineSize == 7 ){
 
-                // TODO: this doesn't work. catches everything
+                int codeId = Integer.parseInt( st.nextToken() );
                 // look up parsed code in user config codes loaded at init
                 try {
-                    item.setMiscCodeByValue( Integer.parseInt( st.nextToken() ) );
+                    item.setMiscCodeByValue(codeId);
                 } catch (Exception e) {
                     // if lookup failed there is a possible disconnect between codes in casaa file
                     // and codes in user config file
-                    throw new Exception("Code in casaa file not found in user configuration file");
+                    throw new Exception( String.format("Code(%d) in casaa file not found in user configuration file", codeId) );
                 }
 				st.nextToken(); //throw away the code string
 			}
+
 			add(item);
 		}
 
@@ -180,7 +177,7 @@ public class UtteranceList {
 
     /**
      * Separate function for reading audio filename from code file
-     * @param file
+     * @param file casaa file
      * @return filenameAudio
      */
     public static String getAudioFilename( File file ) throws IOException {
@@ -193,17 +190,17 @@ public class UtteranceList {
         }
 
         if( !in.hasNext() ){
-            throw new IOException("No Audio File Listed in code file");
+            throw new IOException("No Audio File Listed in casaa file");
         }
 
-        // Eat the audio filename line.
+        // Get the audio filename line.
         String 			filenameAudio 	= in.nextLine();
         StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
 
         headReader.nextToken(); // Eat line heading "Audio Filename:"
         filenameAudio = headReader.nextToken();
         if( (filenameAudio.trim()).equalsIgnoreCase("") ){
-            throw new IOException("No Audio File Listed in code file");
+            throw new IOException("No Audio File Listed in casaa file");
         }
 
         return filenameAudio;

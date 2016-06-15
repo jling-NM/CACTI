@@ -20,8 +20,6 @@ package edu.unm.casaa.misc;
 
 import java.util.Vector;
 
-import edu.unm.casaa.main.MainController;
-
 // MiscCode associates a label, such as "CR+/-" or "ADP", with a numeric value.
 public class MiscCode { 
 	private static final long serialVersionUID 	= 1L;
@@ -30,60 +28,67 @@ public class MiscCode {
 	public static final MiscCode		INVALID_CODE	= new MiscCode();
 
 	// List of available codes.  Built when we parse XML file.
-	private static Vector< MiscCode >	list	= new Vector< MiscCode >();
+	private static Vector< MiscCode >	list	        = new Vector<>();
 
-	public int 			value	= INVALID;
-	public String		name	= "";
+	public int 			value	                        = INVALID;
+	public String		name	                        = "";
+
 
 	// Class:
 
-	// Add new code.  Returns true on success, shows warning dialog on failure.
-	// TODO: this shouldn't call controller but raise an error or send 'false'
-    // TODO: fix this
-	public static boolean	addCode( MiscCode newCode ) {
-		// Check that we're not duplicating an existing value or label.
-		for( int i = 0; i < list.size(); i++ ) {
-			MiscCode code = list.get( i );
+    /**
+     * Add new code
+     * @param newCode code to be added
+     * @throws Exception on duplicates
+     */
+	public static void addCode( MiscCode newCode ) throws Exception {
 
-			if( code.value == newCode.value || code.name.equals( newCode.name ) ) {
-				MainController.showFatalWarning(
-						"User Code Error",
-						"New code " + 
-						newCode.toDisplayString() + " conflicts with existing code " + code.toDisplayString() );
-			}
-		}
+		// Check that we're not duplicating an existing value or label.
+        for (MiscCode code : list) {
+            if (code.value == newCode.value || code.name.equals(newCode.name)) {
+                throw new Exception(String.format("New code %s conflicts with existing code %s", newCode.toDisplayString(), code.toDisplayString()));
+            }
+        }
 		list.add( newCode );
-		return true;
 	}
 
-	public static int	numCodes() {
+
+	public static int numCodes() {
 		return list.size();
 	}
 
-	// PRE: index < numCodes().
-	public static MiscCode codeAtIndex( int index ) {
+    /**
+     *
+     * @param index code position
+     * @return code at index
+     * @throws ArrayIndexOutOfBoundsException
+     */
+	public static MiscCode codeAtIndex( int index ) throws ArrayIndexOutOfBoundsException {
 		return list.get( index );
 	}
 
-	// PRE: code exists with given value.
+
+    /**
+     * Retrieve code
+     * @param value integer code the MISC statistical code
+     * @return MiscCode for given id value
+     * @throws NullPointerException
+     */
 	public static MiscCode codeWithValue( int value ) throws NullPointerException {
 
-        // TODO: this doesn't work. catches everything
 		// Check known codes.
 		if( value == INVALID_CODE.value ) {
 			return INVALID_CODE;
 		}
-		// Check user codes.
-		for( int i = 0; i < list.size(); i++ ) {
-			MiscCode code = list.get( i );
+		// Check user codes loaded from config for matchs.
+        for (MiscCode code : list) {
+            if (code.value == value) {
+                return code;
+            }
+        }
+        // if we get here, no matching code
+		throw new NullPointerException("Code with given value not found: " + value);
 
-			if( code.value == value ) {
-				return code;
-			} else {
-				throw new NullPointerException("Code with given value not found: " + value);
-			}
-		}
-		return null;
 	}
 
 	// PRE: code exists with given name.
@@ -93,13 +98,11 @@ public class MiscCode {
 			return INVALID_CODE;
 		}
 		// Check user codes.
-		for( int i = 0; i < list.size(); i++ ) {
-			MiscCode code = list.get( i );
-
-			if( code.name.equals( name ) ) {
-				return code;
-			}
-		}
+        for (MiscCode code : list) {
+            if (code.name.equals(name)) {
+                return code;
+            }
+        }
 		assert false : "Code with given name not found: " + name;
 		return null;
 	}
@@ -122,4 +125,4 @@ public class MiscCode {
 	public String toDisplayString() {
 		return "(name: " + name + ", value: " + value + ")";
 	}
-};
+}

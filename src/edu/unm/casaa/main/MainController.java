@@ -1,3 +1,21 @@
+/*
+This source code file is part of the CASAA Treatment Coding System Utility
+    Copyright (C) 2009  UNM CASAA
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package edu.unm.casaa.main;
 
 import edu.unm.casaa.misc.MiscCode;
@@ -515,17 +533,15 @@ public class MainController {
         // get audio file name from code file
         try {
             filenameAudio = UtteranceList.getAudioFilename(miscFile);
-
         } catch (IOException e) {
-            showError("Error Loading Code File", e.getMessage());
+            showError("Error Loading Casaa File", e.getMessage());
         }
 
         // now get utterances from code file
-        // TODO: this doesn't work. catches everything
         try {
             getUtteranceList().loadFromFile(miscFile);
         } catch (Exception e) {
-            showError("Error Loading Code File", e.getMessage());
+            showError("Error Loading Casaa File", e.getMessage());
             return;
         }
 
@@ -534,7 +550,7 @@ public class MainController {
         if (audioFile.canRead()) {
             initializeMediaPlayer(audioFile, playerReady);
         } else {
-            showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            showError("Error Loading Audio File", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
 
 
@@ -1267,7 +1283,11 @@ public class MainController {
             case MISC_CODING:
                 filename = filenameMisc;
                 if( asBackup ) { filename += ".backup"; }
-                getUtteranceList().writeToFile( new File( filename ), filenameAudio );
+                try {
+                    getUtteranceList().writeToFile( new File( filename ), filenameAudio );
+                } catch (IOException e) {
+                    showError("Write Error", e.getMessage() );
+                }
                 break;
 
             case GLOBAL_CODING:
@@ -1275,6 +1295,7 @@ public class MainController {
                 if( asBackup ) { filename += ".backup"; }
                 //writeGlobalsToFile( new File( filename ), filenameAudio );
                 // TODO why no save when save works
+                // TODO use this for globals?
                 System.out.println("Write Globals to File");
                 break;
         }
@@ -1398,8 +1419,12 @@ public class MainController {
                 int             value       = Integer.parseInt( nodeValue.getTextContent() );
                 String          name        = map.getNamedItem( "name" ).getTextContent();
 
-                if( !MiscCode.addCode( new MiscCode( value, name ) ) )
-                    handleUserCodesError( file, "Failed to add code." );
+
+                try {
+                    MiscCode.addCode( new MiscCode( value, name ) );
+                } catch (Exception e) {
+                    handleUserCodesError( file, String.format("Failed to add code.\n%s", e.getMessage()) );
+                }
             }
         }
     }
@@ -1866,7 +1891,11 @@ public class MainController {
             if (result.get() == buttonTypeOne){
                 // create new using default path
                 selectConfigFile(UserConfig.getPath());
-                UserConfig.writeDefault();
+                try {
+                    UserConfig.writeDefault();
+                } catch (IOException e) {
+                    showError("File Write Error", "Could not write user config file");
+                }
             } else if (result.get() == buttonTypeTwo) {
                 // select existing by sending no path
                 selectConfigFile("");

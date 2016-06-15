@@ -157,12 +157,13 @@ public class MiscDataItem implements Utterance {
 		this.endBytes = bytes;
 	}
 
-	/**
-	 * Sets the MISC statistical code for this utterance by integer value.
-	 * @param value integer code the MISC statistical code
-	 */
+
+    /**
+     * Sets the MISC statistical code for this utterance by integer value.
+     * @param value integer code the MISC statistical code
+     * @throws NullPointerException
+     */
 	public void setMiscCodeByValue( int value ) throws NullPointerException {
-		// TODO: this doesn't work. catches everything
 		miscCode = MiscCode.codeWithValue( value );
 	}
 	

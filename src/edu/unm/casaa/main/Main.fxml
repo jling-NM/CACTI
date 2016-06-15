@@ -85,7 +85,7 @@
                               <Font size="12.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider">
+                        <Slider fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-set">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
@@ -121,7 +121,7 @@
                               <Font size="12.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider">
+                        <Slider fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-set">
                            <padding>
                               <Insets left="36.0" />
                            </padding>
