@@ -747,9 +747,6 @@ public class MainController {
         // set code file chooser
         FileChooser fc = new FileChooser();
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CACTI Config files", "*.xml"));
-        // set chooser init file
-        System.out.println(UserConfig.getPath());
-
 
         // get user selection
         File selectedFile;
