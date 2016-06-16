@@ -790,7 +790,7 @@ public class MainController {
                 final Media media = new Media(mediaFile.toURI().toString());
                 mediaPlayer = new MediaPlayer(media);
 
-                // legacy TODO: notes
+                // legacy byte timing
                 setAudioLength(mediaFile);
                 setBytesPerSecond(mediaFile);
 
@@ -808,14 +808,12 @@ public class MainController {
 
                 /* Status Handler: OnStop */
                 mediaPlayer.setOnStopped(() -> {
-                    //System.out.println("MEDIAPLAYER: Stopped");
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
                 });
 
                 /* Status Handler:  lambda runnable when mediaplayer reaches end of media
                 * move back to the beginning of the track */
                 mediaPlayer.setOnEndOfMedia(() -> {
-                    //System.out.println("MEDIAPLAYER: End of Media");
                     // seek to zero otherwise it is still at the end time
                     mediaPlayer.seek(Duration.ZERO);
                     // change state
@@ -1512,27 +1510,12 @@ public class MainController {
     }
 
 
+    /**
+     * refresh Timeline display
+     */
     private void updateTimeLineDisplay() {
 
-        // TODO: this doesn't work
-        //if (snTimeline.getContent().isValid()) {
         snTimeline.getContent().repaint();
-        //}
-        //snTimeline.getContent().repaint();
-        //playerView.getTimeline().repaint();
-/*        if (bytesPerSecond != 0) {
-            // Handles constant bit-rates only.
-
-            int bytes = player.getEncodedStreamPosition();
-            int seconds = bytes / bytesPerSecond;
-
-            playerView.setLabelTime("Time  " + TimeCode.toString(seconds));
-        } else {
-            // EXTEND: Get time based on frames rather than bytes.
-            // Need a way to determine current position based on frames.
-            // Something like getEncodedStreamPosition(),
-            // but that returns frames. This for VBR type compressions.
-        }*/
     }
 
 
@@ -1671,6 +1654,7 @@ public class MainController {
                                             //globalsData.setRating(gc, Integer.getInteger(rb.getText(), gc.defaultRating));
                                             globalsData.setRating(gc, Integer.valueOf(rb.getText()));
                                             // TODO: duplicate code alert!!! see setGuiState()
+                                            // TODO: use savetextfile or what???
                                             if( !tfGlobalsNotes.getText().isEmpty() ) {
                                                 globalsData.setNotes(tfGlobalsNotes.getText());
                                             }
@@ -1789,7 +1773,7 @@ public class MainController {
 
 
     /**
-     * TODO
+     * This clears coding controls leaving only the playback device
      */
     private void resetUserControlsContainer() {
         // check length again before removing
@@ -1801,7 +1785,7 @@ public class MainController {
 
 
     /**
-     * TODO
+     * Set player buttons to correct state for GUI
      */
     private void setPlayerButtonState(){
 

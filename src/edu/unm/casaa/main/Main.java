@@ -40,8 +40,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        // TODO: exception handling for start
-
         // store reference
         mainStage = primaryStage;
 
