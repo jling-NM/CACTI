@@ -811,14 +811,14 @@ public class MainController {
 
                 /* Status Handler: OnStop */
                 mediaPlayer.setOnStopped(() -> {
-                    System.out.println("MEDIAPLAYER: Stopped");
+                    //System.out.println("MEDIAPLAYER: Stopped");
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
                 });
 
                 /* Status Handler:  lambda runnable when mediaplayer reaches end of media
                 * move back to the beginning of the track */
                 mediaPlayer.setOnEndOfMedia(() -> {
-                    System.out.println("MEDIAPLAYER: End of Media");
+                    //System.out.println("MEDIAPLAYER: End of Media");
                     // seek to zero otherwise it is still at the end time
                     mediaPlayer.seek(Duration.ZERO);
                     // change state
