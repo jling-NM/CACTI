@@ -13,7 +13,7 @@
 
 <AnchorPane fx:id="MISC_CODING" styleClass="controlsWin" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox fx:id="vbPnlMiscCoding" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox fx:id="vbPnlMiscCoding" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <TitledPane fx:id="pnlTimeline" animated="false" collapsible="false" minHeight="90.0" minWidth="200.0" prefHeight="90.0" text="%pnl.title.timeline">
               <content>
@@ -109,7 +109,7 @@
                         </AnchorPane>
                     </content>
                      <HBox.margin>
-                        <Insets bottom="12.0" right="2.0" />
+                        <Insets bottom="2.0" right="2.0" />
                      </HBox.margin>
                   </TitledPane>
                   <TitledPane fx:id="titlePnlCodesRight" animated="false" collapsible="false" minHeight="100.0" text="" HBox.hgrow="ALWAYS">
@@ -121,7 +121,7 @@
                         </AnchorPane>
                     </content>
                      <HBox.margin>
-                        <Insets bottom="12.0" left="2.0" />
+                        <Insets bottom="2.0" left="2.0" />
                      </HBox.margin>
                   </TitledPane>
                </children>
@@ -131,7 +131,7 @@
             <Insets />
          </VBox.margin>
          <padding>
-            <Insets left="12.0" right="12.0" />
+            <Insets left="2.0" right="2.0" />
          </padding>
       </VBox>
    </children>

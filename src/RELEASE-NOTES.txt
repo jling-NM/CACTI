@@ -1,0 +1,18 @@
+
+------ 0.20.0 ------
+20160617 - jl
+--------------------
+
+CHANGES:
+- Audio Javazoom libraries removed
+- User application settings now persist across session: window location, volume, file locations
+- Current audio file automatically used for coding sessions unless none is loaded
+- User codes file can be located anywhere
+- Option to generate user codes file at start if no such file can be located
+- Variable speed playback added. Range between normal and double-speed
+- Playback button text replaced with icons and popup cues
+- AWT/SWING replaced with JavaFX8 except for Timeline control
+- Single application icon replaced with multiple sizes for automatic selection by OS
+
+KNOWN ISSUES:
+- None
