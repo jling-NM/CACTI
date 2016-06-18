@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\josef\projects\cacti2\out\artifacts\cacti2\cacti2.jar</jar>
+  <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti2.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon></icon>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.8.0_60</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <versionInfo>
+    <fileVersion>0.20.0.0</fileVersion>
+    <txtFileVersion>0.20.0</txtFileVersion>
+    <fileDescription>The CASAA Application for Coding Treatment Interactions</fileDescription>
+    <copyright>Copyright 2009</copyright>
+    <productVersion>0.20.0.0</productVersion>
+    <txtProductVersion>0.20.0</txtProductVersion>
+    <productName>CACTI2</productName>
+    <companyName>Center on Alcoholism, Substance Abuse and Addictions at the University of New Mexico Albuquerque</companyName>
+    <internalName>CACTI2</internalName>
+    <originalFilename>CACTI2.exe</originalFilename>
+  </versionInfo>
+  <messages>
+    <startupErr>An error occurred while starting the application.</startupErr>
+    <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
+    <jreVersionErr>CACT2 application requires a Java Runtime Environment</jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
+    <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>
