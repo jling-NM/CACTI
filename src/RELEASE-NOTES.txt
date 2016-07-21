@@ -1,4 +1,16 @@
 
+------ 0.20.1 ------
+2016xxxx - jl
+--------------------
+
+CHANGES:
+- Normal OS X system menubar used instead of Java menubar
+
+KNOWN ISSUES:
+- None
+
+
+
 ------ 0.20.0 ------
 20160617 - jl
 --------------------

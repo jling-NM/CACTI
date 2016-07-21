@@ -22,7 +22,6 @@ import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.*;
 import edu.unm.casaa.globals.*;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
@@ -42,7 +41,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.Window;
 import javafx.util.Duration;
 import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
@@ -51,9 +49,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -61,7 +57,7 @@ import java.util.prefs.Preferences;
 
 import static java.lang.String.format;
 
-//import com.aquafx_project.AquaFx;
+
 
 public class MainController {
 
@@ -171,17 +167,17 @@ public class MainController {
      ******************************************************************/
     @FXML
     private void initialize() {
+
+        // Use OS X standard menus no Java window menus
+        if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
+            menuBar.setUseSystemMenuBar(true);
+        }
+
         //
         setGuiState(GuiState.PLAYBACK);
 
         // initialize app persistence
         appPrefs = Preferences.userNodeForPackage(Main.class);
-
-        // OSX CSS
-        //if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
-        //    AquaFx.style();
-        //}
-
 
         // check for required config to offer generation
         verifyUserConfig();

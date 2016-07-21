@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-
 public class Main extends Application {
 
     private Preferences appPrefs;           // reference for user preferences
@@ -66,6 +65,7 @@ public class Main extends Application {
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_32.png")));
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_48.png")));
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_64.png")));
+
 
         Scene mainScene = new Scene(root);
         //mainScene.getStylesheets().add("file:///edu/unm/casaa/main/Main.css");
