@@ -5,6 +5,7 @@
 
 CHANGES:
 - Normal OS X system menubar used instead of Java menubar
+- Fixed utterance coding resolution
 
 KNOWN ISSUES:
 - None
