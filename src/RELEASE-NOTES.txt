@@ -1,14 +1,19 @@
 
 ------ 0.20.1 ------
-2016xxxx - jl
+20160805 - jl
 --------------------
 
 CHANGES:
-- Normal OS X system menubar used instead of Java menubar
-- Fixed utterance coding resolution
+- Normal OS X system menubar used instead of Java menubar.
+- Fixed utterance coding temporal resolution.
+- "Start Coding" button removed. Coding state enabled once playback begins.
+- Player buttons now have text in addition to ToolTip popup descriptions that don't function in OS X 10.7.5.
+- User can now apply code to uncoded segment while playback is paused.
+- Layout compressed vertically to accomodate multiple MISC code buttons.
 
 KNOWN ISSUES:
-- None
+- If playback reaches end of audio file and resets to time 0:00,
+  timeline does not advance with player seek bar until PLAY/PAUSE button is clicked again.
 
 
 

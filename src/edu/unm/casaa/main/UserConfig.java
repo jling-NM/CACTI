@@ -76,7 +76,6 @@ public class UserConfig {
         if( appPrefs.get("configFilePath","").isEmpty() ) {
             appPrefs.put("configFilePath", defaultPath);
         }
-
         return appPrefs.get("configFilePath", defaultPath );
 
     }

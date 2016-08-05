@@ -44,7 +44,8 @@ public interface Utterance {
 	public void setEndBytes(int bytes);
 	public void setMiscCodeByValue(int value);
 	public void setMiscCode(MiscCode code);
-	
+
+	public String displayCoded();
 	// Output order should be tab-delimited:
 	// order startCode endCode [codeCode codeString] "\r\n"
 	// The section in [] is written only if utterance has been coded.

@@ -187,6 +187,13 @@ public class MiscDataItem implements Utterance {
         return isCoded() ? writeCoded() : writeParsed();
 	}
 
+	public String displayCoded(){
+		return ("" + orderEnum 	+ "\t" +
+				startTime 	+ "\t" +
+				endTime 	+ "\t" +
+				miscCode.value 	+ "\t" +
+				miscCode.name);
+	}
 	public String writeCoded(){
 		return ("" + orderEnum 	+ "\t" +
 					startTime 	+ "\t" +

@@ -111,8 +111,6 @@ public class MainController {
     @FXML
     private GridPane pnlCodesRight;
     @FXML
-    private ToggleButton btnStartCoding;
-    @FXML
     private SwingNode snTimeline;
     @FXML
     private Label lblCurMiscFile;
@@ -143,8 +141,6 @@ public class MainController {
     private Duration totalDuration;                     // duration of active media
     private int bytesPerSecond           = 0;           // legacy Cached when we load audio file.
     private int audioLength              = 0;           // legacy to be noted later
-
-    // integrate
     private int numSaves                 = 0;           // Number of times we've saved since loading current session data.
     private int numUninterruptedUncodes  = 0;           // Number of times user has uncoded without doing anything else.
     private String filenameMisc          = null;        // name of active CASAA data file.
@@ -153,7 +149,7 @@ public class MainController {
     private File currentAudioFile        = null;        // active media file
     private UtteranceList utteranceList  = null;        // MISC coding data
     private GlobalDataModel globalsData  = null;        // GLOBALS scoring data
-
+    private final int utrCodeButtonWidth = 70;          // fixed width of code generated utterace buttons. Could be CSS.
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
@@ -234,10 +230,6 @@ public class MainController {
     public void btnActPlayPause(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
-            // if coding, make sure to deselect "Coding..." toggle button.
-            if( (getGuiState().equals(GuiState.MISC_CODING)) && (btnStartCoding != null) )  {
-                btnStartCoding.setSelected(false);
-            }
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
             mediaPlayer.play();
         }
@@ -316,47 +308,7 @@ public class MainController {
      *  @param actionEvent not used
      **********************************************************************/
     public void btnActStartCoding(ActionEvent actionEvent) {
-
-        // Cache stream position, as it may change over repeated queries (because it advances
-        // with player thread).
-        int position = getStreamPosition();
-
-        // Start/resume playback.
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-
-            mediaPlayer.pause();
-            sldSeek.setDisable(true);
-            btnStartCoding.setText("Start Coding");
-            btnUncodeReplay.setDisable(true);
-            btnUncode.setDisable(true);
-            btnReplay.setDisable(true);
-            btnRewind.setDisable(true);
-
-        } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
-
-            mediaPlayer.play();
-            sldSeek.setDisable(false);
-            btnStartCoding.setText("Stop Coding");
-            btnUncodeReplay.setDisable(false);
-            btnUncode.setDisable(false);
-            btnReplay.setDisable(false);
-            btnRewind.setDisable(false);
-
-        }
-
-        if( getUtteranceList().size() > 0 )
-            return; // Parsing starts only once.
-
-        // Record start data.
-        String startString = TimeCode.toString( position / bytesPerSecond );
-
-        // Create first utterance.
-        Utterance data = new MiscDataItem( 0, startString, position );
-
-        getUtteranceList().add( data );
-
-        numUninterruptedUncodes = 0;
-        updateUtteranceDisplays();
+        initializeCoding();
     }
 
 
@@ -498,6 +450,9 @@ public class MainController {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
 
+
+        // Prepare for coding when player controls used
+        initializeCoding();
     }
 
 
@@ -549,6 +504,9 @@ public class MainController {
             showError("Error Loading Audio File", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
 
+
+        // Prepare for coding when player controls used
+        initializeCoding();
 
     }
 
@@ -1086,6 +1044,47 @@ public class MainController {
 
     }
 
+    /**********************************************************************
+     *  Prepare for coding on a new utterance session
+     **********************************************************************/
+    private void initializeCoding() {
+
+        // Start/resume playback.
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            mediaPlayer.pause();
+        }
+
+        // Cache stream position, as it may change over repeated queries (because it advances
+        // with player thread).
+        int position = getStreamPosition();
+
+
+        // update control state
+        sldSeek.setDisable(false);
+        btnUncodeReplay.setDisable(false);
+        btnUncode.setDisable(false);
+        btnReplay.setDisable(false);
+        btnRewind.setDisable(false);
+
+
+
+        if( getUtteranceList().size() > 0 )
+            return; // Parsing starts only once.
+
+        // Record start data.
+        String startString = TimeCode.toString( position / bytesPerSecond );
+
+        // Create first utterance.
+        Utterance data = new MiscDataItem( 0, startString, position );
+
+        getUtteranceList().add( data );
+
+        numUninterruptedUncodes = 0;
+        updateUtteranceDisplays();
+
+    }
+
+
 
     /**********************************************************************
      * Set mediaplayer position using bytes
@@ -1339,6 +1338,11 @@ public class MainController {
         Utterance   data    = new MiscDataItem( order, positionString, position );
 
         getUtteranceList().add( data );
+
+        // TODO: test
+        updateTimeLineDisplay();
+
+        // known
         updateUtteranceDisplays();
         saveSession();
     }
@@ -1474,10 +1478,7 @@ public class MainController {
 
         // display full string of previous utterance
         Utterance        prev    = getPreviousUtterance();
-        if( prev == null )
-            lblPrevUtr.setText( "" );
-        else
-            lblPrevUtr.setText( prev.toString() );
+        lblPrevUtr.setText(prev == null ? "" : prev.displayCoded());
 
 
         // display individual fields of the active utterance
@@ -1715,10 +1716,12 @@ public class MainController {
 
                         Button button = new Button(codeName);
                         button.setOnAction(this::btnActCode);
-                        button.setMinWidth(64);
-                        button.setMinHeight(24);
-                        button.setMaxWidth(64);
-                        button.setMaxHeight(24);
+                        // TODO: make varible or class for this button widths
+
+                        button.setMinWidth(utrCodeButtonWidth);
+                        button.setMinHeight(22);
+                        button.setMaxWidth(utrCodeButtonWidth);
+                        button.setMaxHeight(22);
                         button.getStyleClass().add("btn-dark-blue");
                         panel.add(button, activeCol, activeRow, 1, 1);
                     }
@@ -1791,7 +1794,7 @@ public class MainController {
             case PLAYBACK:
 
                 sldSeek.setDisable(false);
-                btnPlayPause.setMinWidth(58.0);
+                btnPlayPause.setMinWidth(96.0);
                 btnPlayPause.setVisible(true);
                 btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(0.0);
@@ -1808,28 +1811,27 @@ public class MainController {
 
             case MISC_CODING:
 
-                sldSeek.setDisable(true);
-                btnPlayPause.setMinWidth(0.0);
-                btnPlayPause.setMaxWidth(0.0);
-                btnPlayPause.setVisible(false);
-                btnPlayPause.setDisable(true);
-                btnReplay.setMinWidth(58.0);
+                sldSeek.setDisable(false);
+                btnPlayPause.setMinWidth(96.0);
+                btnPlayPause.setVisible(true);
+                btnPlayPause.setDisable(false);
+                btnReplay.setMinWidth(96.0);
                 btnReplay.setVisible(true);
-                btnReplay.setDisable(true);
-                btnUncode.setMinWidth(58.0);
+                btnReplay.setDisable(false);
+                btnUncode.setMinWidth(96.0);
                 btnUncode.setVisible(true);
-                btnUncode.setDisable(true);
-                btnUncodeReplay.setMinWidth(58.0);
+                btnUncode.setDisable(false);
+                btnUncodeReplay.setMinWidth(96.0);
                 btnUncodeReplay.setVisible(true);
-                btnUncodeReplay.setDisable(true);
-                btnRewind.setDisable(true);
+                btnUncodeReplay.setDisable(false);
+                btnRewind.setDisable(false);
                 btnReplay.getParent().autosize();
                 break;
 
             case GLOBAL_CODING:
 
                 sldSeek.setDisable(false);
-                btnPlayPause.setMinWidth(58.0);
+                btnPlayPause.setMinWidth(96.0);
                 btnPlayPause.setVisible(true);
                 btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(0.0);
