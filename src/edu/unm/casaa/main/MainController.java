@@ -212,6 +212,8 @@ public class MainController {
         // mediaPlayer is ready continue with user controls setup
         initializeUserControls();
 
+        // TEST
+
     };
 
 
@@ -275,9 +277,21 @@ public class MainController {
      **********************************************************************/
     @SuppressWarnings("UnusedParameters")
     public void btnActUncode(ActionEvent actionEvent) {
-        uncode();
-        saveSession();
-        incrementUncodeCount();
+        /* make sure we are attempting to uncode when nothing
+           available to uncode
+         */
+        if(isUncodeAvailable()) {
+            // remove the last code
+            uncode();
+            // write data file
+            saveSession();
+            // update counter of how many time user uncoded
+            incrementUncodeCount();
+            // redraw timeline to reflect change
+            updateTimeLineDisplay();
+            // uncoding may exhaust available codes so update button state
+            setPlayerButtonState();
+        }
     }
 
 
@@ -286,31 +300,30 @@ public class MainController {
      *  @param actionEvent not used
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
-        uncode();
-        saveSession();
-        incrementUncodeCount();
+        /* make sure we are attempting to uncode when nothing
+           available to uncode
+         */
+        if(isUncodeAvailable()) {
+            // remove the last code
+            uncode();
+            // write data file
+            saveSession();
+            // update counter of how many time user uncoded
+            incrementUncodeCount();
 
-        Utterance   utterance   = getCurrentUtterance();
-        int         pos         = 0;
+            Utterance utterance = getCurrentUtterance();
+            if (utterance != null) {
+                // Position one second before start of utterance.
+                int pos = utterance.getStartBytes() - bytesPerSecond;
+                pos = Math.max(pos, 0); // Clamp.
 
-        if( utterance != null ) {
-            // Position one second before start of utterance.
-            pos = utterance.getStartBytes() - bytesPerSecond;
-            pos = Math.max( pos, 0 ); // Clamp.
+                setMediaPlayerPositionByBytes(pos);
+            }
+
+            // uncoding may exhaust available codes so update button state
+            setPlayerButtonState();
         }
-
-        setMediaPlayerPositionByBytes( pos );
     }
-
-
-    /**********************************************************************
-     *  button event: Begin coding on a new utterance session
-     *  @param actionEvent not used
-     **********************************************************************/
-    public void btnActStartCoding(ActionEvent actionEvent) {
-        initializeCoding();
-    }
-
 
 
     /**********************************************************************
@@ -450,7 +463,6 @@ public class MainController {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
 
-
         // Prepare for coding when player controls used
         initializeCoding();
     }
@@ -504,9 +516,10 @@ public class MainController {
             showError("Error Loading Audio File", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
 
-
         // Prepare for coding when player controls used
         initializeCoding();
+
+        setPlayerButtonState();
 
     }
 
@@ -768,10 +781,23 @@ public class MainController {
                 /* Status Handler:  lambda runnable when mediaplayer reaches end of media
                 * move back to the beginning of the track */
                 mediaPlayer.setOnEndOfMedia(() -> {
-                    // seek to zero otherwise it is still at the end time
-                    mediaPlayer.seek(Duration.ZERO);
+                    /*
+                     option 1: seek to zero otherwise it is still at the end time
+                     However, this doesn't give user option to code that last section
+                     up to the end because it goes away on reseek and stop.
+                     */
+                    //mediaPlayer.seek(Duration.ZERO);
                     // change state
-                    mediaPlayer.stop();
+                    //mediaPlayer.stop();
+
+
+                    /*
+                        option 2: pause at end so user can code
+                        However, have to click play twice???
+                     */
+                    mediaPlayer.pause();
+                    // shouldn't have to do this...
+                    btnPlayImgVw.getStyleClass().remove("img-btn-pause");
                 });
 
 
@@ -1049,38 +1075,28 @@ public class MainController {
      **********************************************************************/
     private void initializeCoding() {
 
-        // Start/resume playback.
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            mediaPlayer.pause();
-        }
+        // TODO: this is legacy code that i need to understand better.
+        // Why do these things here?
+
 
         // Cache stream position, as it may change over repeated queries (because it advances
         // with player thread).
         int position = getStreamPosition();
 
-
-        // update control state
-        sldSeek.setDisable(false);
-        btnUncodeReplay.setDisable(false);
-        btnUncode.setDisable(false);
-        btnReplay.setDisable(false);
-        btnRewind.setDisable(false);
-
-
-
         if( getUtteranceList().size() > 0 )
             return; // Parsing starts only once.
+
 
         // Record start data.
         String startString = TimeCode.toString( position / bytesPerSecond );
 
         // Create first utterance.
         Utterance data = new MiscDataItem( 0, startString, position );
-
+        // add to utterance data
         getUtteranceList().add( data );
 
+        // reset counter which warns user how many times they have uncoded
         numUninterruptedUncodes = 0;
-        updateUtteranceDisplays();
 
     }
 
@@ -1168,6 +1184,26 @@ public class MainController {
     }
 
 
+    /*
+        See if uncoding is currently an option
+     */
+    private boolean isUncodeAvailable() {
+
+        Utterance p = getPreviousUtterance();
+        Utterance l = getUtteranceList().last();
+
+        /*
+            if previous utterance is not null it is coded and can be uncoded.
+            if last utterance is coded it can be uncoded.
+         */
+
+        if( (p != null) || (l != null && l.isCoded()) ) {
+            return true;
+        } else return false;
+
+    }
+
+
     /*****************************************************
      * Store length in bytes
      * Used for backward compatibility
@@ -1244,6 +1280,7 @@ public class MainController {
             u.stripEndData();
             u.stripMiscCode();
         }
+
         updateUtteranceDisplays();
     }
 
@@ -1345,6 +1382,9 @@ public class MainController {
         // known
         updateUtteranceDisplays();
         saveSession();
+
+        //
+        setPlayerButtonState();
     }
 
 
@@ -1784,7 +1824,7 @@ public class MainController {
 
 
     /**
-     * Set player buttons to correct state for GUI
+     * Set player buttons to correct general state for GUI
      */
     private void setPlayerButtonState(){
 
@@ -1820,12 +1860,17 @@ public class MainController {
                 btnReplay.setDisable(false);
                 btnUncode.setMinWidth(96.0);
                 btnUncode.setVisible(true);
-                btnUncode.setDisable(false);
                 btnUncodeReplay.setMinWidth(96.0);
                 btnUncodeReplay.setVisible(true);
-                btnUncodeReplay.setDisable(false);
                 btnRewind.setDisable(false);
                 btnReplay.getParent().autosize();
+                if(!isUncodeAvailable()){
+                    btnUncodeReplay.setDisable(true);
+                    btnUncode.setDisable(true);
+                } else {
+                    btnUncodeReplay.setDisable(false);
+                    btnUncode.setDisable(false);
+                }
                 break;
 
             case GLOBAL_CODING:

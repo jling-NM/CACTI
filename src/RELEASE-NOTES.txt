@@ -1,4 +1,18 @@
 
+------ 0.20.2 ------
+20160811 - jl
+--------------------
+
+CHANGES:
+- At end of audio file playback, player now stops instead of rewinding to time zero.
+  This allows coding of last utterance.
+- Uncode and Uncode/Rewind buttons disabled when no codes available.
+  Method checks prevent uncode attempts when no codes available.
+
+KNOWN ISSUES:
+- None
+
+
 ------ 0.20.1 ------
 20160805 - jl
 --------------------
