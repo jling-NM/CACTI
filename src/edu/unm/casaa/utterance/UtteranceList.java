@@ -18,11 +18,11 @@ This source code file is part of the CASAA Treatment Coding System Utility
 
 package edu.unm.casaa.utterance;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Vector;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -89,17 +89,22 @@ public class UtteranceList {
 	 * @param filenameAudio audio filename
 	 */
 	public void writeToFile( File file, String filenameAudio ) throws IOException {
+        // TODO: consider append option instead of always writing entire file
+		try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(file, false))) {
+            // begin with audio file in header
+            writer.write("Audio File:\t" + filenameAudio);
+            writer.newLine();
 
-            writer.println("Audio File:\t" + filenameAudio);
             for (int i = 0; i < list.size(); i++) {
                 Utterance utterance = list.get(i);
 
                 if (utterance.isCoded()) {
-                    writer.println(utterance.writeCoded());
+                    writer.write(utterance.writeCoded());
+                    writer.newLine();
                 } else if (utterance.isParsed()) {
-                    writer.println(utterance.writeParsed());
+                    writer.write(utterance.writeParsed());
+                    writer.newLine();
                 } else {
                     // If not coded or parsed, utterance is incomplete.  This should
                     // only happen if we're on the last utterance in list.

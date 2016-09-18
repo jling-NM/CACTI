@@ -30,8 +30,13 @@ public class MiscCode {
 	// List of available codes.  Built when we parse XML file.
 	private static Vector< MiscCode >	list	        = new Vector<>();
 
-	public int 			value	                        = INVALID;
-	public String		name	                        = "";
+    public int 			    value	                    = INVALID;
+    public String		    name	                    = "";
+    public MiscCode.Speaker speaker                     = null;
+
+    // possible speakers for MISC codes
+	public enum Speaker { Therapist, Client}
+
 
 
 	// Class:
@@ -109,9 +114,10 @@ public class MiscCode {
 
 	// Instance:
 
-	public MiscCode( int value, String name ) {
+	public MiscCode( int value, String name, MiscCode.Speaker speaker) {
 		this.value    = value;
 		this.name     = name;
+        this.speaker  = speaker;
 	}
 
 	public MiscCode() {

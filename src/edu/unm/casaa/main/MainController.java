@@ -50,6 +50,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -1344,6 +1345,8 @@ public class MainController {
 
         assert (miscCode.isValid());
 
+        System.out.println(miscCode.speaker.toString());
+
         // Assign code to current utterance, if one exists.
         Utterance utterance = getCurrentUtterance();
         if( utterance == null )
@@ -1426,6 +1429,101 @@ public class MainController {
                     Document doc = builder.parse( file.getCanonicalPath() );
                     Node root = doc.getDocumentElement();
 
+                    // first, create lookup list the returns code value for code name
+                    Hashtable<String, Integer> miscCodeValues = new Hashtable<String, Integer>();
+
+                    // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
+                    for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
+                        if( node.getNodeName().equalsIgnoreCase( "codes" ) )
+
+                            for( Node n = node.getFirstChild(); n != null; n = n.getNextSibling() ) {
+                                if( n.getNodeName().equalsIgnoreCase( "code" ) ) {
+                                    NamedNodeMap    map         = n.getAttributes();
+                                    Node            nodeValue   = map.getNamedItem( "value" );
+                                    int             value       = Integer.parseInt( nodeValue.getTextContent() );
+                                    String          name        = map.getNamedItem( "name" ).getTextContent();
+
+                                    // add to lookup list
+                                    miscCodeValues.put(name, value);
+                                }
+                            }
+                        else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
+                            parseUserGlobals( file, node );
+                    }
+
+
+                    // now, store codes use map
+                    doc.getDocumentElement().normalize();
+                    // just get nodes for controls
+                    NodeList controlNodeList = doc.getElementsByTagName("codeControls");
+                    // iterate each child node
+                    for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
+                        Node node = controlNodeList.item(cn);
+
+                        // Get panel name.  Must be "left" or "right".
+                        NamedNodeMap map = node.getAttributes();
+                        String speaker = map.getNamedItem("label").getTextContent();
+
+                        for( Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
+                            if( row.getNodeName().equalsIgnoreCase( "row" ) ) {
+
+                                for( Node cell = row.getFirstChild(); cell != null; cell = cell.getNextSibling() ) {
+                                    if( cell.getNodeName().equalsIgnoreCase("button")) {
+
+                                        NamedNodeMap cellMap = cell.getAttributes();
+                                        String codeName = cellMap.getNamedItem( "code" ).getTextContent();
+                                        int codeValue = miscCodeValues.get(codeName);
+
+                                        try {
+                                            MiscCode.addCode( new MiscCode( codeValue, codeName, MiscCode.Speaker.valueOf(speaker) ) );
+                                        } catch (Exception e) {
+                                            handleUserCodesError( file, String.format("Failed to add code.\n%s", e.getMessage()) );
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                    }
+
+
+
+
+
+                } catch( SAXParseException e ) {
+                    handleUserCodesParseException( file, e );
+                } catch( Exception e ) {
+                    handleUserCodesGenericException( file, e );
+                }
+
+
+
+
+            } else {
+                // Alert and quit.
+                showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
+            }
+        }
+    }
+
+    // Parse user codes and globals from XML.
+/*
+    private void parseUserConfig() {
+
+        // cheap way to check if we need to reload userconfig which we will only allow once per lifecycle
+        if( MiscCode.numCodes() == 0 ){
+
+            // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
+            File file = new File(UserConfig.getPath());
+
+            if( file.canRead() ) {
+                try {
+                    DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder builder = fact.newDocumentBuilder();
+                    Document doc = builder.parse( file.getCanonicalPath() );
+                    Node root = doc.getDocumentElement();
+
                     // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
                     for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
                         if( node.getNodeName().equalsIgnoreCase( "codes" ) )
@@ -1444,8 +1542,9 @@ public class MainController {
             }
         }
     }
+*/
 
-    // Parse codes from given <codes> tag.
+/*    // Parse codes from given <codes> tag.
     private void parseUserCodes( File file, Node codes ) {
         for( Node n = codes.getFirstChild(); n != null; n = n.getNextSibling() ) {
             if( n.getNodeName().equalsIgnoreCase( "code" ) ) {
@@ -1462,7 +1561,7 @@ public class MainController {
                 }
             }
         }
-    }
+    }*/
 
     // Parse globals from given <globals> tag.
     private void parseUserGlobals( File file, Node globals ) {
