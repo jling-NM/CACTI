@@ -31,13 +31,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -114,6 +112,8 @@ public class MainController {
     @FXML
     private SwingNode snTimeline;
     @FXML
+    private StackPane pnNewTimeLine;
+    @FXML
     private Label lblCurMiscFile;
     @FXML
     private Label lblCurUtrEnum;
@@ -156,7 +156,7 @@ public class MainController {
     }
     private GuiState guiState;                          // for referencing state
 
-
+    private TimeLine timeLine;
 
 
     /******************************************************************
@@ -236,6 +236,7 @@ public class MainController {
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
             mediaPlayer.play();
         }
+        //timeLine.play();
     }
 
 
@@ -921,6 +922,14 @@ public class MainController {
 
                     // activate the timeline display
                     snTimeline.setContent(new Timeline(this));
+                    double center = vbApp.getScene().getWidth()/2;
+
+                    timeLine = new TimeLine(totalDuration, 50, center);
+                    pnNewTimeLine.getChildren().add(timeLine);
+                    //TODO: figure out how to move this line into timeline class
+                    Line l = (Line) pnNewTimeLine.getChildren().get(0);
+                    l.setTranslateX(center);
+
 
                     // display controls needed for coding
                     setPlayerButtonState();
