@@ -11,8 +11,8 @@ import javax.swing.JPanel;
 
 import edu.unm.casaa.utterance.Utterance;
 
-// Timeline is a custom renderer for utterance data.
-public class Timeline extends JPanel {
+// OldTimeline is a custom renderer for utterance data.
+public class OldTimeline extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private Dimension 		dimension 		= new Dimension( 800, 80 );
@@ -20,7 +20,7 @@ public class Timeline extends JPanel {
 	private Insets			insets;
 	private int				pixelsPerSecond	= 50; // Determines zoom level.
 
-	public Timeline( MainController control ) {
+	public OldTimeline(MainController control ) {
 		assert( control != null );
 		this.control = control;
 		setBorder( BorderFactory.createEmptyBorder(0, 0, 0, 0) );
@@ -73,7 +73,7 @@ public class Timeline extends JPanel {
 
 		g.setClip( clipX, clipY, clipW, clipH );
 
-		// Timeline.
+		// OldTimeline.
 		int fontAscent	= g.getFontMetrics().getAscent();
 		int fontHeight	= g.getFontMetrics().getHeight();
 		int centerLineY = insets.top + (innerHeight / 2);

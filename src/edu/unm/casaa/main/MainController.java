@@ -24,21 +24,18 @@ import edu.unm.casaa.utterance.*;
 import edu.unm.casaa.globals.*;
 import javafx.animation.Animation;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -997,7 +994,7 @@ public class MainController {
 
                     // activate the timeline display
                     //old
-                    snTimeline.setContent(new Timeline(this));
+                    snTimeline.setContent(new OldTimeline(this));
 
                     // display controls needed for coding
                     setPlayerButtonState();
@@ -1753,7 +1750,7 @@ public class MainController {
 
 
     /**
-     * refresh Timeline display
+     * refresh OldTimeline display
      */
     private void updateTimeLineDisplay() {
 
