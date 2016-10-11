@@ -1,5 +1,8 @@
 package edu.unm.casaa.main;
 
+import edu.unm.casaa.misc.MiscCode;
+import edu.unm.casaa.utterance.Utterance;
+import edu.unm.casaa.utterance.UtteranceList;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
@@ -13,10 +16,16 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+import javafx.util.converter.TimeStringConverter;
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 
 /**
@@ -29,8 +38,11 @@ public class TimeLine extends Group {
     private TranslateTransition animation = null;   // animation for moving timeline
     private TimeLineMarker selectedMarker = null;   // store currently selected marker, if any
 
+    private double height                 = 55.0;   // projected height of timeline. forces Group dimensions early
+    private double thickness              = 2.0;    // thickness of line that represents time :)
 
-    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center) {
+
+    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, UtteranceList utteranceList) {
 
         this.audioDuration = audioDuration;
         this.pixelsPerSecond = pixelsPerSecond;
@@ -39,27 +51,33 @@ public class TimeLine extends Group {
             horizontal center is beginning of timeline
             We position both cursor and start of timeline in center of screen
             Manual layout is ok as i don't want cursor to move when window is resized
-            TODO: see if better way to accomplish this
+            Manual layout is sort of required because the Node type is Group
         */
+        // where does timeline begin; center
         this.setTranslateX(center);
 
         /*
-            the center line of the timeline
+        // expand Group node to full height with non-visible line
+        Line v = new Line(0, 0, 0, this.height);
+        //v.setStroke(Color.TRANSPARENT);
+        v.setStroke(Color.INDIANRED);
+        */
 
-            It would be cool to make this with a slider instead
-            and then bind all the properties together so user could drag timeline as
-            well as player slider
+        /*
+            the center line of the timeline
          */
         double end = audioDuration.toSeconds() * pixelsPerSecond;
-        Rectangle rect = new Rectangle(0,0,end,3);
-        rect.setFill(Color.BLACK);
-        this.getChildren().add(rect);
 
-        // some temp inserts; later added by parsing of casaa file
-        this.addMarker(111, "ICK", 1.0, 1);
-        this.addMarker(222, "CV", 2.367, 2);
-        this.addMarker(333, "SDS", 6.0, 2);
-        this.addMarker(333, "HEL", 29.0, 1);
+        Line h = new Line(0,0,end,0);
+        h.setStrokeWidth(thickness);
+        h.setTranslateY( (height/2.0) + (thickness/2.0) );
+        //this.getChildren().addAll(v, h);
+        this.getChildren().add(h);
+
+
+        // ?????
+        setUtteranceList(utteranceList);
+
 
         // initialize the animation of timeline
         animation = new TranslateTransition(audioDuration, this);
@@ -71,36 +89,88 @@ public class TimeLine extends Group {
         animation.setByX(byX);
     }
 
-    /*
-        could be a convenience function
-     */
-    public void play() {
-        animation.play();
-    }
+
 
     /*
         Adds new utterance marker to timeline
      */
-    private void addMarker(int someUniqueLineId, String code, double posSeconds, int speakerNum) {
-        TimeLineMarker timeLineMarker = new TimeLineMarker(someUniqueLineId, code, posSeconds, speakerNum);
-        this.getChildren().add(timeLineMarker);
+    public void addMarker(int markerIndx, String code, double posSeconds, MiscCode.Speaker speaker) {
+
+        TimeLineMarker activeMarker = getSelectedMarker();
+
+        /*
+            if the timeline's active marker is not null
+            we are in edit mode and will update code and speaker
+         */
+        if(activeMarker != null) {
+            /* Edit active marker */
+
+            int prevId      = activeMarker.getMarkerIndx();
+            double prevPos  = activeMarker.posSeconds;
+
+            removeMarker(prevId);
+
+            TimeLineMarker newMarker = new TimeLineMarker(prevId, code, prevPos, speaker);
+            this.getChildren().add(newMarker);
+
+            this.setSelectedMarker(null);
+
+        } else {
+            /* add new marker */
+
+            /* until utterance inventory is updated i will ignore the time zero marker
+                //TODO: fix
+             */
+            if( posSeconds != 0.0 ) {
+                TimeLineMarker newMarker = new TimeLineMarker(markerIndx, code, posSeconds, speaker);
+                this.getChildren().add(newMarker);
+
+                this.setSelectedMarker(null);
+            }
+        }
     }
 
 
     /*
         Call me when you want to delete an utterance marker from the timeline
      */
-    private void removeMarker(int someUniqueLineId){
-        Node r = this.lookup("#"+Integer.toString(someUniqueLineId));
+    private void removeMarker(int markerIndx){
+        Node r = this.lookup("#"+Integer.toString(markerIndx));
         if( r != null) {
             /*
             r.setVisible(false);
             r.setDisable(true);
             */
             this.getChildren().remove(r);
+
+            this.setSelectedMarker(null);
         }
     }
 
+    public void setUtteranceList(UtteranceList utteranceList) {
+
+        this.getChildren().remove(1, this.getChildren().size());
+
+
+        // since utterance list is not a proper collection we old school it here
+        for (int i = 0; i < utteranceList.size(); i++) {
+            Utterance utterance = utteranceList.get(i);
+
+            if (utterance.isCoded() || utterance.isParsed()) {
+
+                // TODO: remove this temp time parsing and replace with an ISO format
+                Double m = Double.parseDouble(utterance.getStartTime().substring(2,4));
+                Double s = Double.parseDouble(utterance.getStartTime().substring(5,7));
+
+                this.addMarker(
+                        i,
+                        utterance.getMiscCode().name,
+                        s,
+                        utterance.getMiscCode().speaker);
+            }
+        }
+
+    }
 
     public TimeLineMarker getSelectedMarker() {
         return selectedMarker;
@@ -130,45 +200,45 @@ public class TimeLine extends Group {
 
         private int markerIndx;             // how to find record in data
         private double posSeconds;          // start positon in bytes
-        private int speakerNum;             // which speaker for this utterance
-
+        private MiscCode.Speaker speaker;   //
         private Text markerCode;            // displays utterance code for this marker
         private Polygon indicatorShape;     // displays arrow on timeline
         private int indicatorWidth = 12;    // size of arrow
 
 
-        public TimeLineMarker(int markerIndx, String code, double posSeconds, int speakerNum) {
+        public TimeLineMarker(int markerIndx, String code, double posSeconds, MiscCode.Speaker speaker) {
 
             // Set spacing between nodes inside marker. specify spacing as CSS doesn't appear to work for this
             this.setSpacing(1.0);
             this.markerIndx = markerIndx;
             this.posSeconds = posSeconds;
-            this.speakerNum = speakerNum;
+            this.speaker = speaker;
 
             // where does marker point on timeline
-            double tipPos = posSeconds * pixelsPerSecond;
+            double tipPos = (posSeconds * pixelsPerSecond);
 
             // initialize utterance code
             markerCode = new Text(code);
 
             // formatting of marker varies on speaker (above/below timeline)
-            if( speakerNum == 1) {
-                this.indicatorShape = new Polygon(tipPos,indicatorWidth, tipPos-indicatorWidth,0, tipPos+indicatorWidth,0);
+            if( speaker.equals(MiscCode.Speaker.Therapist) ) {
+                this.indicatorShape = new Polygon(0,-indicatorWidth, indicatorWidth,0, indicatorWidth*2,-indicatorWidth);
                 this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
                 markerCode.getStyleClass().add("unselectedMarkerTextSpeaker1");
                 this.getChildren().addAll(markerCode, indicatorShape);
-                this.setLayoutY(-28);
             } else {
                 // speaker 2
-                this.indicatorShape = new Polygon(tipPos,0, tipPos-indicatorWidth,indicatorWidth, tipPos+indicatorWidth,indicatorWidth);
+                this.indicatorShape = new Polygon(0,indicatorWidth, indicatorWidth,0, indicatorWidth*2,indicatorWidth);
+
                 this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
                 markerCode.getStyleClass().add("unselectedMarkerTextSpeaker2");
                 this.getChildren().addAll(indicatorShape, markerCode);
-                this.setLayoutY(3);
+                //
+                this.setTranslateY( (height/2.0)+thickness );
             }
 
             // place on timeline
-            this.setLayoutX(tipPos);
+            this.setTranslateX(tipPos-indicatorWidth);
             this.setAlignment(Pos.TOP_CENTER);
 
 
@@ -269,47 +339,10 @@ public class TimeLine extends Group {
 
         public void setCode(String code) { markerCode.setText(code); }
 
-        public int getSpeakerNum() { return speakerNum; }
+        public MiscCode.Speaker getSpeaker() { return speaker; }
 
-        public void switchSpeakerNum() {
+        public void setSpeaker(MiscCode.Speaker newSpeaker) { this.speaker = newSpeaker; }
 
-            // assume only two speakers and just switch
-            int newSpeaker = this.speakerNum == 1 ? 2 : 1;
-
-            /* method 1 - just remove and re-add marker
-            *   advantage is that it reuses instead of duplicating code
-            * */
-            int prevId      = this.getMarkerIndx();
-            String prevCode = this.getCode();
-            double prevPos  = this.posSeconds;
-
-            removeMarker(prevId);
-            addMarker(prevId, prevCode, prevPos, newSpeaker);
-
-            /* method 2 - change properties
-                this creates lots of duplicate code
-            if( newSpeaker == 1) {
-                this.getChildren().remove(this.indicatorShape);
-                this.indicatorShape = new Polygon(this.bytePos,indicatorWidth, this.bytePos-indicatorWidth,0, this.bytePos+indicatorWidth,0);
-                this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
-                markerCode.getStyleClass().add("unselectedMarkerTextSpeaker1");
-                this.getChildren().add(indicatorShape);
-                this.setLayoutY(-28);
-            } else {
-                // speaker 2
-                this.getChildren().removeAll(this.indicatorShape, markerCode);
-                this.indicatorShape = new Polygon(this.bytePos,0, this.bytePos-indicatorWidth,indicatorWidth, this.bytePos+indicatorWidth,indicatorWidth);
-                this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
-                markerCode.getStyleClass().add("unselectedMarkerTextSpeaker2");
-                this.getChildren().addAll(indicatorShape, markerCode);
-                this.setLayoutY(3);
-            }
-            */
-
-            // finally, update to new speaker number
-            this.speakerNum = newSpeaker;
-
-        }
     }
 
 }

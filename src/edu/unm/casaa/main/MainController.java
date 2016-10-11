@@ -22,19 +22,23 @@ import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.*;
 import edu.unm.casaa.globals.*;
+import javafx.animation.Animation;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -212,9 +216,6 @@ public class MainController {
 
         // mediaPlayer is ready continue with user controls setup
         initializeUserControls();
-
-        // TEST
-
     };
 
 
@@ -580,6 +581,9 @@ public class MainController {
     public void sldSeekMousePressed(Event event) {
         /* if playing we first pause, seek and resume */
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+
+            timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
+
             mediaPlayer.pause();
             mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
             mediaPlayer.play();
@@ -588,6 +592,8 @@ public class MainController {
                label then updated manually since seek an paused media doesn't.
                This method seems reasonable since user will likely play after clicking seek bar
              */
+            timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
+            
             mediaPlayer.pause();
             mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
             lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
@@ -767,12 +773,22 @@ public class MainController {
                 mediaPlayer.setOnReady(onReadyMethod);
 
                 /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
-                mediaPlayer.setOnPlaying(() -> btnPlayImgVw.getStyleClass().add("img-btn-pause"));
+                mediaPlayer.setOnPlaying(() -> {
+                    // TODO: experimental
+                    timeLine.getAnimation().play();
+                    // TODO: experimental
+                    btnPlayImgVw.getStyleClass().add("img-btn-pause");
+
+                });
 
                 /* Status Handler:  OnPaused */
                 mediaPlayer.setOnPaused(() -> {
                     // assumes OnPlay has overlayed style class so just remove that to expose pause class
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
+                    // TODO: experimental
+                    timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
+                    timeLine.getAnimation().pause();
+                    // TODO: experimental
                 });
 
                 /* Status Handler: OnStop */
@@ -804,7 +820,7 @@ public class MainController {
 
 
 
-                /* Listener: Update the media position if user is dragging the slider.
+                /** Listener: Update the media position if user is dragging the slider.
                  * Otherwise, do nothing. See sldSeekMousePressed() for when slider is clicked with mouse
                  * Seems odd to bind to valueProperty and check isValueChanging
                  * but when i use "valueChangingProperty" this performance is
@@ -817,13 +833,12 @@ public class MainController {
                     }
                 });
 
+                /** if dragging slider, update media playback rate */
                 sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-                    /* if dragging slider, update media playback rate */
                     if (sldRate.isValueChanging()) {
                         mediaPlayer.setRate(newValue.doubleValue());
                     }
                 });
-
 
             } catch ( MediaException mex ) {
                 if(mex.getType() == MediaException.Type.MEDIA_UNSUPPORTED) {
@@ -837,6 +852,67 @@ public class MainController {
 
         }
     }
+
+
+    private void initializeTimeLine() {
+
+        double center = vbApp.getScene().getWidth()/2;
+
+        pnNewTimeLine.getChildren().clear();
+
+        //TODO: figure out how to move this line into timeline class
+        //Line l = (Line) pnNewTimeLine.getChildren().get(0);
+        Line l = new Line(0,0,0,10.0);
+        l.setStrokeWidth(0.5);
+        l.setTranslateX(center + l.getStrokeWidth());
+
+        //System.out.println("Number of utterances now:"+ utteranceList.size());
+        timeLine = new TimeLine(totalDuration, 50, center, utteranceList);
+        //pnNewTimeLine.getChildren().add(timeLine);
+        pnNewTimeLine.getChildren().addAll(l, timeLine);
+
+
+        /*
+        // directly bind time; defeats purpose of using an animation in the first place
+        // if this is the only way it works we can dump the timeline for a simple line
+        // direct binding is not as smooth animation as playing transition
+        mediaPlayer.currentTimeProperty().addListener((invalidated, oldValue, newValue) -> {
+            //System.out.println("mediaPlayer time changing:"+newValue);
+            timeLine.getAnimation().jumpTo(newValue);
+            //System.out.println("mediaplayer getCurrentTime(): " + mediaPlayer.getCurrentTime().toSeconds());
+            //System.out.println("timeline getCurrentTime(): " + timeLine.getAnimation().getCurrentTime().toSeconds());
+        });
+        */
+
+
+
+        /**
+         * Seek slider should manipulate timeline as it does mediaplayer
+         */
+        sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            /* if dragging slider, update timeline position */
+            if (sldSeek.isValueChanging()) {
+                // multiply duration by percentage calculated by slider position
+                timeLine.getAnimation().jumpTo(totalDuration.multiply(newValue.doubleValue()));
+            }
+        });
+
+        /**
+            Playback rate binding
+         */
+        timeLine.getAnimation().rateProperty().bind(sldRate.valueProperty());
+
+        /**
+         * timeline can be paused internally so this listener pauses mediaplayer in response
+         */
+        timeLine.getAnimation().statusProperty().addListener((invalidated, oldValue, newValue) -> {
+            if (newValue.equals(Animation.Status.PAUSED)) {
+                mediaPlayer.pause();
+            }
+        });
+
+    }
+
 
 
     private void initializeUserControls() {
@@ -919,17 +995,9 @@ public class MainController {
                         showError("Error", ex.toString());
                     }
 
-
                     // activate the timeline display
+                    //old
                     snTimeline.setContent(new Timeline(this));
-                    double center = vbApp.getScene().getWidth()/2;
-
-                    timeLine = new TimeLine(totalDuration, 50, center);
-                    pnNewTimeLine.getChildren().add(timeLine);
-                    //TODO: figure out how to move this line into timeline class
-                    Line l = (Line) pnNewTimeLine.getChildren().get(0);
-                    l.setTranslateX(center);
-
 
                     // display controls needed for coding
                     setPlayerButtonState();
@@ -939,8 +1007,9 @@ public class MainController {
 
                     // resize app window
                     ourTown.sizeToScene();
-
                 }
+
+                System.out.println("Number of utterances before active utter:"+ utteranceList.size());
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -958,8 +1027,17 @@ public class MainController {
                 });
 
 
+                /*
+                    initialize new timeline
+                    before adding "active"/empty utterance
+
+                 */
+                initializeTimeLine();
+
+
+
                 /***
-                 * BEGIN: initialize active utterance
+                 * BEGIN: initialize "active" utterance
                  * we want to initialize the active utterance record to use it to resuming coding.
                  * we do so by taking the last utterance, using its end time and end bytes as the
                  * start time/start bytes of a new utterance.
@@ -983,6 +1061,7 @@ public class MainController {
 
                         // add this to our utterance listing and it is our active utterance
                         getUtteranceList().add( data );
+
                         // update mediaplayer position appropriately for our now active utterance
                         mediaplayerSeekBytes = utterance.getEndBytes();
                     }
@@ -1016,6 +1095,19 @@ public class MainController {
 
                 // update timeline display as player seek doesn't update correctly on reload
                 updateTimeLineDisplay();
+
+
+
+
+                // TODO: finish new timeline position update
+                // this will move timeline to current playback position
+                // and could be moved into updateTimeLineDisplay() later
+                // or initializeTimeLine(position)
+                timeLine.getAnimation().play();
+                timeLine.getAnimation().pause();
+                timeLine.getAnimation().jumpTo(onReadySeekDuration);
+                // TODO: finish new timeline position update
+
 
                 // display coding file path in gui
                 lblCurMiscFile.setText(filenameMisc);
@@ -1354,7 +1446,12 @@ public class MainController {
 
         assert (miscCode.isValid());
 
-        System.out.println(miscCode.speaker.toString());
+        // TODO: experiment with new timeline marker
+        System.out.println("handleButtonMiscCode");
+
+        timeLine.addMarker(getUtteranceList().size(), miscCode.name, mediaPlayer.getCurrentTime().toSeconds(), miscCode.speaker);
+
+
 
         // Assign code to current utterance, if one exists.
         Utterance utterance = getCurrentUtterance();
@@ -1661,6 +1758,7 @@ public class MainController {
     private void updateTimeLineDisplay() {
 
         snTimeline.getContent().repaint();
+
     }
 
 
