@@ -9,15 +9,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Line?>
 
-<?import javafx.scene.Group?>
 <AnchorPane fx:id="MISC_CODING" styleClass="controlsWin" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox fx:id="vbPnlMiscCoding" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
 
-            <TitledPane animated="false" prefHeight="91.0" prefWidth="796.0" text="newTimeLine">
+            <TitledPane animated="false" collapsible="false" prefHeight="91.0" prefWidth="796.0" text="newTimeLine">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="796.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <StackPane fx:id="pnNewTimeLine" alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

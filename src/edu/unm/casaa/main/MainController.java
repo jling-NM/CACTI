@@ -1565,7 +1565,8 @@ public class MainController {
 
                         // Get panel name.  Must be "left" or "right".
                         NamedNodeMap map = node.getAttributes();
-                        String speaker = map.getNamedItem("label").getTextContent();
+                        String speaker = map.getNamedItem("label").getTextContent().split(" ")[0];
+                        // i added ".split(" ")[0];" because one user had other text after that and i just wanted the first word.
 
                         for( Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
                             if( row.getNodeName().equalsIgnoreCase( "row" ) ) {

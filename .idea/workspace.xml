@@ -7,10 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/Coding.fxml" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/Coding.fxml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/MISC_CODING.fxml" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/MISC_CODING.fxml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
     </list>
     <ignored path="JavaFxApplication.iws" />
@@ -23,7 +22,6 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
@@ -70,88 +68,7 @@
     <favorites_list name="JavaFxApplication" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="MainController.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="1279" column="0" selection-start-line="1279" selection-start-column="0" selection-end-line="1279" selection-end-column="0" />
-              <folding>
-                <element signature="docComment;method#btnActPlayPause#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActPlayPause#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActRewind#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActRewind#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActReplay#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActUncode#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActUncode#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-                <element signature="e#9074#9159#0" expanded="false" />
-                <element signature="docComment;method#btnActCode#0;class#MainController#0" expanded="false" />
-                <element signature="method#btnActCode#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#mniActAbout#0;class#MainController#0" expanded="false" />
-                <element signature="e#11310#11375#0" expanded="false" />
-                <element signature="docComment;method#mniActOnlineHelp#0;class#MainController#0" expanded="false" />
-                <element signature="e#12531#12585#0" expanded="false" />
-                <element signature="method#mniActOpenFile#0;class#MainController#0" expanded="false" />
-                <element signature="e#15695#15744#0" expanded="false" />
-                <element signature="docComment;method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
-                <element signature="method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
-                <element signature="e#18523#18557#0" expanded="false" />
-                <element signature="docComment;method#selectAudioFile#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#selectMiscFile#0;class#MainController#0" expanded="false" />
-                <element signature="method#selectMiscFile#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
-                <element signature="method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
-                <element signature="e#29504#29578#0" expanded="false" />
-                <element signature="e#30594#30667#0" expanded="false" />
-                <element signature="docComment;method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
-                <element signature="method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#showError#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#showFatalWarning#0;class#MainController#0" expanded="false" />
-                <element signature="method#showFatalWarning#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#getUtteranceList#0;class#MainController#0" expanded="false" />
-                <element signature="method#getUtteranceList#0;class#MainController#0" expanded="false" />
-                <element signature="method#getPreviousUtterance#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#setAudioLength#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#setBytesPerSecond#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#getBytesPerSecond#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#getAudioLength#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#streamPosition#0;class#MainController#0" expanded="false" />
-                <element signature="method#streamPosition#0;class#MainController#0" expanded="false" />
-                <element signature="e#40778#40829#0" expanded="false" />
-                <element signature="method#saveSession#0;class#MainController#0" expanded="false" />
-                <element signature="e#42099#42166#0" expanded="false" />
-                <element signature="method#incrementUncodeCount#0;class#MainController#0" expanded="false" />
-                <element signature="method#handleUserCodesParseException#0;class#MainController#0" expanded="false" />
-                <element signature="method#handleUserCodesError#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#changeSuffix#0;class#MainController#0" expanded="false" />
-                <element signature="method#changeSuffix#0;class#MainController#0" expanded="false" />
-                <element signature="e#50305#50362#0" expanded="false" />
-                <element signature="docComment;method#updateUtteranceDisplays#0;class#MainController#0" expanded="false" />
-                <element signature="e#52230#52256#0" expanded="false" />
-                <element signature="e#52359#52362#0" expanded="false" />
-                <element signature="docComment;method#parseUserControls#0;class#MainController#0" expanded="false" />
-                <element signature="docComment;method#parseControlColumn#0;class#MainController#0" expanded="false" />
-                <element signature="method#parseControlColumn#0;class#MainController#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="userConfiguration.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/userConfiguration.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="3185" selection-start-line="0" selection-start-column="3185" selection-end-line="0" selection-end-column="3185" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -210,8 +127,8 @@
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Coding.fxml" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" />
         <option value="$PROJECT_DIR$/userConfiguration.xml" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
       </list>
     </option>
   </component>
@@ -266,9 +183,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -343,6 +257,9 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -737,7 +654,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329235" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32650274" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -748,7 +665,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28551912" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329235" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22940226" sideWeight="0.6703755" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22940226" sideWeight="0.6703755" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3069467" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32956383" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -799,7 +716,7 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="44" />
+      <option name="time" value="45" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -813,22 +730,15 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
+      <provider editor-type-id="JavaFX-Scene-Builder">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="990">
           <caret line="55" column="40" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
@@ -846,14 +756,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
+      <provider editor-type-id="JavaFX-Scene-Builder">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="990">
           <caret line="55" column="40" selection-start-line="55" selection-start-column="40" selection-end-line="55" selection-end-column="40" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css">
@@ -899,14 +809,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
+      <provider editor-type-id="JavaFX-Scene-Builder">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="918">
           <caret line="51" column="95" selection-start-line="51" selection-start-column="95" selection-end-line="51" selection-end-column="95" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
@@ -917,14 +827,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
+      <provider editor-type-id="JavaFX-Scene-Builder">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="918">
           <caret line="51" column="95" selection-start-line="51" selection-start-column="95" selection-end-line="51" selection-end-column="95" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
@@ -1022,7 +932,6 @@
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/NewUtils" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateUiService.java" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/OldControllerAction.java" />
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Timeline.java" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TemplateUiService.java" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscTemplateView.java" />
@@ -1092,19 +1001,18 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
           <caret line="81" column="13" selection-start-line="81" selection-start-column="13" selection-end-line="81" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml">
+      <provider editor-type-id="JavaFX-Scene-Builder">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="57" column="34" selection-start-line="57" selection-start-column="34" selection-end-line="57" selection-end-column="34" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/userConfiguration.xml">
@@ -1115,29 +1023,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Coding.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="31" column="119" selection-start-line="31" selection-start-column="119" selection-end-line="31" selection-end-column="119" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder">
-        <state />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Coding.fxml" />
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="86" column="32" selection-start-line="86" selection-start-column="32" selection-end-line="86" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/UserConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="69">
+          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="310" column="0" selection-start-line="310" selection-start-column="0" selection-end-line="310" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="1279" column="0" selection-start-line="1279" selection-start-column="0" selection-end-line="1279" selection-end-column="0" />
+        <state relative-caret-position="205">
+          <caret line="1573" column="36" selection-start-line="1573" selection-start-column="36" selection-end-line="1573" selection-end-column="36" />
           <folding>
             <element signature="docComment;method#btnActPlayPause#0;class#MainController#0" expanded="false" />
             <element signature="method#btnActPlayPause#0;class#MainController#0" expanded="false" />
@@ -1148,27 +1061,18 @@
             <element signature="method#btnActUncode#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
             <element signature="method#btnActUncodeReplay#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-            <element signature="method#btnActStartCoding#0;class#MainController#0" expanded="false" />
-            <element signature="e#9074#9159#0" expanded="false" />
             <element signature="docComment;method#btnActCode#0;class#MainController#0" expanded="false" />
             <element signature="method#btnActCode#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#mniActAbout#0;class#MainController#0" expanded="false" />
-            <element signature="e#11310#11375#0" expanded="false" />
             <element signature="docComment;method#mniActOnlineHelp#0;class#MainController#0" expanded="false" />
-            <element signature="e#12531#12585#0" expanded="false" />
             <element signature="method#mniActOpenFile#0;class#MainController#0" expanded="false" />
-            <element signature="e#15695#15744#0" expanded="false" />
             <element signature="docComment;method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
             <element signature="method#sldSeekMousePressed#0;class#MainController#0" expanded="false" />
-            <element signature="e#18523#18557#0" expanded="false" />
             <element signature="docComment;method#selectAudioFile#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#selectMiscFile#0;class#MainController#0" expanded="false" />
             <element signature="method#selectMiscFile#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
             <element signature="method#initializeMediaPlayer#0;class#MainController#0" expanded="false" />
-            <element signature="e#29504#29578#0" expanded="false" />
-            <element signature="e#30594#30667#0" expanded="false" />
             <element signature="docComment;method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
             <element signature="method#setMediaPlayerPositionByBytes#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#showError#0;class#MainController#0" expanded="false" />
@@ -1181,20 +1085,11 @@
             <element signature="docComment;method#setBytesPerSecond#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#getBytesPerSecond#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#getAudioLength#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#streamPosition#0;class#MainController#0" expanded="false" />
-            <element signature="method#streamPosition#0;class#MainController#0" expanded="false" />
-            <element signature="e#40778#40829#0" expanded="false" />
             <element signature="method#saveSession#0;class#MainController#0" expanded="false" />
-            <element signature="e#42099#42166#0" expanded="false" />
-            <element signature="method#incrementUncodeCount#0;class#MainController#0" expanded="false" />
+            <element signature="method#saveCurrentTextFile#0;class#MainController#0" expanded="false" />
             <element signature="method#handleUserCodesParseException#0;class#MainController#0" expanded="false" />
-            <element signature="method#handleUserCodesError#0;class#MainController#0" expanded="false" />
-            <element signature="docComment;method#changeSuffix#0;class#MainController#0" expanded="false" />
-            <element signature="method#changeSuffix#0;class#MainController#0" expanded="false" />
-            <element signature="e#50305#50362#0" expanded="false" />
+            <element signature="method#handleUserCodesGenericException#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#updateUtteranceDisplays#0;class#MainController#0" expanded="false" />
-            <element signature="e#52230#52256#0" expanded="false" />
-            <element signature="e#52359#52362#0" expanded="false" />
             <element signature="docComment;method#parseUserControls#0;class#MainController#0" expanded="false" />
             <element signature="docComment;method#parseControlColumn#0;class#MainController#0" expanded="false" />
             <element signature="method#parseControlColumn#0;class#MainController#0" expanded="false" />
