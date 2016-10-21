@@ -139,9 +139,6 @@ public class MainController {
 
     // mediaplayer attributes
     private Duration totalDuration;                     // duration of active media
-    private int bytesPerSecond           = 0;           // legacy Cached when we load audio file.
-    private int audioLength              = 0;           // legacy to be noted later
-    private int numSaves                 = 0;           // Number of times we've saved since loading current session data.
     private int numUninterruptedUncodes  = 0;           // Number of times user has uncoded without doing anything else.
     private String filenameMisc          = null;        // name of active CASAA data file.
     private String filenameGlobals       = null;        // name of active globals data file
@@ -244,6 +241,7 @@ public class MainController {
         /* specific rewind button back 5 seconds */
         if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+            timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
         }
     }
 
@@ -293,7 +291,7 @@ public class MainController {
 
 
     /**********************************************************************
-     *  button event: Uncode last utterance and replay it, i think
+     *  button event: Uncode last utterance and replay it
      *  @param actionEvent not used
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
@@ -459,8 +457,6 @@ public class MainController {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
 
-        // Prepare for coding when player controls used
-        //initializeCoding();
     }
 
 
@@ -757,9 +753,6 @@ public class MainController {
             try {
                 final Media media = new Media(mediaFile.toURI().toString());
                 mediaPlayer = new MediaPlayer(media);
-
-                // legacy byte timing
-                setAudioLength(mediaFile);
 
                 /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(onReadyMethod);
@@ -1061,7 +1054,6 @@ public class MainController {
                 // reset some utterance accounting
                 resetUtteranceCoding();
 
-
                 break;
 
 
@@ -1225,39 +1217,6 @@ public class MainController {
 
     }
 
-
-    /*****************************************************
-     * Store length in bytes
-     * Used for backward compatibility
-     * @param audioFile file to inspect
-     *****************************************************/
-    private void setAudioLength(java.io.File audioFile) {
-        try {
-            javax.sound.sampled.AudioInputStream as = javax.sound.sampled.AudioSystem.getAudioInputStream(audioFile);
-            audioLength = as.available();
-
-        } catch (UnsupportedAudioFileException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /******************************************************
-     * Store rate for audio file
-     * Used for backward compatibility
-     * @param audioFile file to inspect
-     *****************************************************/
-    private void setBytesPerSecond(java.io.File audioFile){
-        try {
-            javax.sound.sampled.AudioFileFormat m_audioFileFormat = AudioSystem.getAudioFileFormat(audioFile);
-            bytesPerSecond = (m_audioFileFormat.getFormat().getFrameSize() * (new Float(m_audioFileFormat.getFormat().getFrameRate()).intValue()));
-
-        } catch (UnsupportedAudioFileException | IOException e) {
-            showError("Error", e.toString());
-        }
-
-    }
-
     /********************************************************
      * Undo the actions of pressing a MISC code button.
      ********************************************************/
@@ -1277,7 +1236,6 @@ public class MainController {
         }
     }
 
-
     /*********************************************************
      * Save current session. Periodically also save backup copy.
      *********************************************************/
@@ -1285,11 +1243,12 @@ public class MainController {
         // Save normal file.
         saveCurrentTextFile( false );
 
-        // Backup every n'th save.
+        /* Backup every n'th save.
         if( numSaves % 10 == 0 ) {
             saveCurrentTextFile( true );
         }
         numSaves++;
+        */
     }
 
 
@@ -1571,9 +1530,6 @@ public class MainController {
 
     private void resetUtteranceCoding() {
         numUninterruptedUncodes = 0;
-        // Reset save counter, so we backup on next save (i.e. as
-        // soon as player saves changes to newly loaded data).
-        numSaves = 0;
     }
 
 
