@@ -15,10 +15,10 @@
       <VBox fx:id="vbPnlMiscCoding" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
 
-            <TitledPane animated="false" collapsible="false" prefHeight="91.0" prefWidth="796.0" text="newTimeLine">
+             <TitledPane animated="false" collapsible="false" minHeight="90.0" minWidth="200.0" prefHeight="90.0" text="%pnl.title.timeline">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="796.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <StackPane fx:id="pnNewTimeLine" alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="796.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"  styleClass="timeline">
+                    <StackPane fx:id="pnTimeLine" alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <children>
                         </children>
                         <VBox.margin>
@@ -29,18 +29,6 @@
               </content>
             </TitledPane>
 
-            <TitledPane fx:id="pnlTimeline" animated="false" collapsible="false" minHeight="90.0" minWidth="200.0" prefHeight="90.0" text="%pnl.title.timeline">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="timeline">
-                     <children>
-                        <SwingNode fx:id="snTimeline" styleClass="timeline" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
-              </content>
-               <VBox.margin>
-                  <Insets top="0.0" />
-               </VBox.margin>
-            </TitledPane>
             <HBox alignment="CENTER_LEFT" prefHeight="25.0">
                <children>
                   <Label fx:id="lblCurMiscFile" text="">

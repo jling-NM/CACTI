@@ -19,6 +19,8 @@ This source code file is part of the CASAA Treatment Coding System Utility
 package edu.unm.casaa.misc;
 
 import edu.unm.casaa.utterance.Utterance;
+import edu.unm.casaa.main.Utils;
+import javafx.util.Duration;
 
 /**
  * The MiscDataItem is an object designed to hold all of the
@@ -29,10 +31,7 @@ import edu.unm.casaa.utterance.Utterance;
 public class MiscDataItem implements Utterance {
 
 	private int 		orderEnum	= -1;
-	private String 		startTime	= null;
-	private int 		startBytes	= -1;
-	private String 		endTime		= null;
-	private int 		endBytes	= -1;
+	private Duration    startTime   = Duration.ZERO;
 	private MiscCode 	miscCode	= new MiscCode();
 
 	/**
@@ -41,11 +40,15 @@ public class MiscDataItem implements Utterance {
 	 * @param orderEnum the enumerated order for this utterance
 	 * @param startTime the start time code for this utterance
 	 */
-	public MiscDataItem( int orderEnum, String startTime, int startBytes ) {
+	public MiscDataItem( int orderEnum, double startTime ) {
 		this.orderEnum 	= orderEnum;
-		this.startTime 	= startTime;
-		this.startBytes = startBytes;
+		this.startTime 	= Duration.seconds(startTime);
 	}
+
+    public MiscDataItem( int orderEnum, Duration startTime ) {
+        this.orderEnum 	= orderEnum;
+        this.startTime 	= startTime;
+    }
 
 	/**
 	 * Set order number where this particular utterance occurs.
@@ -69,48 +72,8 @@ public class MiscDataItem implements Utterance {
 	 * Returns -1 if value wasn't properly set.
 	 * @return the start time code
 	 */
-	public String getStartTime() {
+	public Duration getStartTime() {
 		return startTime;
-	}
-	
-	/**
-	 * Returns the number of bytes into the audio file 
-	 * at the start of this utterance.
-	 * Returns -1 if value wasn't properly set.
-	 * @return the start time code
-	 */
-	public int getStartBytes() {
-		return startBytes;
-	}
-	
-	/**
-	 * Returns the end time code for this utterance.
-	 * Returns -1 if value wasn't properly set.
-	 * @return the end time code
-	 */
-	public String getEndTime() {
-		//should this throw an exception if the end time 
-		//can't be retrieved due to the audio file ending?
-		return endTime;
-	}
-
-	/**
-	 * Returns the number of bytes into the audio file 
-	 * at the end of this utterance.
-	 * Returns -1 if value wasn't properly set.
-	 * @return the end time code
-	 */
-	public int getEndBytes() {
-		//should this throw an exception if the end time 
-		//can't be retrieved due to the audio file ending?
-		return endBytes;
-	}
-
-	/**
-	 * Return true if this utterance has been parsed.
-	 */
-	public boolean isParsed() {
-		return endBytes != -1;
 	}
 
 	/**
@@ -120,13 +83,6 @@ public class MiscDataItem implements Utterance {
 		return miscCode.isValid();
 	}
 
-	/**
-	 * Strip end data.
-	 */
-	public void	stripEndData() {
-		endBytes 	= -1;
-		endTime		= null;
-	}
 
 	public void stripMiscCode() {
 		setMiscCode( MiscCode.INVALID_CODE );
@@ -140,23 +96,6 @@ public class MiscDataItem implements Utterance {
 	public MiscCode getMiscCode() {
 		return miscCode;
 	}
-	
-	/**
-	 * Sets the end time code for this utterance.
-	 * @param end the end time code
-	 */
-	public void setEndTime( String end ) {
-		this.endTime = end;
-	}
-
-	/**
-	 * Sets the end time byte accumulation for this utterance.
-	 * @param bytes end time code
-	 */
-	public void setEndBytes( int bytes ) {
-		this.endBytes = bytes;
-	}
-
 
     /**
      * Sets the MISC statistical code for this utterance by integer value.
@@ -182,34 +121,23 @@ public class MiscDataItem implements Utterance {
 	 * @return a string representation of this utterance
 	 */
 	public String toString(){
-        // 20160527 - JL - reversed logic as the original didn't make sense to me or work.
-		//return isCoded() ? writeParsed() : writeCoded();
         return isCoded() ? writeCoded() : writeParsed();
 	}
 
 	public String displayCoded(){
-		return ("" + orderEnum 	+ "\t" +
-				startTime 	+ "\t" +
-				endTime 	+ "\t" +
-				miscCode.value 	+ "\t" +
+		return ("" + Utils.formatDuration(startTime) + "\t" +
 				miscCode.name);
 	}
 	public String writeCoded(){
 		return ("" + orderEnum 	+ "\t" +
-					startTime 	+ "\t" +
-					endTime 	+ "\t" +
-					startBytes	+ "\t" +
-					endBytes	+ "\t" +
+                    Utils.formatDuration(startTime)	+ "\t" +
 					miscCode.value 	+ "\t" +
 					miscCode.name);
 	}
 	
 	public String writeParsed(){
 		return ("" + orderEnum 	+ "\t" +
-					startTime 	+ "\t" +
-					endTime 	+ "\t" +
-					startBytes	+ "\t" +
-					endBytes);
+                     startTime.toSeconds() 	+ "s\t");
 	}
 
 }

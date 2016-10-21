@@ -19,29 +19,20 @@ This source code file is part of the CASAA Treatment Coding System Utility
 package edu.unm.casaa.utterance;
 
 import edu.unm.casaa.misc.MiscCode;
+import javafx.util.Duration;
 
 public interface Utterance {
 
 	public int getEnum();
-	public String getStartTime();	
-	public String getEndTime();
-	public int getStartBytes();
-	public int getEndBytes();
-
-	public boolean isParsed();
+	public Duration getStartTime();
 	public boolean isCoded();
 	public MiscCode getMiscCode();
-	
-	// Strip end data, so isParsed() will return false.  Preserves start data.
-	public void	stripEndData();
-	
+
 	// Strip code, so isCoded() will return false.  Writes MiscCode.INVALID_CODE.
 	public void stripMiscCode();
 
 	// Enum and start time will be initialized by derived class constructor.
 	public void	setEnum(int index);
-	public void setEndTime(String end);	
-	public void setEndBytes(int bytes);
 	public void setMiscCodeByValue(int value);
 	public void setMiscCode(MiscCode code);
 

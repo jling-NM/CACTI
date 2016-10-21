@@ -90,6 +90,9 @@ public class TimeLine extends Group {
     }
 
 
+    public void addMarker( Utterance newUtterance) {
+        this.addMarker(newUtterance.getEnum(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker() );
+    }
 
     /*
         Adds new utterance marker to timeline
@@ -117,16 +120,10 @@ public class TimeLine extends Group {
 
         } else {
             /* add new marker */
+            TimeLineMarker newMarker = new TimeLineMarker(markerIndx, code, posSeconds, speaker);
+            this.getChildren().add(newMarker);
 
-            /* until utterance inventory is updated i will ignore the time zero marker
-                //TODO: fix
-             */
-            if( posSeconds != 0.0 ) {
-                TimeLineMarker newMarker = new TimeLineMarker(markerIndx, code, posSeconds, speaker);
-                this.getChildren().add(newMarker);
-
-                this.setSelectedMarker(null);
-            }
+            this.setSelectedMarker(null);
         }
     }
 
@@ -134,7 +131,7 @@ public class TimeLine extends Group {
     /*
         Call me when you want to delete an utterance marker from the timeline
      */
-    private void removeMarker(int markerIndx){
+    public void removeMarker(int markerIndx){
         Node r = this.lookup("#"+Integer.toString(markerIndx));
         if( r != null) {
             /*
@@ -156,18 +153,12 @@ public class TimeLine extends Group {
         for (int i = 0; i < utteranceList.size(); i++) {
             Utterance utterance = utteranceList.get(i);
 
-            if (utterance.isCoded() || utterance.isParsed()) {
+            this.addMarker(
+                    i,
+                    utterance.getMiscCode().name,
+                    utterance.getStartTime().toSeconds(),
+                    utterance.getMiscCode().getSpeaker());
 
-                // TODO: remove this temp time parsing and replace with an ISO format
-                Double m = Double.parseDouble(utterance.getStartTime().substring(2,4));
-                Double s = Double.parseDouble(utterance.getStartTime().substring(5,7));
-
-                this.addMarker(
-                        i,
-                        utterance.getMiscCode().name,
-                        s,
-                        utterance.getMiscCode().speaker);
-            }
         }
 
     }

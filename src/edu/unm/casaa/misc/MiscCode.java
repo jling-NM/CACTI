@@ -30,9 +30,9 @@ public class MiscCode {
 	// List of available codes.  Built when we parse XML file.
 	private static Vector< MiscCode >	list	        = new Vector<>();
 
-    public int 			    value	                    = INVALID;
-    public String		    name	                    = "";
-    public MiscCode.Speaker speaker                     = null;
+    public  int 			 value	                    = INVALID;
+    public  String		     name	                    = "";
+    private MiscCode.Speaker speaker                    = null;
 
     // possible speakers for MISC codes
 	public enum Speaker { Therapist, Client}
@@ -130,5 +130,9 @@ public class MiscCode {
 	// Get string representation for use in user dialogs.
 	public String toDisplayString() {
 		return "(name: " + name + ", value: " + value + ")";
+	}
+
+	public MiscCode.Speaker getSpeaker(){
+		return this.speaker;
 	}
 }

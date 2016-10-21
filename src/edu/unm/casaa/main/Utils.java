@@ -2,20 +2,36 @@ package edu.unm.casaa.main;
 
 import javafx.util.Duration;
 
+import java.util.StringTokenizer;
+
 /**
  *
  */
-class Utils {
+public class Utils {
 
     /**
      * Newer format using Duration
      * @param duration time
      * @return time converted to string
      */
-    static String formatDuration(Duration duration) {
+    public static String formatDuration(Duration duration) {
         double duration_secs = duration.toSeconds();
-        return String.format("%02.0f:%02.0f:%02.0f", Math.floor((duration_secs/3600) % 24), Math.floor( (duration_secs/60) % 60), (duration_secs % 60) );
+        return String.format("%02.0f:%02.0f:%04.1f", Math.floor((duration_secs/3600) % 24), Math.floor( (duration_secs/60) % 60), (duration_secs % 60) );
     }
+
+
+    public static Duration parseDuration( String string ) {
+        StringTokenizer st 		= new StringTokenizer( string, ":" );
+
+        assert( st.countTokens() == 3 );
+
+        int	hours 	= Integer.parseInt( st.nextToken() );
+        int minutes = Integer.parseInt( st.nextToken() );
+        double seconds	= Double.valueOf( st.nextToken() );
+
+        return Duration.seconds( (hours * 3600) + (minutes * 60) + seconds);
+    }
+
 
     /**
      * @param bytesPerSecond rate
@@ -32,7 +48,7 @@ class Utils {
      * @param newSuffix Suffixes should be specified without leading period.
      * @return copy of filename with oldSuffix (if present) removed, and newSuffix added.
      */
-    static String changeSuffix(String filename, String newSuffix) {
+    public static String changeSuffix(String filename, String newSuffix) {
         String	result 	= filename;
         int		index 	= filename.lastIndexOf( '.' );
 

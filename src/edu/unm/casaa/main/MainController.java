@@ -111,9 +111,7 @@ public class MainController {
     @FXML
     private GridPane pnlCodesRight;
     @FXML
-    private SwingNode snTimeline;
-    @FXML
-    private StackPane pnNewTimeLine;
+    private StackPane pnTimeLine;
     @FXML
     private Label lblCurMiscFile;
     @FXML
@@ -260,15 +258,14 @@ public class MainController {
     public void btnActReplay(ActionEvent actionEvent) {
 
         Utterance   utterance   = getCurrentUtterance();
-        int         pos         = 0;
+        Duration    pos         = Duration.ZERO;
 
         if( utterance != null ) {
             // Position one second before start of utterance.
-            pos = utterance.getStartBytes() - bytesPerSecond;
-            pos = Math.max( pos, 0 ); // Clamp.
+            pos = utterance.getStartTime().subtract(Duration.ONE);
         }
 
-        setMediaPlayerPositionByBytes( pos );
+        setMediaPlayerPosition( pos );
     }
 
 
@@ -288,7 +285,7 @@ public class MainController {
             // update counter of how many time user uncoded
             incrementUncodeCount();
             // redraw timeline to reflect change
-            updateTimeLineDisplay();
+            //updateTimeLineDisplay();
             // uncoding may exhaust available codes so update button state
             setPlayerButtonState();
         }
@@ -314,10 +311,9 @@ public class MainController {
             Utterance utterance = getCurrentUtterance();
             if (utterance != null) {
                 // Position one second before start of utterance.
-                int pos = utterance.getStartBytes() - bytesPerSecond;
-                pos = Math.max(pos, 0); // Clamp.
+                Duration pos = utterance.getStartTime().subtract(Duration.ONE);
 
-                setMediaPlayerPositionByBytes(pos);
+                setMediaPlayerPosition(pos);
             }
 
             // uncoding may exhaust available codes so update button state
@@ -464,7 +460,7 @@ public class MainController {
         }
 
         // Prepare for coding when player controls used
-        initializeCoding();
+        //initializeCoding();
     }
 
 
@@ -517,7 +513,7 @@ public class MainController {
         }
 
         // Prepare for coding when player controls used
-        initializeCoding();
+        //initializeCoding();
 
         setPlayerButtonState();
 
@@ -764,7 +760,6 @@ public class MainController {
 
                 // legacy byte timing
                 setAudioLength(mediaFile);
-                setBytesPerSecond(mediaFile);
 
                 /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(onReadyMethod);
@@ -855,7 +850,7 @@ public class MainController {
 
         double center = vbApp.getScene().getWidth()/2;
 
-        pnNewTimeLine.getChildren().clear();
+        pnTimeLine.getChildren().clear();
 
         //TODO: figure out how to move this line into timeline class
         //Line l = (Line) pnNewTimeLine.getChildren().get(0);
@@ -866,7 +861,7 @@ public class MainController {
         //System.out.println("Number of utterances now:"+ utteranceList.size());
         timeLine = new TimeLine(totalDuration, 50, center, utteranceList);
         //pnNewTimeLine.getChildren().add(timeLine);
-        pnNewTimeLine.getChildren().addAll(l, timeLine);
+        pnTimeLine.getChildren().addAll(l, timeLine);
 
 
         /*
@@ -992,10 +987,6 @@ public class MainController {
                         showError("Error", ex.toString());
                     }
 
-                    // activate the timeline display
-                    //old
-                    snTimeline.setContent(new OldTimeline(this));
-
                     // display controls needed for coding
                     setPlayerButtonState();
 
@@ -1005,8 +996,6 @@ public class MainController {
                     // resize app window
                     ourTown.sizeToScene();
                 }
-
-                System.out.println("Number of utterances before active utter:"+ utteranceList.size());
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -1019,8 +1008,6 @@ public class MainController {
                     lblTimePos.setText(Utils.formatDuration(newValue));
                     // update the mediaplayer slider
                     sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
-                    // update the timeline
-                    updateTimeLineDisplay();
                 });
 
 
@@ -1032,69 +1019,32 @@ public class MainController {
                 initializeTimeLine();
 
 
-
-                /***
-                 * BEGIN: initialize "active" utterance
-                 * we want to initialize the active utterance record to use it to resuming coding.
-                 * we do so by taking the last utterance, using its end time and end bytes as the
-                 * start time/start bytes of a new utterance.
-                 ***/
-                Utterance utterance = getCurrentUtterance();
-
-
-                int mediaplayerSeekBytes = 0;
+                /**
+                 * initialize "active" utterance
+                 **/
+                Utterance currentUtterance = getCurrentUtterance();
+                // default seek init
+                onReadySeekDuration = Duration.ZERO;
 
                 // We expect utterances in file to be coded.  For backwards compatibility,
                 // tolerate uncoded utterances in file.
-                if( utterance != null ) {
-                    if( utterance.isCoded() ) {
-                        // Start new utterance.
-                        int 		position		= utterance.getEndBytes();
-                        String 		positionString 	= TimeCode.toString( position / getBytesPerSecond() );
-                        int         order 		  	= getUtteranceList().size();
-
-                        // create new utterance from relevant last utterance data
-                        Utterance   data		 	= new MiscDataItem( order, positionString, position );
-
-                        // add this to our utterance listing and it is our active utterance
-                        getUtteranceList().add( data );
-
+                if( currentUtterance != null ) {
+                    if( currentUtterance.isCoded() ) {
                         // update mediaplayer position appropriately for our now active utterance
-                        mediaplayerSeekBytes = utterance.getEndBytes();
+                        onReadySeekDuration = currentUtterance.getStartTime();
                     }
-                    else {
-                        // Tolerate uncoded final utterance.  Strip end data, so it is consistent
-                        // with how we treat current utterance.  NOTE: This does not check for
-                        // uncoded utterances anywhere else in file.
-                        utterance.stripEndData();
-                        // update mediaplayer position appropriately for our now active utterance
-                        mediaplayerSeekBytes = utterance.getStartBytes();
-                    }
-
                 }
-
-                /***
-                 * END: initialize active utterance
-                 ***/
 
 
                 /**
                  * adjust player position
                  */
-                double positionInSecs = mediaplayerSeekBytes/getBytesPerSecond();
-                onReadySeekDuration = Duration.seconds(positionInSecs);
                 mediaPlayer.seek(onReadySeekDuration);
                 lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
                 sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
 
                 // update the utterance data(previous/current) displayed in the gui
                 updateUtteranceDisplays();
-
-                // update timeline display as player seek doesn't update correctly on reload
-                updateTimeLineDisplay();
-
-
-
 
                 // TODO: finish new timeline position update
                 // this will move timeline to current playback position
@@ -1104,7 +1054,6 @@ public class MainController {
                 timeLine.getAnimation().pause();
                 timeLine.getAnimation().jumpTo(onReadySeekDuration);
                 // TODO: finish new timeline position update
-
 
                 // display coding file path in gui
                 lblCurMiscFile.setText(filenameMisc);
@@ -1170,48 +1119,22 @@ public class MainController {
     }
 
     /**********************************************************************
-     *  Prepare for coding on a new utterance session
+     * Set mediaplayer position using seconds
      **********************************************************************/
-    private void initializeCoding() {
-
-        // TODO: this is legacy code that i need to understand better.
-        // Why do these things here?
-
-
-        // Cache stream position, as it may change over repeated queries (because it advances
-        // with player thread).
-        int position = getStreamPosition();
-
-        if( getUtteranceList().size() > 0 )
-            return; // Parsing starts only once.
-
-
-        // Record start data.
-        String startString = TimeCode.toString( position / bytesPerSecond );
-
-        // Create first utterance.
-        Utterance data = new MiscDataItem( 0, startString, position );
-        // add to utterance data
-        getUtteranceList().add( data );
-
-        // reset counter which warns user how many times they have uncoded
-        numUninterruptedUncodes = 0;
-
-    }
-
-
-
-    /**********************************************************************
-     * Set mediaplayer position using bytes
-     * This makes new mediaplayer compatible with legacy code
-     * @param positionInBytes provide player position in bytes
-     **********************************************************************/
-    private synchronized void setMediaPlayerPositionByBytes(int positionInBytes){
-        double positionInSecs = positionInBytes/getBytesPerSecond();
-
+    private synchronized void setMediaPlayerPosition(double positionInSecs){
         // pause player whether playing or not which enables seek
         mediaPlayer.pause();
         mediaPlayer.seek(Duration.seconds(positionInSecs));
+        mediaPlayer.play();
+    }
+
+    /**********************************************************************
+     * Set mediaplayer position using Duration
+     **********************************************************************/
+    private synchronized void setMediaPlayerPosition(Duration position){
+        // pause player whether playing or not which enables seek
+        mediaPlayer.pause();
+        mediaPlayer.seek(position);
         mediaPlayer.play();
     }
 
@@ -1335,31 +1258,6 @@ public class MainController {
 
     }
 
-
-    /***********************************************
-     * @return audio bytes per second.
-     ***********************************************/
-    public int getBytesPerSecond() {
-        return bytesPerSecond;
-    }
-
-
-    /***********************************************
-     * @return audio file length, in bytes.
-     ***********************************************/
-    public int getAudioLength() {
-        return audioLength;
-    }
-
-
-    /***********************************************
-     * @return current playback position, in bytes.
-     ***********************************************/
-    public int getStreamPosition() {
-        return Utils.convertTimeToBytes(getBytesPerSecond(), mediaPlayer.getCurrentTime());
-    }
-
-
     /********************************************************
      * Undo the actions of pressing a MISC code button.
      ********************************************************/
@@ -1369,18 +1267,14 @@ public class MainController {
         UtteranceList 	list 	= getUtteranceList();
         Utterance 		u 		= list.last();
 
-        if( u != null && !u.isCoded() )
+        if( u != null ) {
+            // remove from timeline
+            timeLine.removeMarker(u.getEnum()+1);
+            // remove from utterance list
             list.removeLast();
-
-        // Strip code and end data from last remaining utterance.
-        u = list.last();
-        if( u != null )
-        {
-            u.stripEndData();
-            u.stripMiscCode();
+            // refresh last utterance display
+            updateUtteranceDisplays();
         }
-
-        updateUtteranceDisplays();
     }
 
 
@@ -1443,49 +1337,18 @@ public class MainController {
 
         assert (miscCode.isValid());
 
-        // TODO: experiment with new timeline marker
-        System.out.println("handleButtonMiscCode");
-
-        timeLine.addMarker(getUtteranceList().size(), miscCode.name, mediaPlayer.getCurrentTime().toSeconds(), miscCode.speaker);
-
-
-
-        // Assign code to current utterance, if one exists.
-        Utterance utterance = getCurrentUtterance();
-        if( utterance == null )
-            return; // No current utterance.
-
-        // get current player position
-        int position = getStreamPosition();
-
-        if( position <= utterance.getStartBytes() )
-            return; // Ignore when playback is outside utterance.
-        if( utterance.isCoded() )
-            return; // Ignore if already coded.
-
-        // assign code to utterance
-        utterance.setMiscCode( miscCode );
-        // number of uncoding events goes back to zero
-        numUninterruptedUncodes = 0;
-
-        // End utterance.
-        assert (bytesPerSecond > 0);
-        String positionString = TimeCode.toString( position / bytesPerSecond );
-        //Utils.convertTimeToBytes();
-
-        utterance.setEndTime( positionString );
-        utterance.setEndBytes( position );
+        // get current time
+        Duration position = mediaPlayer.getCurrentTime();
 
         // Start new utterance.
         int         order   = getUtteranceList().size();
-        Utterance   data    = new MiscDataItem( order, positionString, position );
-
+        Utterance   data    = new MiscDataItem( order, position );
+        data.setMiscCode(miscCode);
         getUtteranceList().add( data );
 
-        // TODO: test
-        updateTimeLineDisplay();
+        // add to
+        timeLine.addMarker(getUtteranceList().size(), miscCode.name, position.toSeconds(), miscCode.getSpeaker());
 
-        // known
         updateUtteranceDisplays();
         saveSession();
 
@@ -1722,41 +1585,6 @@ public class MainController {
         // display full string of previous utterance
         Utterance        prev    = getPreviousUtterance();
         lblPrevUtr.setText(prev == null ? "" : prev.displayCoded());
-
-
-        // display individual fields of the active utterance
-        Utterance        current = getCurrentUtterance();
-        if( current == null ) {
-            lblCurUtrEnum.setText( "" );
-            lblCurUtrCode.setText( "" );
-            lblCurUtrStartTime.setText( "" );
-            lblCurUtrEndTime.setText( "" );
-        } else {
-            lblCurUtrEnum.setText( "" + current.getEnum() );
-            if( current.getMiscCode().value == MiscCode.INVALID )
-                lblCurUtrCode.setText( "" );
-            else
-                lblCurUtrCode.setText( current.getMiscCode().name );
-
-            lblCurUtrStartTime.setText( current.getStartTime() );
-            lblCurUtrEndTime.setText( current.getEndTime() );
-
-            // Visual indication when in between utterances.
-            if( getStreamPosition() < current.getStartBytes() )
-                lblCurUtrStartTime.setStyle("-fx-text-fill: 'Red';");
-            else
-                lblCurUtrStartTime.setStyle("-fx-text-fill: 'Black';");
-        }
-    }
-
-
-    /**
-     * refresh OldTimeline display
-     */
-    private void updateTimeLineDisplay() {
-
-        snTimeline.getContent().repaint();
-
     }
 
 

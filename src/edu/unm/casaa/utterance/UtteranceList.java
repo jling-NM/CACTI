@@ -27,7 +27,9 @@ import java.util.Vector;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import edu.unm.casaa.main.Utils;
 import edu.unm.casaa.misc.MiscDataItem;
+import javafx.util.Duration;
 
 /**
  * A vector of utterances, stored in their recorded order.
@@ -98,19 +100,8 @@ public class UtteranceList {
 
             for (int i = 0; i < list.size(); i++) {
                 Utterance utterance = list.get(i);
-
-                if (utterance.isCoded()) {
-                    writer.write(utterance.writeCoded());
-                    writer.newLine();
-                } else if (utterance.isParsed()) {
-                    writer.write(utterance.writeParsed());
-                    writer.newLine();
-                } else {
-                    // If not coded or parsed, utterance is incomplete.  This should
-                    // only happen if we're on the last utterance in list.
-                    assert (i + 1 == list.size());
-                    break;
-                }
+                writer.write(utterance.writeCoded());
+                writer.newLine();
             }
         } catch (IOException e) {
             throw e;
@@ -124,6 +115,7 @@ public class UtteranceList {
      * @throws Exception
      */
 	public void loadFromFile( File file ) throws Exception {
+
 		list.clear(); // Clear existing contents.
 
 		Scanner in;
@@ -141,26 +133,16 @@ public class UtteranceList {
 		headReader.nextToken(); // Eat line heading "Audio Filename:"
 
 		while( in.hasNextLine() ){
-			// NOTE: MISC is hard-coded
-			// MISC format: int order, String startTime, String EndTime,
-			//				int startBytes, int endBytes,
-			//				int code, String codename
+
 			String 			nextStr 	= in.nextLine();
 			StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
-			int 			lineSize 	= st.countTokens();  //5 = parsed only, 7 = coded
+			int 			lineSize 	= st.countTokens();
 			int 			order 		= Integer.parseInt(st.nextToken());
 
-			// IMPROVE: Place a check for "null" in start and end fields to report to the user.
-			String 			start 		= st.nextToken();
-			String 			end 		= st.nextToken();
-			int 			stBytes 	= Integer.parseInt(st.nextToken());
-			int 			endBytes 	= Integer.parseInt(st.nextToken());
-			MiscDataItem 	item 		= new MiscDataItem(order, start, stBytes);
+            Duration startTime          = Utils.parseDuration(st.nextToken());
+            MiscDataItem 	item 		= new MiscDataItem(order, startTime);
 
-
-			item.setEndTime(end);
-			item.setEndBytes(endBytes);
-			if( lineSize == 7 ){
+			if( lineSize == 4 ){
 
                 int codeId = Integer.parseInt( st.nextToken() );
                 // look up parsed code in user config codes loaded at init
@@ -172,9 +154,10 @@ public class UtteranceList {
                     throw new Exception( String.format("Code(%d) in casaa file not found in user configuration file", codeId) );
                 }
 				st.nextToken(); //throw away the code string
+
+                add(item);
 			}
 
-			add(item);
 		}
 
 	}
