@@ -18,14 +18,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
-import javafx.util.converter.TimeStringConverter;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.io.IOException;
 
 
 /**
@@ -37,15 +33,16 @@ public class TimeLine extends Group {
     private int pixelsPerSecond	          = 50;     // sort of a framerate for the animation
     private TranslateTransition animation = null;   // animation for moving timeline
     private TimeLineMarker selectedMarker = null;   // store currently selected marker, if any
-
+    private UtteranceList utteranceList   = null;   //
     private double height                 = 55.0;   // projected height of timeline. forces Group dimensions early
     private double thickness              = 2.0;    // thickness of line that represents time :)
 
 
-    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, UtteranceList utteranceList) {
+    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, UtteranceList utteranceList) throws IOException {
 
         this.audioDuration = audioDuration;
         this.pixelsPerSecond = pixelsPerSecond;
+        this.utteranceList = utteranceList;
 
         /*
             horizontal center is beginning of timeline
@@ -75,8 +72,8 @@ public class TimeLine extends Group {
         this.getChildren().add(h);
 
 
-        // ?????
-        setUtteranceList(utteranceList);
+        //
+        loadUtterances();
 
 
         // initialize the animation of timeline
@@ -90,14 +87,14 @@ public class TimeLine extends Group {
     }
 
 
-    public void addMarker( Utterance newUtterance) {
+    public void addMarker(Utterance newUtterance) throws IOException {
         this.addMarker(newUtterance.getEnum(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker() );
     }
 
     /*
         Adds new utterance marker to timeline
      */
-    public void addMarker(int markerIndx, String code, double posSeconds, MiscCode.Speaker speaker) {
+    public void addMarker(int markerIndx, String code, double posSeconds, MiscCode.Speaker speaker) throws IOException {
 
         TimeLineMarker activeMarker = getSelectedMarker();
 
@@ -131,7 +128,7 @@ public class TimeLine extends Group {
     /*
         Call me when you want to delete an utterance marker from the timeline
      */
-    public void removeMarker(int markerIndx){
+    public void removeMarker(int markerIndx) throws IOException {
         Node r = this.lookup("#"+Integer.toString(markerIndx));
         if( r != null) {
             /*
@@ -139,12 +136,13 @@ public class TimeLine extends Group {
             r.setDisable(true);
             */
             this.getChildren().remove(r);
-
+            //
+            utteranceList.remove(utteranceList.get(markerIndx));
             this.setSelectedMarker(null);
         }
     }
 
-    public void setUtteranceList(UtteranceList utteranceList) {
+    public void loadUtterances() throws IOException {
 
         this.getChildren().remove(1, this.getChildren().size());
 
@@ -154,11 +152,10 @@ public class TimeLine extends Group {
             Utterance utterance = utteranceList.get(i);
 
             this.addMarker(
-                    i,
-                    utterance.getMiscCode().name,
-                    utterance.getStartTime().toSeconds(),
-                    utterance.getMiscCode().getSpeaker());
-
+                i,
+                utterance.getMiscCode().name,
+                utterance.getStartTime().toSeconds(),
+                utterance.getMiscCode().getSpeaker());
         }
 
     }
@@ -299,7 +296,11 @@ public class TimeLine extends Group {
             // menu item for deleting marker
             MenuItem mniRemoveMarker = new MenuItem("Remove Marker");
             mniRemoveMarker.setOnAction( e -> {
-                removeMarker(getSelectedMarker().getMarkerIndx());
+                try {
+                    removeMarker(getSelectedMarker().getMarkerIndx());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             });
 
             contextMenu.getItems().addAll(mniRemoveMarker);

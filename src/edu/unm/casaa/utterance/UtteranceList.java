@@ -38,23 +38,54 @@ public class UtteranceList {
 
 	private static final long serialVersionUID 	= 1L;
 	private Vector< Utterance >	list 			= new Vector<>();
+    private File storageFile                    = null;
+    private String audioFilename                = null;
+
+
+    public UtteranceList (File storageFile, String audioFilename) {
+        this.storageFile = storageFile;
+        this.audioFilename = audioFilename;
+    }
+
 
 	/**
 	 * Append utterance.
-	 * @param data new utterance
+	 * @param utr new utterance
 	 */
-	public void	add( Utterance data ){
-		list.add( data );
+	public void	add( Utterance utr ) throws IOException {
+
+        list.add( utr );
+        System.out.println("UtteranceList added utr:"+utr.getEnum());
+
+        try {
+            writeToFile();
+        } catch (IOException e) {
+            throw e;
+        }
 	}
 
 	/**
 	 * Remove last utterance, if list is non-empty.
 	 */
-	public void removeLast(){
-		if( !list.isEmpty() ){
-			list.remove( list.size() - 1 );
-		}
+	public void removeLast() throws IOException {
+		if( !list.isEmpty() ) {
+            this.remove(list.lastElement());
+        }
 	}
+
+	/**
+	 * Remove utterance
+	 */
+	public void remove(Utterance utr) throws IOException {
+		list.remove(utr);
+        System.out.println("UtteranceList remove removed utr:"+utr.getEnum());
+        try {
+            writeToFile();
+        } catch (IOException e) {
+            throw e;
+        }
+	}
+
 
 	/**
 	 * Return utterance at given index, or null is index is out of bounds.
@@ -87,15 +118,13 @@ public class UtteranceList {
 
 	/**
 	 * Write to file.
-	 * @param file casaa file
-	 * @param filenameAudio audio filename
 	 */
-	public void writeToFile( File file, String filenameAudio ) throws IOException {
+	public void writeToFile() throws IOException {
         // TODO: consider append option instead of always writing entire file
-		try (BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
+		try (BufferedWriter writer = Files.newBufferedWriter(storageFile.toPath(), StandardCharsets.UTF_8)) {
 
             // begin with audio file in header
-            writer.write("Audio File:\t" + filenameAudio);
+            writer.write("Audio File:\t" + audioFilename);
             writer.newLine();
 
             for (int i = 0; i < list.size(); i++) {
@@ -106,6 +135,8 @@ public class UtteranceList {
         } catch (IOException e) {
             throw e;
         }
+
+        System.out.println("UtteranceList wrote to storage.");
 	}
 
 
@@ -126,11 +157,16 @@ public class UtteranceList {
 			throw e;
 		}
 
+		storageFile = file;
+
 		// Eat the audio filename line.
 		String 			filenameAudio 	= in.nextLine();
 		StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
 
-		headReader.nextToken(); // Eat line heading "Audio Filename:"
+        // Eat  "Audio Filename:"
+		headReader.nextToken();
+        // local reference of audiofilename
+        audioFilename = headReader.nextToken();
 
 		while( in.hasNextLine() ){
 

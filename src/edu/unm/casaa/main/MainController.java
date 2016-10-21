@@ -25,7 +25,6 @@ import edu.unm.casaa.globals.*;
 import javafx.animation.Animation;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -43,8 +42,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -229,7 +227,6 @@ public class MainController {
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
             mediaPlayer.play();
         }
-        //timeLine.play();
     }
 
 
@@ -272,21 +269,12 @@ public class MainController {
      **********************************************************************/
     @SuppressWarnings("UnusedParameters")
     public void btnActUncode(ActionEvent actionEvent) {
-        /* make sure we are attempting to uncode when nothing
-           available to uncode
-         */
-        if(isUncodeAvailable()) {
-            // remove the last code
-            uncode();
-            // write data file
-            saveSession();
-            // update counter of how many time user uncoded
-            incrementUncodeCount();
-            // redraw timeline to reflect change
-            //updateTimeLineDisplay();
-            // uncoding may exhaust available codes so update button state
-            setPlayerButtonState();
-        }
+        // remove the last code
+        removeLastUtterance();
+        // update counter of how many time user uncoded
+        incrementUncodeCount();
+        // uncoding may exhaust available codes so update button state
+        setPlayerButtonState();
     }
 
 
@@ -295,24 +283,18 @@ public class MainController {
      *  @param actionEvent not used
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
-        /* make sure we are attempting to uncode when nothing
-           available to uncode
-         */
-        if(isUncodeAvailable()) {
+
+        Utterance utterance = getCurrentUtterance();
+        if (utterance != null) {
+            // Position one second before start of utterance.
+            Duration pos = utterance.getStartTime().subtract(Duration.ONE);
+
+            setMediaPlayerPosition(pos);
+
             // remove the last code
-            uncode();
-            // write data file
-            saveSession();
+            removeLastUtterance();
             // update counter of how many time user uncoded
             incrementUncodeCount();
-
-            Utterance utterance = getCurrentUtterance();
-            if (utterance != null) {
-                // Position one second before start of utterance.
-                Duration pos = utterance.getStartTime().subtract(Duration.ONE);
-
-                setMediaPlayerPosition(pos);
-            }
 
             // uncoding may exhaust available codes so update button state
             setPlayerButtonState();
@@ -326,7 +308,7 @@ public class MainController {
     private void btnActCode(ActionEvent actionEvent) {
         Button src = (Button) actionEvent.getSource();
         MiscCode mc = MiscCode.codeWithName(src.getText());
-        handleButtonMiscCode(mc);
+        insertUtterance(mc);
     }
 
 
@@ -440,9 +422,6 @@ public class MainController {
             filenameAudio = audioFile.getAbsolutePath();
         }
 
-        // reset utteranceList to start fresh
-        utteranceList = null;
-
         // Default casaa filename to match audio file, with .casaa suffix.
         String newFileName = Utils.changeSuffix( audioFile.getName(), "casaa" );
         File miscFile = selectMiscFile(newFileName);
@@ -450,6 +429,9 @@ public class MainController {
             return;
         }
         filenameMisc = miscFile.getAbsolutePath();
+
+        // reset utteranceList to start fresh
+        utteranceList = new UtteranceList(miscFile, filenameAudio);
 
         if (audioFile.canRead()) {
             initializeMediaPlayer(audioFile, playerReady);
@@ -851,9 +833,12 @@ public class MainController {
         l.setStrokeWidth(0.5);
         l.setTranslateX(center + l.getStrokeWidth());
 
-        //System.out.println("Number of utterances now:"+ utteranceList.size());
-        timeLine = new TimeLine(totalDuration, 50, center, utteranceList);
-        //pnNewTimeLine.getChildren().add(timeLine);
+        try {
+            timeLine = new TimeLine(totalDuration, 50, center, utteranceList);
+        } catch (IOException e) {
+            showFatalWarning("File error", e.getMessage());
+        }
+
         pnTimeLine.getChildren().addAll(l, timeLine);
 
 
@@ -1168,20 +1153,11 @@ public class MainController {
      *
      * @return list of utterances
      **********************************************************/
+    //TODO: this needs to be replaced perhaps; no longer needed?
     private synchronized UtteranceList getUtteranceList() {
         if( utteranceList == null )
-            utteranceList = new UtteranceList();
+            showFatalWarning("Error", "UtteranceList is null");
         return utteranceList;
-    }
-
-
-    // Access utterances.
-    public int numUtterances() {
-        return getUtteranceList().size();
-    }
-
-    public Utterance utterance(int index ) {
-        return getUtteranceList().get( index );
     }
 
     // Get current utterance, which is always the last utterance in list.  May be null.
@@ -1217,41 +1193,6 @@ public class MainController {
 
     }
 
-    /********************************************************
-     * Undo the actions of pressing a MISC code button.
-     ********************************************************/
-    private synchronized void uncode() {
-        // Remove last utterance, if uncoded (utterance was
-        // generated when user coded the second-to-last utterance).
-        UtteranceList 	list 	= getUtteranceList();
-        Utterance 		u 		= list.last();
-
-        if( u != null ) {
-            // remove from timeline
-            timeLine.removeMarker(u.getEnum()+1);
-            // remove from utterance list
-            list.removeLast();
-            // refresh last utterance display
-            updateUtteranceDisplays();
-        }
-    }
-
-    /*********************************************************
-     * Save current session. Periodically also save backup copy.
-     *********************************************************/
-    private synchronized void saveSession() {
-        // Save normal file.
-        saveCurrentTextFile( false );
-
-        /* Backup every n'th save.
-        if( numSaves % 10 == 0 ) {
-            saveCurrentTextFile( true );
-        }
-        numSaves++;
-        */
-    }
-
-
 
     private synchronized void saveCurrentTextFile( boolean asBackup ) {
 
@@ -1263,7 +1204,7 @@ public class MainController {
                 filename = filenameMisc;
                 if( asBackup ) { filename += ".backup"; }
                 try {
-                    getUtteranceList().writeToFile( new File( filename ), filenameAudio );
+                    getUtteranceList().writeToFile();
                 } catch (IOException e) {
                     showError("Write Error", e.getMessage() );
                 }
@@ -1292,30 +1233,58 @@ public class MainController {
 
 
 
-    private synchronized void handleButtonMiscCode(MiscCode miscCode) {
-
-        assert (miscCode.isValid());
+    private synchronized void insertUtterance(MiscCode miscCode) {
 
         // get current time
         Duration position = mediaPlayer.getCurrentTime();
 
-        // Start new utterance.
+        // init new utterance.
         int         order   = getUtteranceList().size();
         Utterance   data    = new MiscDataItem( order, position );
         data.setMiscCode(miscCode);
-        getUtteranceList().add( data );
 
-        // add to
-        timeLine.addMarker(getUtteranceList().size(), miscCode.name, position.toSeconds(), miscCode.getSpeaker());
+        try {
+            // insert in storage
+            getUtteranceList().add( data );
+            // insert in timeline
+            timeLine.addMarker(data);
+        } catch (IOException e) {
+            showFatalWarning("File Error", e.getMessage());
+        }
 
+        // update display
         updateUtteranceDisplays();
-        saveSession();
-
-        //
+        // button state different if 0 ver > 0 utterances
         setPlayerButtonState();
     }
 
 
+    private synchronized void removeUtterance(Utterance utr) {
+        try {
+            // remove from timeline
+            timeLine.removeMarker(utr.getEnum());
+            // remove from utterance list
+            getUtteranceList().remove(utr);
+        } catch (IOException e) {
+            showFatalWarning("File Error", e.getMessage());
+        }
+
+        // refresh last utterance display
+        updateUtteranceDisplays();
+    }
+
+
+    /********************************************************
+     * Undo the actions of pressing a MISC code button.
+     ********************************************************/
+    private synchronized void removeLastUtterance() {
+        // Remove last utterance
+        Utterance u = getUtteranceList().last();
+
+        if( u != null ) {
+            removeUtterance(u);
+        }
+    }
 
 
     /*********************************************************************
