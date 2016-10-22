@@ -252,7 +252,7 @@ public class MainController {
     @SuppressWarnings("UnusedParameters")
     public void btnActReplay(ActionEvent actionEvent) {
 
-        Utterance   utterance   = getCurrentUtterance();
+        Utterance   utterance   = getUtteranceList().last();
         Duration    pos         = Duration.ZERO;
 
         if( utterance != null ) {
@@ -284,7 +284,7 @@ public class MainController {
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
 
-        Utterance utterance = getCurrentUtterance();
+        Utterance utterance = getUtteranceList().last();
         if (utterance != null) {
             // Position one second before start of utterance.
             Duration pos = utterance.getStartTime().subtract(Duration.ONE);
@@ -1000,17 +1000,15 @@ public class MainController {
                 /**
                  * initialize "active" utterance
                  **/
-                Utterance currentUtterance = getCurrentUtterance();
+                Utterance currentUtterance = getUtteranceList().last();
                 // default seek init
                 onReadySeekDuration = Duration.ZERO;
 
                 // We expect utterances in file to be coded.  For backwards compatibility,
                 // tolerate uncoded utterances in file.
                 if( currentUtterance != null ) {
-                    if( currentUtterance.isCoded() ) {
-                        // update mediaplayer position appropriately for our now active utterance
-                        onReadySeekDuration = currentUtterance.getStartTime();
-                    }
+                    // update mediaplayer position appropriately for our now active utterance
+                    onReadySeekDuration = currentUtterance.getStartTime();
                 }
 
 
@@ -1160,37 +1158,17 @@ public class MainController {
         return utteranceList;
     }
 
-    // Get current utterance, which is always the last utterance in list.  May be null.
-    public synchronized Utterance getCurrentUtterance() {
-        return getUtteranceList().last();
-    }
 
-
-    // Get previous utterance, or null if no previous utterance exists.
-    private synchronized Utterance getPreviousUtterance() {
-        int count = getUtteranceList().size();
-
-        return (count > 1) ? getUtteranceList().get( count - 2 ) : null;
-    }
-
-
-    /*
+    /**
         See if uncoding is currently an option
-     */
+     **/
     private boolean isUncodeAvailable() {
 
-        Utterance p = getPreviousUtterance();
         Utterance l = getUtteranceList().last();
 
-        /*
-            if previous utterance is not null it is coded and can be uncoded.
-            if last utterance is coded it can be uncoded.
-         */
-
-        if( (p != null) || (l != null && l.isCoded()) ) {
+        if( l != null ) {
             return true;
         } else return false;
-
     }
 
 
@@ -1239,13 +1217,13 @@ public class MainController {
         Duration position = mediaPlayer.getCurrentTime();
 
         // init new utterance.
-        int         order   = getUtteranceList().size();
-        Utterance   data    = new MiscDataItem( order, position );
+        String      id   = Utils.durationToID(position);
+        Utterance   data = new MiscDataItem( id, position );
         data.setMiscCode(miscCode);
 
         try {
             // insert in storage
-            getUtteranceList().add( data );
+            getUtteranceList().add(data);
             // insert in timeline
             timeLine.addMarker(data);
         } catch (IOException e) {
@@ -1262,7 +1240,7 @@ public class MainController {
     private synchronized void removeUtterance(Utterance utr) {
         try {
             // remove from timeline
-            timeLine.removeMarker(utr.getEnum());
+            timeLine.removeMarker(utr);
             // remove from utterance list
             getUtteranceList().remove(utr);
         } catch (IOException e) {
@@ -1506,10 +1484,9 @@ public class MainController {
      * Update utterance displays (e.g. current, last, etc) in active template view
      */
     private synchronized void updateUtteranceDisplays() {
-
         // display full string of previous utterance
-        Utterance        prev    = getPreviousUtterance();
-        lblPrevUtr.setText(prev == null ? "" : prev.displayCoded());
+        Utterance last = getUtteranceList().last();
+        lblPrevUtr.setText(last == null ? "" : last.displayCoded());
     }
 
 

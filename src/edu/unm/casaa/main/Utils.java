@@ -20,6 +20,11 @@ public class Utils {
     }
 
 
+    public static String durationToID(Duration duration) {
+        return formatDuration(duration).replaceAll("[^0-9]", "");
+    }
+
+
     public static Duration parseDuration( String string ) {
         StringTokenizer st 		= new StringTokenizer( string, ":" );
 

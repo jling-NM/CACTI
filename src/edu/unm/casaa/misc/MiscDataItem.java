@@ -25,67 +25,37 @@ import javafx.util.Duration;
 /**
  * The MiscDataItem is an object designed to hold all of the
  * relevant information for a MISC utterance.
- * @author Alex Manuel
+ * @author Alex Manuel with changes by josef ling
  *
  */
 public class MiscDataItem implements Utterance {
 
-	private int 		orderEnum	= -1;
+	private String      id          = null;
 	private Duration    startTime   = Duration.ZERO;
 	private MiscCode 	miscCode	= new MiscCode();
 
 	/**
 	 * Constructor requires the order from the data queue,
 	 * and the start time from the player.
-	 * @param orderEnum the enumerated order for this utterance
+	 * @param id sortable; string representation of start time here
 	 * @param startTime the start time code for this utterance
 	 */
-	public MiscDataItem( int orderEnum, double startTime ) {
-		this.orderEnum 	= orderEnum;
-		this.startTime 	= Duration.seconds(startTime);
+	public MiscDataItem( String id, double startTime ) {
+		this.id 	   = id;
+		this.startTime = Duration.seconds(startTime);
 	}
 
-    public MiscDataItem( int orderEnum, Duration startTime ) {
-        this.orderEnum 	= orderEnum;
-        this.startTime 	= startTime;
+    public MiscDataItem( String id, Duration startTime ) {
+		this.id 	   = id;
+        this.startTime = startTime;
     }
 
 	/**
-	 * Set order number where this particular utterance occurs.
-	 * @param index
-	 */
-	public void setEnum( int index ) {
-		orderEnum = index;
-	}
-
-	/**
-	 * Returns the order number where this particular utterance occurs.
-	 * Returns -1 if value wasn't properly set.
-	 * @return the order of this utterance in the queue. 
-	 */
-	public int getEnum() {
-		return orderEnum;
-	}
-
-	/**
 	 * Returns the start time code for this utterance.
-	 * Returns -1 if value wasn't properly set.
 	 * @return the start time code
 	 */
 	public Duration getStartTime() {
 		return startTime;
-	}
-
-	/**
-	 * Return true if this utterance has been coded.
-	 */
-	public boolean isCoded() {
-		return miscCode.isValid();
-	}
-
-
-	public void stripMiscCode() {
-		setMiscCode( MiscCode.INVALID_CODE );
 	}
 
 	/**
@@ -97,7 +67,11 @@ public class MiscDataItem implements Utterance {
 		return miscCode;
 	}
 
-    /**
+	public void setID(String id) {
+		this.id = id;
+	}
+
+	/**
      * Sets the MISC statistical code for this utterance by integer value.
      * @param value integer code the MISC statistical code
      * @throws NullPointerException
@@ -113,15 +87,13 @@ public class MiscDataItem implements Utterance {
 	public void setMiscCode( MiscCode code ) {
 		this.miscCode = code;
 	}
-	
-	/**
-	 * Returns the string value for this utterance,
-	 * based on whether it has received a MISC code or not.
-	 * This is used for writing the utterance to a File.
-	 * @return a string representation of this utterance
-	 */
+
+	public String getID() {
+		return this.id;
+	}
+
 	public String toString(){
-        return isCoded() ? writeCoded() : writeParsed();
+        return displayCoded();
 	}
 
 	public String displayCoded(){
@@ -129,15 +101,9 @@ public class MiscDataItem implements Utterance {
 				miscCode.name);
 	}
 	public String writeCoded(){
-		return ("" + orderEnum 	+ "\t" +
-                    Utils.formatDuration(startTime)	+ "\t" +
+		return ("" + Utils.formatDuration(startTime)	+ "\t" +
 					miscCode.value 	+ "\t" +
 					miscCode.name);
-	}
-	
-	public String writeParsed(){
-		return ("" + orderEnum 	+ "\t" +
-                     startTime.toSeconds() 	+ "s\t");
 	}
 
 }

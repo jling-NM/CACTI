@@ -23,23 +23,14 @@ import javafx.util.Duration;
 
 public interface Utterance {
 
-	public int getEnum();
-	public Duration getStartTime();
-	public boolean isCoded();
-	public MiscCode getMiscCode();
+	void setID(String id);
+	void setMiscCodeByValue(int value);
+	void setMiscCode(MiscCode code);
+	String getID();
+	Duration getStartTime();
+	MiscCode getMiscCode();
 
-	// Strip code, so isCoded() will return false.  Writes MiscCode.INVALID_CODE.
-	public void stripMiscCode();
 
-	// Enum and start time will be initialized by derived class constructor.
-	public void	setEnum(int index);
-	public void setMiscCodeByValue(int value);
-	public void setMiscCode(MiscCode code);
-
-	public String displayCoded();
-	// Output order should be tab-delimited:
-	// order startCode endCode [codeCode codeString] "\r\n"
-	// The section in [] is written only if utterance has been coded.
-	public String writeParsed();
-	public String writeCoded();
+	String displayCoded();
+	String writeCoded();
 }

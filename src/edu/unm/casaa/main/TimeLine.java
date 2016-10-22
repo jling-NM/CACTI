@@ -88,13 +88,13 @@ public class TimeLine extends Group {
 
 
     public void addMarker(Utterance newUtterance) throws IOException {
-        this.addMarker(newUtterance.getEnum(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker() );
+        this.addMarker(newUtterance.getID(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker() );
     }
 
     /*
         Adds new utterance marker to timeline
      */
-    public void addMarker(int markerIndx, String code, double posSeconds, MiscCode.Speaker speaker) throws IOException {
+    public void addMarker(String markerID, String code, double posSeconds, MiscCode.Speaker speaker) throws IOException {
 
         TimeLineMarker activeMarker = getSelectedMarker();
 
@@ -105,8 +105,8 @@ public class TimeLine extends Group {
         if(activeMarker != null) {
             /* Edit active marker */
 
-            int prevId      = activeMarker.getMarkerIndx();
-            double prevPos  = activeMarker.posSeconds;
+            String prevId  = activeMarker.getMarkerID();
+            double prevPos = activeMarker.posSeconds;
 
             removeMarker(prevId);
 
@@ -117,7 +117,7 @@ public class TimeLine extends Group {
 
         } else {
             /* add new marker */
-            TimeLineMarker newMarker = new TimeLineMarker(markerIndx, code, posSeconds, speaker);
+            TimeLineMarker newMarker = new TimeLineMarker(markerID, code, posSeconds, speaker);
             this.getChildren().add(newMarker);
 
             this.setSelectedMarker(null);
@@ -128,16 +128,24 @@ public class TimeLine extends Group {
     /*
         Call me when you want to delete an utterance marker from the timeline
      */
-    public void removeMarker(int markerIndx) throws IOException {
-        Node r = this.lookup("#"+Integer.toString(markerIndx));
+    public void removeMarker(String markerID) throws IOException {
+        Node r = this.lookup("#"+markerID);
         if( r != null) {
-            /*
-            r.setVisible(false);
-            r.setDisable(true);
-            */
             this.getChildren().remove(r);
-            //
-            utteranceList.remove(utteranceList.get(markerIndx));
+            utteranceList.remove(utteranceList.get(markerID));
+            this.setSelectedMarker(null);
+        }
+    }
+
+
+    /*
+        Call me when you want to delete an utterance marker from the timeline
+    */
+    public void removeMarker(Utterance utr) throws IOException {
+        Node r = this.lookup("#"+(utr.getID()));
+        if( r != null) {
+            this.getChildren().remove(r);
+            utteranceList.remove(utr);
             this.setSelectedMarker(null);
         }
     }
@@ -146,16 +154,13 @@ public class TimeLine extends Group {
 
         this.getChildren().remove(1, this.getChildren().size());
 
-
         // since utterance list is not a proper collection we old school it here
-        for (int i = 0; i < utteranceList.size(); i++) {
-            Utterance utterance = utteranceList.get(i);
-
+        for (Utterance utr : utteranceList.values()) {
             this.addMarker(
-                i,
-                utterance.getMiscCode().name,
-                utterance.getStartTime().toSeconds(),
-                utterance.getMiscCode().getSpeaker());
+                utr.getID(),
+                utr.getMiscCode().name,
+                utr.getStartTime().toSeconds(),
+                utr.getMiscCode().getSpeaker());
         }
 
     }
@@ -186,7 +191,7 @@ public class TimeLine extends Group {
      */
     public class TimeLineMarker extends VBox {
 
-        private int markerIndx;             // how to find record in data
+        private String markerID;            // how to find record in data
         private double posSeconds;          // start positon in bytes
         private MiscCode.Speaker speaker;   //
         private Text markerCode;            // displays utterance code for this marker
@@ -194,11 +199,11 @@ public class TimeLine extends Group {
         private int indicatorWidth = 12;    // size of arrow
 
 
-        public TimeLineMarker(int markerIndx, String code, double posSeconds, MiscCode.Speaker speaker) {
+        public TimeLineMarker(String markerID, String code, double posSeconds, MiscCode.Speaker speaker) {
 
             // Set spacing between nodes inside marker. specify spacing as CSS doesn't appear to work for this
             this.setSpacing(1.0);
-            this.markerIndx = markerIndx;
+            this.markerID = markerID;
             this.posSeconds = posSeconds;
             this.speaker = speaker;
 
@@ -280,8 +285,8 @@ public class TimeLine extends Group {
 
             });
 
-            // set parent container to id that will be used to pull utterance; startbyes or id in new scheme
-            this.setId(Integer.toString(markerIndx));
+            // set parent container to id that will be used to pull utterance;
+            this.setId(markerID);
         }
 
 
@@ -297,7 +302,7 @@ public class TimeLine extends Group {
             MenuItem mniRemoveMarker = new MenuItem("Remove Marker");
             mniRemoveMarker.setOnAction( e -> {
                 try {
-                    removeMarker(getSelectedMarker().getMarkerIndx());
+                    removeMarker(getSelectedMarker().getMarkerID());
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -319,12 +324,12 @@ public class TimeLine extends Group {
             this.indicatorShape = indicatorShape;
         }
 
-        public int getMarkerIndx() {
-            return markerIndx;
+        public String getMarkerID() {
+            return markerID;
         }
 
-        public void setMarkerIndx(int markerIndx) {
-            this.markerIndx = markerIndx;
+        public void setMarkerID(String markerID) {
+            this.markerID = markerID;
         }
 
         public String getCode() { return markerCode.getText(); }

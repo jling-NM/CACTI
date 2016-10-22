@@ -21,25 +21,21 @@ package edu.unm.casaa.utterance;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Vector;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-
+import java.util.*;
 import edu.unm.casaa.main.Utils;
 import edu.unm.casaa.misc.MiscDataItem;
 import javafx.util.Duration;
 
+
 /**
- * A vector of utterances, stored in their recorded order.
+ * A sortedMap of utterances, sorted by id which should be a string representation of start time
  */
 public class UtteranceList {
 
-	private static final long serialVersionUID 	= 1L;
-	private Vector< Utterance >	list 			= new Vector<>();
-    private File storageFile                    = null;
-    private String audioFilename                = null;
+	private static final long serialVersionUID 	   = 1L;
+    private SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
+    private File storageFile                       = null;
+    private String audioFilename                   = null;
 
 
     public UtteranceList (File storageFile, String audioFilename) {
@@ -54,8 +50,8 @@ public class UtteranceList {
 	 */
 	public void	add( Utterance utr ) throws IOException {
 
-        list.add( utr );
-        System.out.println("UtteranceList added utr:"+utr.getEnum());
+        utteranceTreeMap.put( Utils.durationToID(utr.getStartTime()), utr);
+        System.out.println("UtteranceList added utr:"+utr.displayCoded());
 
         try {
             writeToFile();
@@ -68,8 +64,8 @@ public class UtteranceList {
 	 * Remove last utterance, if list is non-empty.
 	 */
 	public void removeLast() throws IOException {
-		if( !list.isEmpty() ) {
-            this.remove(list.lastElement());
+        if( !utteranceTreeMap.isEmpty() ) {
+            utteranceTreeMap.remove(utteranceTreeMap.lastKey());
         }
 	}
 
@@ -77,8 +73,8 @@ public class UtteranceList {
 	 * Remove utterance
 	 */
 	public void remove(Utterance utr) throws IOException {
-		list.remove(utr);
-        System.out.println("UtteranceList remove removed utr:"+utr.getEnum());
+		utteranceTreeMap.remove(utr.getID());
+        System.out.println("UtteranceList remove removed utr:"+utr.getID());
         try {
             writeToFile();
         } catch (IOException e) {
@@ -88,55 +84,50 @@ public class UtteranceList {
 
 
 	/**
-	 * Return utterance at given index, or null is index is out of bounds.
-	 * @param index utterance position
-	 * @return the utterance at given index, or null if index is out of bounds
+	 * Return utterance with given id
+	 * @return the utterance or null
 	 */
-	public Utterance get(int index){
-		if(index < list.size()){
-			return list.get(index);
-		}
-		else{
-			return null;
-		}
-	}
+	public Utterance get(String utteranceID){
+        return utteranceTreeMap.get(utteranceID);
+    }
 
 	/**
 	 * Get last utterance (coded or not), or null if list is empty.
 	 */
 	public Utterance last() {
-		return list.isEmpty() ? null : list.lastElement();
+		return utteranceTreeMap.isEmpty() ? null : utteranceTreeMap.get(utteranceTreeMap.lastKey());
 	}
 
+	public Collection<Utterance> values() {
+        return utteranceTreeMap.values();
+    }
+
 	public int size(){
-		return list.size();
+		return utteranceTreeMap.size();
 	}
 
 	public boolean isEmpty(){
-		return list.isEmpty();
+		return utteranceTreeMap.isEmpty();
 	}
 
 	/**
 	 * Write to file.
 	 */
 	public void writeToFile() throws IOException {
-        // TODO: consider append option instead of always writing entire file
 		try (BufferedWriter writer = Files.newBufferedWriter(storageFile.toPath(), StandardCharsets.UTF_8)) {
 
             // begin with audio file in header
             writer.write("Audio File:\t" + audioFilename);
             writer.newLine();
 
-            for (int i = 0; i < list.size(); i++) {
-                Utterance utterance = list.get(i);
-                writer.write(utterance.writeCoded());
+            for (Utterance utr : utteranceTreeMap.values()) {
+                writer.write(utr.writeCoded());
                 writer.newLine();
             }
+
         } catch (IOException e) {
             throw e;
         }
-
-        System.out.println("UtteranceList wrote to storage.");
 	}
 
 
@@ -147,7 +138,7 @@ public class UtteranceList {
      */
 	public void loadFromFile( File file ) throws Exception {
 
-		list.clear(); // Clear existing contents.
+		utteranceTreeMap.clear(); // Clear existing contents.
 
 		Scanner in;
 
@@ -173,12 +164,12 @@ public class UtteranceList {
 			String 			nextStr 	= in.nextLine();
 			StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
 			int 			lineSize 	= st.countTokens();
-			int 			order 		= Integer.parseInt(st.nextToken());
 
             Duration startTime          = Utils.parseDuration(st.nextToken());
-            MiscDataItem 	item 		= new MiscDataItem(order, startTime);
+            MiscDataItem 	item 		= new MiscDataItem(Utils.durationToID(startTime), startTime);
 
-			if( lineSize == 4 ){
+            // TODO: also read old format of 7 tokens properly
+			if( lineSize == 3 ){
 
                 int codeId = Integer.parseInt( st.nextToken() );
                 // look up parsed code in user config codes loaded at init
@@ -189,7 +180,7 @@ public class UtteranceList {
                     // and codes in user config file
                     throw new Exception( String.format("Code(%d) in casaa file not found in user configuration file", codeId) );
                 }
-				st.nextToken(); //throw away the code string
+				st.nextToken(); // throw away the code string
 
                 add(item);
 			}
