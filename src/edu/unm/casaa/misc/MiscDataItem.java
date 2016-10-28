@@ -58,6 +58,8 @@ public class MiscDataItem implements Utterance {
 		return startTime;
 	}
 
+	public void setStartTime(double startTime) { this.startTime = Duration.seconds(startTime); }
+
 	/**
 	 * Returns the MISC code for this utterance.
 	 * Returned misc code will have value MiscCode.INVALID if value wasn't set.
@@ -92,7 +94,7 @@ public class MiscDataItem implements Utterance {
 		return this.id;
 	}
 
-	public String toString(){
+    public String toString(){
         return displayCoded();
 	}
 

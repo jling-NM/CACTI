@@ -26,10 +26,10 @@ public interface Utterance {
 	void setID(String id);
 	void setMiscCodeByValue(int value);
 	void setMiscCode(MiscCode code);
+	void setStartTime(double startTime);
 	String getID();
 	Duration getStartTime();
 	MiscCode getMiscCode();
-
 
 	String displayCoded();
 	String writeCoded();

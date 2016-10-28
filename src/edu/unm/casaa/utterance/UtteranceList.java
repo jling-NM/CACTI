@@ -38,32 +38,31 @@ public class UtteranceList {
     private String audioFilename                   = null;
 
 
+    public UtteranceList (File storageFile) {
+        this.storageFile = storageFile;
+    }
+
     public UtteranceList (File storageFile, String audioFilename) {
         this.storageFile = storageFile;
         this.audioFilename = audioFilename;
     }
 
 
-	/**
-	 * Append utterance.
-	 * @param utr new utterance
-	 */
-	public void	add( Utterance utr ) throws IOException {
 
-        utteranceTreeMap.put( Utils.durationToID(utr.getStartTime()), utr);
-        System.out.println("UtteranceList added utr:"+utr.displayCoded());
-
-        try {
-            writeToFile();
-        } catch (IOException e) {
-            throw e;
-        }
-	}
+    /**
+     * Add new utterance
+     * @param utr
+     * @throws IOException
+     */
+    public void add( Utterance utr ) {
+        System.out.println("Add Utterance:" + utr.displayCoded());
+        utteranceTreeMap.put( Utils.formatID(utr.getStartTime(), utr.getMiscCode().value), utr);
+    }
 
 	/**
 	 * Remove last utterance, if list is non-empty.
 	 */
-	public void removeLast() throws IOException {
+	public void removeLast() {
         if( !utteranceTreeMap.isEmpty() ) {
             utteranceTreeMap.remove(utteranceTreeMap.lastKey());
         }
@@ -72,14 +71,9 @@ public class UtteranceList {
 	/**
 	 * Remove utterance
 	 */
-	public void remove(Utterance utr) throws IOException {
+	public void remove(Utterance utr) {
+        System.out.println("Remove Utterance:" + utr.displayCoded());
 		utteranceTreeMap.remove(utr.getID());
-        System.out.println("UtteranceList remove removed utr:"+utr.getID());
-        try {
-            writeToFile();
-        } catch (IOException e) {
-            throw e;
-        }
 	}
 
 
@@ -114,6 +108,7 @@ public class UtteranceList {
 	 * Write to file.
 	 */
 	public void writeToFile() throws IOException {
+        System.out.println("Write MISC file");
 		try (BufferedWriter writer = Files.newBufferedWriter(storageFile.toPath(), StandardCharsets.UTF_8)) {
 
             // begin with audio file in header
@@ -133,31 +128,31 @@ public class UtteranceList {
 
     /**
      * Load from file.  Overwrites any existing contents.
-     * @param file casaa file
+     * @param MISCfile casaa file
      * @throws Exception
      */
-	public void loadFromFile( File file ) throws Exception {
+	public static UtteranceList loadFromFile( File MISCfile ) throws Exception {
 
-		utteranceTreeMap.clear(); // Clear existing contents.
+        UtteranceList utteranceList = new UtteranceList(MISCfile);
 
 		Scanner in;
 
 		try {
-			in = new Scanner(file);
+			in = new Scanner(MISCfile);
 		} catch (FileNotFoundException e) {
 			throw e;
 		}
 
-		storageFile = file;
+        utteranceList.storageFile = MISCfile;
 
-		// Eat the audio filename line.
+		// get the audio filename line.
 		String 			filenameAudio 	= in.nextLine();
 		StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
 
         // Eat  "Audio Filename:"
 		headReader.nextToken();
         // local reference of audiofilename
-        audioFilename = headReader.nextToken();
+        utteranceList.audioFilename = headReader.nextToken();
 
 		while( in.hasNextLine() ){
 
@@ -165,13 +160,13 @@ public class UtteranceList {
 			StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
 			int 			lineSize 	= st.countTokens();
 
-            Duration startTime          = Utils.parseDuration(st.nextToken());
-            MiscDataItem 	item 		= new MiscDataItem(Utils.durationToID(startTime), startTime);
-
-            // TODO: also read old format of 7 tokens properly
+            /* new data format */
 			if( lineSize == 3 ){
 
-                int codeId = Integer.parseInt( st.nextToken() );
+                Duration startTime  = Utils.parseDuration(st.nextToken());
+                int codeId          = Integer.parseInt( st.nextToken() );
+                MiscDataItem item 	= new MiscDataItem(Utils.formatID(startTime,codeId), startTime);
+
                 // look up parsed code in user config codes loaded at init
                 try {
                     item.setMiscCodeByValue(codeId);
@@ -182,12 +177,50 @@ public class UtteranceList {
                 }
 				st.nextToken(); // throw away the code string
 
-                add(item);
+                utteranceList.add(item);
 			}
+			/* read 7 to handle old data format */
+			else if( lineSize == 7 ) {
 
+                /* throw away useless index number, start time*/
+                st.nextToken();
+                st.nextToken();
+                /* start time */
+                Duration startTime  = Utils.parseDuration(st.nextToken());
+
+                /* skip time zero utterances from this format */
+                if(!startTime.equals(Duration.ZERO)) {
+
+                    /* throw away useless, byte data */
+                    st.nextToken();
+                    st.nextToken();
+
+                    int codeId = Integer.parseInt(st.nextToken());
+                    MiscDataItem item = new MiscDataItem(Utils.formatID(startTime, codeId), startTime);
+
+                    // look up parsed code in user config codes loaded at init
+                    try {
+                        item.setMiscCodeByValue(codeId);
+                    } catch (Exception e) {
+                        // if lookup failed there is a possible disconnect between codes in casaa file
+                        // and codes in user config file
+                        throw new Exception(String.format("Code(%d) in casaa file not found in user configuration file", codeId));
+                    }
+                    st.nextToken(); // throw away the code string
+
+                    utteranceList.add(item);
+                }
+            }
 		}
 
+		return utteranceList;
 	}
+
+
+	public String getAudioFilename() {
+        return this.audioFilename;
+    }
+
 
 
     /**

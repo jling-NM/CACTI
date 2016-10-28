@@ -19,11 +19,9 @@ public class Utils {
         return String.format("%02.0f:%02.0f:%04.1f", Math.floor((duration_secs/3600) % 24), Math.floor( (duration_secs/60) % 60), (duration_secs % 60) );
     }
 
-
-    public static String durationToID(Duration duration) {
-        return formatDuration(duration).replaceAll("[^0-9]", "");
+    public static String formatID(Duration startTime, int codeValue) {
+        return String.format("%s%d", formatDuration(startTime).replaceAll("[^0-9]", ""), codeValue);
     }
-
 
     public static Duration parseDuration( String string ) {
         StringTokenizer st 		= new StringTokenizer( string, ":" );
@@ -37,16 +35,6 @@ public class Utils {
         return Duration.seconds( (hours * 3600) + (minutes * 60) + seconds);
     }
 
-
-    /**
-     * @param bytesPerSecond rate
-     * @param time time to convert
-     * @return byte position
-     */
-    static int convertTimeToBytes(int bytesPerSecond, Duration time) {
-        // truncation cast to int to cut off '.0' introduced by double seconds
-        return (int) ( time.toSeconds() * bytesPerSecond );
-    }
 
     /**
      * @param filename input filename to change

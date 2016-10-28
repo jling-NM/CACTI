@@ -87,15 +87,14 @@ public class TimeLine extends Group {
     }
 
 
-    public void addMarker(Utterance newUtterance) throws IOException {
-        this.addMarker(newUtterance.getID(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker() );
-    }
-
-    /*
-        Adds new utterance marker to timeline
+    /**
+     * Add or update utterance on timeline and model
+     *
+     * @param newUtterance
      */
-    public void addMarker(String markerID, String code, double posSeconds, MiscCode.Speaker speaker) throws IOException {
+    public void addMarker(Utterance newUtterance) throws IOException {
 
+        /* check for selected timeline marker */
         TimeLineMarker activeMarker = getSelectedMarker();
 
         /*
@@ -104,42 +103,70 @@ public class TimeLine extends Group {
          */
         if(activeMarker != null) {
             /* Edit active marker */
-
             String prevId  = activeMarker.getMarkerID();
             double prevPos = activeMarker.posSeconds;
 
-            removeMarker(prevId);
+            /* remove marker from timeline and model */
+            this.removeMarker(prevId);
 
-            TimeLineMarker newMarker = new TimeLineMarker(prevId, code, prevPos, speaker);
-            this.getChildren().add(newMarker);
+            /* create new id with previous time and new code value */
+            String newID = Utils.formatID(Duration.seconds(prevPos), newUtterance.getMiscCode().value);
 
-            this.setSelectedMarker(null);
+            /* prevent flipping onto existing marker */
+            Node r = this.lookup("#"+newUtterance.getID());
+            if( r == null) {
+                // insert updated marker
+                TimeLineMarker newMarker = new TimeLineMarker(newID, newUtterance.getMiscCode().name, prevPos, newUtterance.getMiscCode().getSpeaker());
+                this.getChildren().add(newMarker);
+
+                /*
+                  update model, id and time = PREVIOUS, the other members can be updated
+                 */
+                newUtterance.setID(newID);
+                newUtterance.setStartTime(prevPos);
+                utteranceList.add(newUtterance);
+            }
 
         } else {
-            /* add new marker */
-            TimeLineMarker newMarker = new TimeLineMarker(markerID, code, posSeconds, speaker);
-            this.getChildren().add(newMarker);
+            /*  check if exact utterance is already in list.
+                This to prevent timeline from adding duplicates.
+                Could also use a node lookup on id if that is faster.
+             */
+            Node r = this.lookup("#"+newUtterance.getID());
+            if( r == null) {
+                /* add new marker */
+                TimeLineMarker newMarker = new TimeLineMarker(newUtterance.getID(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker());
+                this.getChildren().add(newMarker);
 
-            this.setSelectedMarker(null);
+                // new utterance in storage
+                utteranceList.add(newUtterance);
+            }
+
         }
     }
 
 
+
     /*
-        Call me when you want to delete an utterance marker from the timeline
-     */
+      Call me when you want to delete an utterance marker from the timeline and model
+    */
     public void removeMarker(String markerID) throws IOException {
         Node r = this.lookup("#"+markerID);
         if( r != null) {
+            // update timeline
             this.getChildren().remove(r);
+            // update model
             utteranceList.remove(utteranceList.get(markerID));
+            // clear selected marker
             this.setSelectedMarker(null);
+
+            utteranceList.writeToFile();
         }
     }
 
 
     /*
-        Call me when you want to delete an utterance marker from the timeline
+        Call me when you want to delete an utterance marker from the timeline and model
     */
     public void removeMarker(Utterance utr) throws IOException {
         Node r = this.lookup("#"+(utr.getID()));
@@ -154,13 +181,8 @@ public class TimeLine extends Group {
 
         this.getChildren().remove(1, this.getChildren().size());
 
-        // since utterance list is not a proper collection we old school it here
         for (Utterance utr : utteranceList.values()) {
-            this.addMarker(
-                utr.getID(),
-                utr.getMiscCode().name,
-                utr.getStartTime().toSeconds(),
-                utr.getMiscCode().getSpeaker());
+            this.addMarker(utr);
         }
 
     }
@@ -176,11 +198,6 @@ public class TimeLine extends Group {
     public TranslateTransition getAnimation() {
         return animation;
     }
-
-    public void setAnimation(TranslateTransition animation) {
-        this.animation = animation;
-    }
-
 
 
 

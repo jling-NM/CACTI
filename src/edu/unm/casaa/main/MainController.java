@@ -467,34 +467,23 @@ public class MainController {
         }
         filenameMisc = miscFile.getAbsolutePath();
 
-        // get audio file name from code file
-        try {
-            filenameAudio = UtteranceList.getAudioFilename(miscFile);
-        } catch (IOException e) {
-            showError("Error Loading Casaa File", e.getMessage());
-        }
-
         // now get utterances from code file
         try {
-            getUtteranceList().loadFromFile(miscFile);
+            utteranceList = UtteranceList.loadFromFile(miscFile);
         } catch (Exception e) {
             showError("Error Loading Casaa File", e.getMessage());
             return;
         }
 
         // load the audio and start the player
-        File audioFile = new File(filenameAudio);
+        File audioFile = new File(utteranceList.getAudioFilename());
         if (audioFile.canRead()) {
             initializeMediaPlayer(audioFile, playerReady);
         } else {
             showError("Error Loading Audio File", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
 
-        // Prepare for coding when player controls used
-        //initializeCoding();
-
         setPlayerButtonState();
-
     }
 
 
@@ -1179,10 +1168,8 @@ public class MainController {
         switch (getGuiState()) {
 
             case MISC_CODING:
-                filename = filenameMisc;
-                if( asBackup ) { filename += ".backup"; }
                 try {
-                    getUtteranceList().writeToFile();
+                    utteranceList.writeToFile();
                 } catch (IOException e) {
                     showError("Write Error", e.getMessage() );
                 }
@@ -1217,32 +1204,28 @@ public class MainController {
         Duration position = mediaPlayer.getCurrentTime();
 
         // init new utterance.
-        String      id   = Utils.durationToID(position);
-        Utterance   data = new MiscDataItem( id, position );
+        String      id   = Utils.formatID(position, miscCode.value);
+        Utterance   data = new MiscDataItem(id, position);
         data.setMiscCode(miscCode);
 
         try {
-            // insert in storage
-            getUtteranceList().add(data);
-            // insert in timeline
             timeLine.addMarker(data);
+            // update display
+            updateUtteranceDisplays();
+            // button state different if 0 ver > 0 utterances
+            setPlayerButtonState();
+            // write data
+            utteranceList.writeToFile();
         } catch (IOException e) {
             showFatalWarning("File Error", e.getMessage());
         }
-
-        // update display
-        updateUtteranceDisplays();
-        // button state different if 0 ver > 0 utterances
-        setPlayerButtonState();
     }
 
 
     private synchronized void removeUtterance(Utterance utr) {
         try {
-            // remove from timeline
+            // remove from timeline which will update model
             timeLine.removeMarker(utr);
-            // remove from utterance list
-            getUtteranceList().remove(utr);
         } catch (IOException e) {
             showFatalWarning("File Error", e.getMessage());
         }
