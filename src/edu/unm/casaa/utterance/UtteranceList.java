@@ -24,6 +24,8 @@ import java.nio.file.Files;
 import java.util.*;
 import edu.unm.casaa.main.Utils;
 import edu.unm.casaa.misc.MiscDataItem;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 
 
@@ -36,6 +38,7 @@ public class UtteranceList {
     private SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
     private File storageFile                       = null;
     private String audioFilename                   = null;
+    private ObservableMap<String, Utterance> observableMap = FXCollections.observableMap(utteranceTreeMap);
 
 
     public UtteranceList (File storageFile) {
@@ -49,14 +52,19 @@ public class UtteranceList {
 
 
 
+    public ObservableMap getObservableMap() {
+        return observableMap;
+    }
+
+
     /**
      * Add new utterance
      * @param utr
      * @throws IOException
      */
     public void add( Utterance utr ) {
-        System.out.println("Add Utterance:" + utr.displayCoded());
-        utteranceTreeMap.put( Utils.formatID(utr.getStartTime(), utr.getMiscCode().value), utr);
+        System.out.println("UtteranceList ADD:"+utr.displayCoded());
+        observableMap.put( Utils.formatID(utr.getStartTime(), utr.getMiscCode().value), utr);
     }
 
 	/**
@@ -64,7 +72,7 @@ public class UtteranceList {
 	 */
 	public void removeLast() {
         if( !utteranceTreeMap.isEmpty() ) {
-            utteranceTreeMap.remove(utteranceTreeMap.lastKey());
+            observableMap.remove(utteranceTreeMap.lastKey());
         }
 	}
 
@@ -72,10 +80,14 @@ public class UtteranceList {
 	 * Remove utterance
 	 */
 	public void remove(Utterance utr) {
-        System.out.println("Remove Utterance:" + utr.displayCoded());
-		utteranceTreeMap.remove(utr.getID());
+        System.out.println("UtteranceList REMOVE:"+utr.displayCoded());
+        observableMap.remove(utr.getID());
 	}
 
+    public void remove(String ID) {
+        System.out.println("UtteranceList REMOVE:"+utteranceTreeMap.get(ID).displayCoded());
+        observableMap.remove(ID);
+    }
 
 	/**
 	 * Return utterance with given id
@@ -178,6 +190,7 @@ public class UtteranceList {
 				st.nextToken(); // throw away the code string
 
                 utteranceList.add(item);
+
 			}
 			/* read 7 to handle old data format */
 			else if( lineSize == 7 ) {

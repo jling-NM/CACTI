@@ -55,6 +55,10 @@ import java.util.prefs.Preferences;
 
 import static java.lang.String.format;
 
+import javafx.collections.ObservableMap;
+import javafx.collections.MapChangeListener;
+import javafx.collections.FXCollections;
+
 
 
 public class MainController {
@@ -870,6 +874,24 @@ public class MainController {
             }
         });
 
+
+        ObservableMap<String, Utterance> observableMap = utteranceList.getObservableMap();
+        observableMap.addListener(new MapChangeListener() {
+            @Override
+            public void onChanged(MapChangeListener.Change change) {
+                if(change.wasAdded()){
+                    Utterance utr = (Utterance) change.getValueAdded();
+                    System.out.println("Add timeline marker:" + utr.toString());
+                    //timeLine.add(utr);
+                    timeLine.addMarker(utr);
+
+                } else if(change.wasRemoved()) {
+                    Utterance utr = (Utterance) change.getValueRemoved();
+                    System.out.println("Remove timeline marker:" + utr.toString());
+                    timeLine.removeMarker(utr);
+                }
+            }
+        });
     }
 
 
@@ -1209,12 +1231,23 @@ public class MainController {
         data.setMiscCode(miscCode);
 
         try {
-            timeLine.addMarker(data);
+            timeLine.add(data);
             // update display
             updateUtteranceDisplays();
             // button state different if 0 ver > 0 utterances
             setPlayerButtonState();
-            // write data
+        } catch (IOException e) {
+            showFatalWarning("File Error", e.getMessage());
+        }
+    }
+
+
+    private synchronized void removeUtterance(Utterance utr){
+        utteranceList.remove(utr);
+        // refresh last utterance display
+        updateUtteranceDisplays();
+
+        try {
             utteranceList.writeToFile();
         } catch (IOException e) {
             showFatalWarning("File Error", e.getMessage());
@@ -1222,23 +1255,10 @@ public class MainController {
     }
 
 
-    private synchronized void removeUtterance(Utterance utr) {
-        try {
-            // remove from timeline which will update model
-            timeLine.removeMarker(utr);
-        } catch (IOException e) {
-            showFatalWarning("File Error", e.getMessage());
-        }
-
-        // refresh last utterance display
-        updateUtteranceDisplays();
-    }
-
-
     /********************************************************
      * Undo the actions of pressing a MISC code button.
      ********************************************************/
-    private synchronized void removeLastUtterance() {
+    private synchronized void removeLastUtterance(){
         // Remove last utterance
         Utterance u = getUtteranceList().last();
 
