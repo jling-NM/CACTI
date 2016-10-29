@@ -242,7 +242,8 @@ public class MainController {
         /* specific rewind button back 5 seconds */
         if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
-            timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
+            // TODO: DOESN"T WORK IN PLAYBACK AND GLOBALS
+            //timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
         }
     }
 
@@ -546,7 +547,8 @@ public class MainController {
         /* if playing we first pause, seek and resume */
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
 
-            timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
+            // TODO: DOES NOT WORK ON PLAYBACK AND GLOBALS
+            //timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
 
             mediaPlayer.pause();
             mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
@@ -556,7 +558,8 @@ public class MainController {
                label then updated manually since seek an paused media doesn't.
                This method seems reasonable since user will likely play after clicking seek bar
              */
-            timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
+            // TODO: DOES NOT WORK ON PLAYBACK AND GLOBALS
+            //timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
             
             mediaPlayer.pause();
             mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
@@ -735,7 +738,8 @@ public class MainController {
                 /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
                 mediaPlayer.setOnPlaying(() -> {
                     // TODO: experimental
-                    timeLine.getAnimation().play();
+                    // TODO: this doesn't work for PLAYBACK AND GLOABAL CODES
+                    //timeLine.getAnimation().play();
                     // TODO: experimental
                     btnPlayImgVw.getStyleClass().add("img-btn-pause");
 
@@ -746,8 +750,8 @@ public class MainController {
                     // assumes OnPlay has overlayed style class so just remove that to expose pause class
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
                     // TODO: experimental
-                    timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
-                    timeLine.getAnimation().pause();
+                    //timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
+                    //timeLine.getAnimation().pause();
                     // TODO: experimental
                 });
 
@@ -820,18 +824,14 @@ public class MainController {
 
         pnTimeLine.getChildren().clear();
 
-        //TODO: figure out how to move this line into timeline class
-        //Line l = (Line) pnNewTimeLine.getChildren().get(0);
-        Line l = new Line(0,0,0,10.0);
+        Line l = new Line(0,0,0,28.0);
         l.setStrokeWidth(0.5);
         l.setTranslateX(center + l.getStrokeWidth());
-
         try {
             timeLine = new TimeLine(totalDuration, 50, center, utteranceList);
         } catch (IOException e) {
             showFatalWarning("File error", e.getMessage());
         }
-
         pnTimeLine.getChildren().addAll(l, timeLine);
 
 
@@ -1180,32 +1180,6 @@ public class MainController {
         if( l != null ) {
             return true;
         } else return false;
-    }
-
-
-    private synchronized void saveCurrentTextFile( boolean asBackup ) {
-
-        String filename;
-
-        switch (getGuiState()) {
-
-            case MISC_CODING:
-                try {
-                    utteranceList.writeToFile();
-                } catch (IOException e) {
-                    showError("Write Error", e.getMessage() );
-                }
-                break;
-
-            case GLOBAL_CODING:
-                filename = filenameGlobals;
-                if( asBackup ) { filename += ".backup"; }
-                //writeGlobalsToFile( new File( filename ), filenameAudio );
-                // TODO why no save when save works
-                // TODO use this for globals?
-                System.out.println("Write Globals to File");
-                break;
-        }
     }
 
 

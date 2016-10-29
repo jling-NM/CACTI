@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.embed.swing.SwingNode?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
@@ -15,9 +14,9 @@
       <VBox fx:id="vbPnlMiscCoding" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
 
-             <TitledPane animated="false" collapsible="false" minHeight="90.0" minWidth="200.0" prefHeight="90.0" text="%pnl.title.timeline">
+             <TitledPane animated="false" collapsible="false" minHeight="88.0" minWidth="200.0" prefHeight="120.0" prefWidth="796.0" text="%pnl.title.timeline">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="796.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"  styleClass="timeline">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="74.0" prefWidth="794.0" styleClass="timeline" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <StackPane fx:id="pnTimeLine" alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <children>
                         </children>
@@ -25,66 +24,28 @@
                             <Insets />
                         </VBox.margin>
                     </StackPane>
+                     <HBox alignment="CENTER_LEFT" spacing="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <children>
+                           <Label prefHeight="17.0" text="%lbl.prevUtr">
+                              <padding>
+                                 <Insets right="3.0" />
+                              </padding>
+                           </Label>
+                           <Label fx:id="lblPrevUtr" prefWidth="307.0" text="" />
+                        </children>
+                        <opaqueInsets>
+                           <Insets />
+                        </opaqueInsets>
+                        <padding>
+                           <Insets bottom="2.0" left="4.0" top="1.0" />
+                        </padding>
+                     </HBox>
                 </AnchorPane>
               </content>
+               <padding>
+                  <Insets bottom="2.0" />
+               </padding>
             </TitledPane>
-
-            <HBox alignment="CENTER_LEFT" prefHeight="25.0">
-               <children>
-                  <Label fx:id="lblCurMiscFile" text="">
-                     <padding>
-                        <Insets left="12.0" />
-                     </padding>
-                  </Label>
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </HBox>
-            <HBox VBox.vgrow="ALWAYS">
-               <children>
-                  <TitledPane fx:id="pnlUtr" animated="false" collapsible="false" minHeight="60.0" prefHeight="60.0" prefWidth="851.0" text="%pnl.title.Utr">
-                    <content>
-                      <AnchorPane maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="-Infinity" prefHeight="180.0">
-                           <children>
-                              <HBox alignment="CENTER_LEFT" prefHeight="48.0" prefWidth="620.0" spacing="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <children>
-                                    <Label prefHeight="17.0" style="-fx-border-color: #0000FF; -fx-padding: 2 2 2 2; -fx-background-color: #BFBFFF;" text="%lbl.prevUtr">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                       <padding>
-                                          <Insets right="3.0" />
-                                       </padding>
-                                    </Label>
-                                    <Label fx:id="lblPrevUtr" prefHeight="48.0" prefWidth="307.0" text="" />
-                                    <Label prefHeight="17.0" style="-fx-border-color: #00FF00; -fx-background-color: #BFFFBF; -fx-padding: 2 2 2 2;" text="%lbl.currUtr">
-                                       <padding>
-                                          <Insets right="3.0" />
-                                       </padding>
-                                    </Label>
-                                    <Label fx:id="lblCurUtrEnum" text="">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                    </Label>
-                                    <Label fx:id="lblCurUtrCode" layoutX="94.0" layoutY="10.0" text="" />
-                                    <Label fx:id="lblCurUtrStartTime" text="" />
-                                    <Label fx:id="lblCurUtrEndTime" layoutX="94.0" layoutY="10.0" text="" />
-                                 </children>
-                                 <opaqueInsets>
-                                    <Insets />
-                                 </opaqueInsets>
-                              </HBox>
-                           </children>
-                        </AnchorPane>
-                    </content>
-                     <HBox.margin>
-                        <Insets right="2.0" />
-                     </HBox.margin>
-                  </TitledPane>
-               </children>
-            </HBox>
             <HBox VBox.vgrow="ALWAYS">
                <children>
                   <TitledPane fx:id="titlePnlCodesLeft" animated="false" collapsible="false" minHeight="100.0" text="" HBox.hgrow="ALWAYS">
@@ -115,6 +76,19 @@
                      </HBox.margin>
                   </TitledPane>
                </children>
+            </HBox>
+      
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label fx:id="lblCurMiscFile" text="">
+                     <padding>
+                        <Insets bottom="4.0" left="8.0" />
+                     </padding>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
             </HBox>
          </children>
          <VBox.margin>

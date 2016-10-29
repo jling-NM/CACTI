@@ -64,7 +64,6 @@ public class TimeLine extends Group {
             the center line of the timeline
          */
         double end = audioDuration.toSeconds() * pixelsPerSecond;
-
         Line h = new Line(0,0,end,0);
         h.setStrokeWidth(thickness);
         h.setTranslateY( (height/2.0) + (thickness/2.0) );

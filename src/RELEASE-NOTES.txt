@@ -3,10 +3,21 @@
 --------------------
 
 CHANGES:
-- None
+- Updated file write to NIO BufferWriter as an minimum to make more network friendly.
+- Discontinue writing *.backup files.
+- Implemented new Timeline representation. Removed all old code supporting previous Timeline.
+  Program no longer uses bytes for time management.
+- Utterance resolution currently set to 1/10th of a second.
+- Changed MISC coding file format. Program reads old and new format but only writes new format.
+- Changed internal MISC code storage for ObservableMap functionality.
+- Reformatted "Last Utterance" display.
+
+
 
 KNOWN ISSUES:
-- None
+- Default Timeline scrolling may be too fast or too slow and need adjustment.
+
+
 
 ------ 0.20.2 ------
 20160811 - jl
