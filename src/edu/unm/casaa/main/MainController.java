@@ -542,18 +542,7 @@ public class MainController {
      * @param event details
      **********************************************************************/
     public void sldSeekMousePressed(Event event) {
-        /* if playing we first pause, seek and resume */
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
-        } else {
-            /* if not playing, we can't seek stopped media so i pause it and then seek
-               label then updated manually since seek an paused media doesn't.
-               This method seems reasonable since user will likely play after clicking seek bar
-             */
-            setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
-            mediaPlayer.pause();
-            lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
-        }
+        setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
     }
 
 
@@ -1109,6 +1098,7 @@ public class MainController {
         // NOTE: Does not seek when player status is READY. Only when PAUSED or PLAYING
         mediaPlayer.pause();
         mediaPlayer.seek(position);
+        lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
 
         /**
          * this is unfortunate here but works better than other linking options
