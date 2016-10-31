@@ -439,6 +439,12 @@ public class MainController {
         }
         filenameMisc = miscFile.getAbsolutePath();
 
+        // if file is already there we drop it now, not at first code
+        if( miscFile.exists() ) {
+            miscFile.delete();
+        }
+
+
         // reset utteranceList to start fresh
         utteranceList = new UtteranceList(miscFile, filenameAudio);
 
@@ -727,23 +733,6 @@ public class MainController {
                 });
 
 
-                /*
-                mediaPlayer.statusProperty().addListener( (invalidated, oldvalue, newvalue) -> {
-
-                    System.out.println("mp status property");
-                    switch (newvalue) {
-                        case PLAYING:
-                            btnPlayImgVw.getStyleClass().add("img-btn-pause");
-                            break;
-                        case PAUSED:
-                            btnPlayImgVw.getStyleClass().remove("img-btn-pause");
-                            System.out.println("mp pause time:"+mediaPlayer.getCurrentTime());
-                            lblTimePos.setText(Utils.formatDuration(mediaPlayer.getCurrentTime()));
-                            break;
-                    }
-                });
-                */
-
                 //mediaPlayer.setOnPaused(playerPaused);
                 /* Status Handler:  OnPaused */
                 mediaPlayer.setOnPaused(() -> {
@@ -775,6 +764,7 @@ public class MainController {
                         option 2: pause at end so user can code
                         However, have to click play twice???
                      */
+                    timeLine.getAnimation().pause();
                     mediaPlayer.pause();
                     // shouldn't have to do this...
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
@@ -868,6 +858,12 @@ public class MainController {
             }
             });
 
+
+        timeLine.getAnimation().setOnFinished( (e) -> {
+            System.out.println("timeline finished");
+            timeLine.getAnimation().pause();
+            //timeLine.getAnimation().jumpTo(timeLine.getAnimation().getDuration());
+        });
 
         /*
         This works for linking timeline to player when seek happens on player which is a challenge

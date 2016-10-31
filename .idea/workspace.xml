@@ -68,11 +68,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MainController.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MainController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="366">
-              <caret line="211" column="90" selection-start-line="211" selection-start-column="90" selection-end-line="211" selection-end-column="90" />
+            <state relative-caret-position="321">
+              <caret line="767" column="40" selection-start-line="767" selection-start-column="40" selection-end-line="767" selection-end-column="40" />
               <folding>
                 <element signature="e#7643#7680#1" expanded="true" />
               </folding>
@@ -80,11 +80,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TimeLine.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TimeLine.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="166" column="28" selection-start-line="166" selection-start-column="28" selection-end-line="166" selection-end-column="28" />
+            <state relative-caret-position="150">
+              <caret line="268" column="46" selection-start-line="268" selection-start-column="46" selection-end-line="268" selection-end-column="46" />
               <folding />
             </state>
           </provider>
@@ -150,8 +150,8 @@
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" />
         <option value="$PROJECT_DIR$/userConfiguration.xml" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java" />
       </list>
     </option>
   </component>
@@ -681,7 +681,14 @@
       <option name="project" value="LOCAL" />
       <updated>1477945318675</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Rendering works on OSX.&#10;Mediaplayer state properly initialized after RESUME.">
+      <created>1477950789816</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1477950789816</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -755,7 +762,8 @@
     <MESSAGE value="Mostly GUI work for sizing and look-and-feel" />
     <MESSAGE value="Only get first word of panel name for &quot;client&quot;" />
     <MESSAGE value="Trying to get rendering to work on OSX. i think the video driver on the linux box had failed." />
-    <option name="LAST_COMMIT_MESSAGE" value="Trying to get rendering to work on OSX. i think the video driver on the linux box had failed." />
+    <MESSAGE value="Rendering works on OSX.&#10;Mediaplayer state properly initialized after RESUME." />
+    <option name="LAST_COMMIT_MESSAGE" value="Rendering works on OSX.&#10;Mediaplayer state properly initialized after RESUME." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1074,21 +1082,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="166" column="28" selection-start-line="166" selection-start-column="28" selection-end-line="166" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="366">
-          <caret line="211" column="90" selection-start-line="211" selection-start-column="90" selection-end-line="211" selection-end-column="90" />
+        <state relative-caret-position="321">
+          <caret line="767" column="40" selection-start-line="767" selection-start-column="40" selection-end-line="767" selection-end-column="40" />
           <folding>
             <element signature="e#7643#7680#1" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="268" column="46" selection-start-line="268" selection-start-column="46" selection-end-line="268" selection-end-column="46" />
+          <folding />
         </state>
       </provider>
     </entry>

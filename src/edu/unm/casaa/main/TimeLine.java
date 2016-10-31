@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class TimeLine extends Group {
         this.pixelsPerSecond = pixelsPerSecond;
         this.utteranceList = utteranceList;
 
-        /*
+        /**
             horizontal center is beginning of timeline
             We position both cursor and start of timeline in center of screen
             Manual layout is ok as i don't want cursor to move when window is resized
@@ -53,14 +54,7 @@ public class TimeLine extends Group {
         // where does timeline begin; center
         this.setTranslateX(center);
 
-        /*
-        // expand Group node to full height with non-visible line
-        Line v = new Line(0, 0, 0, this.height);
-        //v.setStroke(Color.TRANSPARENT);
-        v.setStroke(Color.INDIANRED);
-        */
-
-        /*
+        /**
             the center line of the timeline
          */
         double end = audioDuration.toSeconds() * pixelsPerSecond;
@@ -73,13 +67,21 @@ public class TimeLine extends Group {
         renderUtterances();
 
 
-        // initialize the animation of timeline
-        animation = new TranslateTransition(audioDuration, this);
+        /**
+         * initialize the animation of timeline
+         * add 2 seconds to duration of timeline. We want to timeline to outlast
+         * the media playback until we figure out how to recover timeline after
+         * onFinished
+         */
+        animation = new TranslateTransition(audioDuration.add(new Duration(2000.0)), this);
         // interpolator needs to be linear like the audio playback
         animation.setInterpolator(Interpolator.LINEAR);
 
-        // translation is negative of the entire timeline width
-        double byX = -audioDuration.toSeconds() * pixelsPerSecond;
+        /**
+         * translation is negative of the entire timeline width
+         * Here, subtract 2 seconds worth of line to compensate for duration extension above
+         */
+        double byX = -audioDuration.toSeconds() * pixelsPerSecond - (2 * pixelsPerSecond);
         animation.setByX(byX);
 
         /**
@@ -102,10 +104,6 @@ public class TimeLine extends Group {
             }
         });
 
-        this.getAnimation().setOnFinished((x) -> {
-            getAnimation().pause();
-            getAnimation().jumpTo(Duration.ZERO);
-        });
     }
 
 
@@ -160,12 +158,16 @@ public class TimeLine extends Group {
             utteranceList.writeToFile();
 
         } else {
-            /*  check if exact utterance is already in list.
-                This to prevent timeline from adding duplicates.
+            /**
+             * check if exact utterance is already in list.
+             * This to prevent timeline from adding duplicates.
              */
             Node r = this.lookup("#"+newUtterance.getID());
             if( r == null) {
-                // sync timeline with player time to marker appears lined up.
+                /**
+                 * sync timeline with player time to marker appears lined up.
+                 * Do this only for new markers not edited above here
+                  */
                 this.getAnimation().jumpTo(newUtterance.getStartTime());
 
                 // new utterance in storage
@@ -179,9 +181,8 @@ public class TimeLine extends Group {
     }
 
 
-
-    /*
-      Call me when you want to delete an utterance marker from the timeline and model
+    /**
+     * Call me when you want to delete an utterance from model
     */
     public void remove(String markerID) throws IOException {
         Node r = this.lookup("#"+markerID);
@@ -191,8 +192,8 @@ public class TimeLine extends Group {
         }
     }
 
-    /*
-        Call me when you want to delete an utterance marker from the timeline and model
+    /**
+     * Call me when you want to delete an utterance marker from the timeline
     */
     public void removeMarker(Utterance utr) {
         Node r = this.lookup("#"+(utr.getID()));
@@ -202,19 +203,34 @@ public class TimeLine extends Group {
         }
     }
 
+    /**
+     * adds a marker to the timeline for each utterance in the model
+     */
     public void renderUtterances() {
         this.getChildren().remove(1, this.getChildren().size());
         utteranceList.values().forEach(this::addMarker);
     }
 
+    /**
+     *
+     * @return user selected timeline marker or null
+     */
     public TimeLineMarker getSelectedMarker() {
         return selectedMarker;
     }
 
+    /**
+     * set user selected timeline marker
+     * @param selectedMarker
+     */
     public void setSelectedMarker(TimeLineMarker selectedMarker) {
         this.selectedMarker = selectedMarker;
     }
 
+    /**
+     * access the animation portion of this timeline
+     * @return animation
+     */
     public TranslateTransition getAnimation() {
         return animation;
     }
@@ -222,9 +238,9 @@ public class TimeLine extends Group {
 
 
 
-    /*
-        Represents a marker on the timeline.
-        Inline so that it has access to TimeLine properties
+    /**
+     * Represents a marker on the timeline.
+     * Inline so that it has access to TimeLine properties
      */
     public class TimeLineMarker extends VBox {
 
@@ -249,6 +265,8 @@ public class TimeLine extends Group {
 
             // initialize utterance code
             markerCode = new Text(code);
+            markerCode.setTextAlignment(TextAlignment.CENTER);
+            markerCode.setWrappingWidth(30.0);
 
             // formatting of marker varies on speaker (above/below timeline)
             if( speaker.equals(MiscCode.Speaker.Therapist) ) {
@@ -259,7 +277,6 @@ public class TimeLine extends Group {
             } else {
                 // speaker 2
                 this.indicatorShape = new Polygon(0,indicatorWidth, indicatorWidth,0, indicatorWidth*2,indicatorWidth);
-
                 this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
                 markerCode.getStyleClass().add("unselectedMarkerTextSpeaker2");
                 this.getChildren().addAll(indicatorShape, markerCode);
@@ -273,11 +290,11 @@ public class TimeLine extends Group {
 
 
 
-            /*
-                Filter the TimeLineMarker MouseEvent.MOUSE_CLICKED to control event order.
-                If i simply assign setOnContextMenuRequested() this gets handled before the
-                MouseEvent.MOUSE_CLICKED. This interferes with setting the selected marker
-                prior to wanting to use it in context menu.
+            /**
+             * Filter the TimeLineMarker MouseEvent.MOUSE_CLICKED to control event order.
+             * If i simply assign setOnContextMenuRequested() this gets handled before the
+             * MouseEvent.MOUSE_CLICKED. This interferes with setting the selected marker
+             * prior to wanting to use it in context menu.
              */
             this.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
@@ -293,29 +310,32 @@ public class TimeLine extends Group {
                 if( timeLineMarker != null) {
 
                     if( timeLineMarker.equals(getSelectedMarker()) ) {
-                        // selected marker clicked again. If left-click, delect this marker, if right-click, don't.
-
+                        /**
+                         * selected marker clicked again. If left-click, delect this marker, if right-click, don't.
+                         */
                         if( e.getButton().equals(MouseButton.PRIMARY)) {
                             timeLineMarker.getIndicatorShape().setFill(Color.TRANSPARENT);
                             setSelectedMarker(null);
                         }
                     } else {
-
-                        // different marker selected, deselect any previous and select this one regardles of mouse button
+                        /**
+                         * different marker selected, deselect any previous and select this one regardles of mouse button
+                         */
                         if( getSelectedMarker() != null ) {
                             getSelectedMarker().getIndicatorShape().setFill(Color.TRANSPARENT);
                         }
 
                         // SELECT
                         timeLineMarker.getIndicatorShape().setFill(Color.INDIANRED);
-
                         // set active
                         setSelectedMarker(timeLineMarker);
                     }
                 }
 
-                // finished with accounting. Now, provide a popup menu on right-click that will use selectedMarker
-                // "|| e.isControlDown()" is for OSX Ctrl+Click provided in addition to two finger click
+                /**
+                 * finished with accounting. Now, provide a popup menu on right-click that will use selectedMarker
+                 * "|| e.isControlDown()" is for OSX Ctrl+Click provided in addition to two finger click
+                 */
                 if( e.getButton().equals(MouseButton.SECONDARY) || e.isControlDown() ){
                     getContextMenu().show(this, Side.BOTTOM, 0, 0);
                 }
@@ -327,8 +347,9 @@ public class TimeLine extends Group {
         }
 
 
-        /*
-            generate right-click pop-up menu
+        /**
+         * generate right-click pop-up menu
+         * @return ContextMenu
          */
         private ContextMenu getContextMenu() {
 
