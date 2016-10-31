@@ -6,6 +6,8 @@ import edu.unm.casaa.utterance.UtteranceList;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Group;
@@ -29,7 +31,6 @@ import java.io.IOException;
  */
 public class TimeLine extends Group {
 
-    private Duration audioDuration;                 // animation duration
     private int pixelsPerSecond	          = 50;     // sort of a framerate for the animation
     private TranslateTransition animation = null;   // animation for moving timeline
     private TimeLineMarker selectedMarker = null;   // store currently selected marker, if any
@@ -38,9 +39,8 @@ public class TimeLine extends Group {
     private double thickness              = 2.0;    // thickness of line that represents time :)
 
 
-    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, UtteranceList utteranceList) throws IOException {
+    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, UtteranceList utteranceList) {
 
-        this.audioDuration = audioDuration;
         this.pixelsPerSecond = pixelsPerSecond;
         this.utteranceList = utteranceList;
 
@@ -81,6 +81,27 @@ public class TimeLine extends Group {
         // translation is negative of the entire timeline width
         double byX = -audioDuration.toSeconds() * pixelsPerSecond;
         animation.setByX(byX);
+
+        /**
+         * Define listeners for change to utterance list
+         * This links timeline markers to changes in utterance list
+        */
+        ObservableMap<String, Utterance> observableMap = utteranceList.getObservableMap();
+        observableMap.addListener(new MapChangeListener() {
+            public void onChanged(MapChangeListener.Change change) {
+                if(change.wasAdded()){
+                    Utterance utr = (Utterance) change.getValueAdded();
+                    System.out.println("Add timeline marker:" + utr.toString());
+                    addMarker(utr);
+
+                } else if(change.wasRemoved()) {
+                    Utterance utr = (Utterance) change.getValueRemoved();
+                    System.out.println("Remove timeline marker:" + utr.toString());
+                    removeMarker(utr);
+                }
+            }
+        });
+
     }
 
 
@@ -174,12 +195,9 @@ public class TimeLine extends Group {
         }
     }
 
-    public void renderUtterances() throws IOException {
-
+    public void renderUtterances() {
         this.getChildren().remove(1, this.getChildren().size());
-
         utteranceList.values().forEach(this::addMarker);
-
     }
 
     public TimeLineMarker getSelectedMarker() {

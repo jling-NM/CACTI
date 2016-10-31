@@ -226,7 +226,7 @@ public class MainController {
      * button event: play media
      **********************************************************************/
     public void btnActPlayPause(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+        if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING) ) {
             mediaPlayer.pause();
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
             mediaPlayer.play();
@@ -241,9 +241,7 @@ public class MainController {
     public void btnActRewind(ActionEvent actionEvent) {
         /* specific rewind button back 5 seconds */
         if( mediaPlayer.getCurrentTime().greaterThan(Duration.seconds(5.0))){
-            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
-            // TODO: DOESN"T WORK IN PLAYBACK AND GLOBALS
-            //timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
+            setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
         }
     }
 
@@ -546,23 +544,14 @@ public class MainController {
     public void sldSeekMousePressed(Event event) {
         /* if playing we first pause, seek and resume */
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-
-            // TODO: DOES NOT WORK ON PLAYBACK AND GLOBALS
-            //timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
-
-            mediaPlayer.pause();
-            mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
-            mediaPlayer.play();
+            setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
         } else {
             /* if not playing, we can't seek stopped media so i pause it and then seek
                label then updated manually since seek an paused media doesn't.
                This method seems reasonable since user will likely play after clicking seek bar
              */
-            // TODO: DOES NOT WORK ON PLAYBACK AND GLOBALS
-            //timeLine.getAnimation().jumpTo(totalDuration.multiply(sldSeek.getValue()));
-            
+            setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
             mediaPlayer.pause();
-            mediaPlayer.seek(totalDuration.multiply(sldSeek.getValue()));
             lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
         }
     }
@@ -737,22 +726,15 @@ public class MainController {
 
                 /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
                 mediaPlayer.setOnPlaying(() -> {
-                    // TODO: experimental
-                    // TODO: this doesn't work for PLAYBACK AND GLOABAL CODES
                     //timeLine.getAnimation().play();
-                    // TODO: experimental
+                    //timeLine.getAnimation().playFrom(mediaPlayer.getCurrentTime());
                     btnPlayImgVw.getStyleClass().add("img-btn-pause");
-
                 });
 
                 /* Status Handler:  OnPaused */
                 mediaPlayer.setOnPaused(() -> {
                     // assumes OnPlay has overlayed style class so just remove that to expose pause class
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
-                    // TODO: experimental
-                    //timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
-                    //timeLine.getAnimation().pause();
-                    // TODO: experimental
                 });
 
                 /* Status Handler: OnStop */
@@ -818,36 +800,61 @@ public class MainController {
     }
 
 
+    /**
+     * Timeline setup
+     */
     private void initializeTimeLine() {
 
+        /**
+         * determine where to put timeline overlay
+         */
         double center = vbApp.getScene().getWidth()/2;
-
-        pnTimeLine.getChildren().clear();
-
+        // time position line
         Line l = new Line(0,0,0,28.0);
         l.setStrokeWidth(0.5);
         l.setTranslateX(center + l.getStrokeWidth());
-        try {
-            timeLine = new TimeLine(totalDuration, 50, center, utteranceList);
-        } catch (IOException e) {
-            showFatalWarning("File error", e.getMessage());
-        }
+
+        /**
+         * initialize timeline and add to display
+         */
+        timeLine = new TimeLine(totalDuration, 20, center, utteranceList);
+        pnTimeLine.getChildren().clear();
         pnTimeLine.getChildren().addAll(l, timeLine);
+
+        /**
+         * Here we link to mediaplayer status to sync timeline status
+         * This is not done in setOnPlaying() lambda because the mediaplayer
+         * can be initialized without there being a timeline defined.
+         */
+        mediaPlayer.statusProperty().addListener( (invalidated, oldvalue, newvalue) -> {
+            switch (newvalue) {
+                case PLAYING:
+                    timeLine.getAnimation().play();
+                    break;
+                case PAUSED:
+                    // first pause
+                    timeLine.getAnimation().pause();
+                    // then, match to media position
+                    timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
+                    break;
+                case STOPPED:
+                    timeLine.getAnimation().stop();
+                    break;
+                case STALLED:
+                    timeLine.getAnimation().stop();
+                    break;
+                case HALTED:
+                    timeLine.getAnimation().stop();
+                    break;
+            }
+            });
 
 
         /*
-        // directly bind time; defeats purpose of using an animation in the first place
-        // if this is the only way it works we can dump the timeline for a simple line
-        // direct binding is not as smooth animation as playing transition
         mediaPlayer.currentTimeProperty().addListener((invalidated, oldValue, newValue) -> {
-            //System.out.println("mediaPlayer time changing:"+newValue);
-            timeLine.getAnimation().jumpTo(newValue);
-            //System.out.println("mediaplayer getCurrentTime(): " + mediaPlayer.getCurrentTime().toSeconds());
-            //System.out.println("timeline getCurrentTime(): " + timeLine.getAnimation().getCurrentTime().toSeconds());
+           timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
         });
         */
-
-
 
         /**
          * Seek slider should manipulate timeline as it does mediaplayer
@@ -855,18 +862,21 @@ public class MainController {
         sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
             /* if dragging slider, update timeline position */
             if (sldSeek.isValueChanging()) {
+                timeLine.getAnimation().pause();
                 // multiply duration by percentage calculated by slider position
                 timeLine.getAnimation().jumpTo(totalDuration.multiply(newValue.doubleValue()));
             }
         });
 
+
         /**
-            Playback rate binding
+         * Playback rate binding
          */
         timeLine.getAnimation().rateProperty().bind(sldRate.valueProperty());
 
         /**
-         * timeline can be paused internally so this listener pauses mediaplayer in response
+         * timeline can be paused internally by clicking on a marker
+         * so this listener pauses mediaplayer in response
          */
         timeLine.getAnimation().statusProperty().addListener((invalidated, oldValue, newValue) -> {
             if (newValue.equals(Animation.Status.PAUSED)) {
@@ -874,28 +884,20 @@ public class MainController {
             }
         });
 
-
-        ObservableMap<String, Utterance> observableMap = utteranceList.getObservableMap();
-        observableMap.addListener(new MapChangeListener() {
-            @Override
-            public void onChanged(MapChangeListener.Change change) {
-                if(change.wasAdded()){
-                    Utterance utr = (Utterance) change.getValueAdded();
-                    System.out.println("Add timeline marker:" + utr.toString());
-                    //timeLine.add(utr);
-                    timeLine.addMarker(utr);
-
-                } else if(change.wasRemoved()) {
-                    Utterance utr = (Utterance) change.getValueRemoved();
-                    System.out.println("Remove timeline marker:" + utr.toString());
-                    timeLine.removeMarker(utr);
-                }
-            }
-        });
+        /**
+         * timeline currenttime must be set to match mediaplyer's currentime
+         * Following sequence seems to be best way to do that
+         */
+        timeLine.getAnimation().play(); // have to start before jumpto will work
+        timeLine.getAnimation().pause();
+        timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
     }
 
 
 
+    /**********************************************************************
+     * Called by mediaplayer after initialized and ready for work
+     **********************************************************************/
     private void initializeUserControls() {
 
         // save this window's stage for resizing new controls
@@ -1000,16 +1002,8 @@ public class MainController {
                 });
 
 
-                /*
-                    initialize new timeline
-                    before adding "active"/empty utterance
-
-                 */
-                initializeTimeLine();
-
-
                 /**
-                 * initialize "active" utterance
+                 * get last utterance to set player position in time
                  **/
                 Utterance currentUtterance = getUtteranceList().last();
                 // default seek init
@@ -1033,14 +1027,12 @@ public class MainController {
                 // update the utterance data(previous/current) displayed in the gui
                 updateUtteranceDisplays();
 
-                // TODO: finish new timeline position update
-                // this will move timeline to current playback position
-                // and could be moved into updateTimeLineDisplay() later
-                // or initializeTimeLine(position)
-                timeLine.getAnimation().play();
-                timeLine.getAnimation().pause();
-                timeLine.getAnimation().jumpTo(onReadySeekDuration);
-                // TODO: finish new timeline position update
+
+                /**
+                    initialize new timeline
+                    assumes mediaplayer time position is already set
+                 */
+                initializeTimeLine();
 
                 // display coding file path in gui
                 lblCurMiscFile.setText(filenameMisc);
@@ -1118,7 +1110,7 @@ public class MainController {
      * Set mediaplayer position using Duration
      **********************************************************************/
     private synchronized void setMediaPlayerPosition(Duration position){
-        // pause player whether playing or not which enables seek
+        // pause player whether playing or not which enables seek. also enables timeline to detect
         mediaPlayer.pause();
         mediaPlayer.seek(position);
         mediaPlayer.play();
