@@ -806,7 +806,7 @@ public class MainController {
         /**
          * initialize timeline and add to display
          */
-        timeLine = new TimeLine(totalDuration, 20, center, utteranceList);
+        timeLine = new TimeLine(totalDuration, 30, center, utteranceList);
         pnTimeLine.getChildren().clear();
         pnTimeLine.getChildren().addAll(l, timeLine);
 
@@ -1208,9 +1208,6 @@ public class MainController {
 
         // get current time
         Duration position = mediaPlayer.getCurrentTime();
-
-        //TODO: possible?
-        timeLine.getAnimation().jumpTo(position);
 
         // init new utterance.
         String      id   = Utils.formatID(position, miscCode.value);
