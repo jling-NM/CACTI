@@ -1093,7 +1093,7 @@ public class MainController {
      **********************************************************************/
     private synchronized void setMediaPlayerPosition(Duration position){
         // pause player whether playing or not which enables seek. also enables timeline to detect
-        MediaPlayer.Status ls = mediaPlayer.getStatus();
+        //MediaPlayer.Status ls = mediaPlayer.getStatus();
 
         // NOTE: Does not seek when player status is READY. Only when PAUSED or PLAYING
         mediaPlayer.pause();
@@ -1108,10 +1108,29 @@ public class MainController {
             timeLine.getAnimation().jumpTo(position);
         }
 
+        /***
+         *
+         * can NOT get this to work reliably across platform
         // start playing again only if that is what the status
         if(ls.equals(MediaPlayer.Status.PLAYING)){
+
+            if(timeLine != null) {
+                timeLine.getAnimation().pause();
+                timeLine.getAnimation().playFrom(position);
+            }
+
             mediaPlayer.play();
+
+        } else if(ls.equals(MediaPlayer.Status.PAUSED)) {
+            if(timeLine != null) {
+                timeLine.getAnimation().pause();
+                timeLine.getAnimation().jumpTo(position);
+            }
+
+            mediaPlayer.pause();
         }
+         */
+
     }
 
 
