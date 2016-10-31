@@ -851,6 +851,8 @@ public class MainController {
 
 
         /*
+        This works for linking timeline to player when seek happens on player which is a challenge
+        However, this cause timeline to jump on PLAY which is annoying so i might go about this a less elegant way.
         mediaPlayer.currentTimeProperty().addListener((invalidated, oldValue, newValue) -> {
            timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
         });
@@ -1096,24 +1098,30 @@ public class MainController {
 
     }
 
-    /**********************************************************************
-     * Set mediaplayer position using seconds
-     **********************************************************************/
-    private synchronized void setMediaPlayerPosition(double positionInSecs){
-        // pause player whether playing or not which enables seek
-        mediaPlayer.pause();
-        mediaPlayer.seek(Duration.seconds(positionInSecs));
-        mediaPlayer.play();
-    }
 
     /**********************************************************************
      * Set mediaplayer position using Duration
      **********************************************************************/
     private synchronized void setMediaPlayerPosition(Duration position){
         // pause player whether playing or not which enables seek. also enables timeline to detect
+        MediaPlayer.Status ls = mediaPlayer.getStatus();
+
+        // NOTE: Does not seek when player status is READY. Only when PAUSED or PLAYING
         mediaPlayer.pause();
         mediaPlayer.seek(position);
-        mediaPlayer.play();
+
+        /**
+         * this is unfortunate here but works better than other linking options
+         */
+        if(timeLine != null) {
+            timeLine.getAnimation().pause();
+            timeLine.getAnimation().jumpTo(position);
+        }
+
+        // start playing again only if that is what the status
+        if(ls.equals(MediaPlayer.Status.PLAYING)){
+            mediaPlayer.play();
+        }
     }
 
 
