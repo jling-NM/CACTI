@@ -102,6 +102,10 @@ public class TimeLine extends Group {
             }
         });
 
+        this.getAnimation().setOnFinished((x) -> {
+            getAnimation().pause();
+            getAnimation().jumpTo(Duration.ZERO);
+        });
     }
 
 

@@ -824,7 +824,7 @@ public class MainController {
                     // first pause
                     timeLine.getAnimation().pause();
                     // then, match to media position
-                    timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
+                    //timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
                     break;
                 case STOPPED:
                     timeLine.getAnimation().stop();
@@ -842,6 +842,7 @@ public class MainController {
         /*
         This works for linking timeline to player when seek happens on player which is a challenge
         However, this cause timeline to jump on PLAY which is annoying so i might go about this a less elegant way.
+
         mediaPlayer.currentTimeProperty().addListener((invalidated, oldValue, newValue) -> {
            timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
         });
@@ -1207,6 +1208,9 @@ public class MainController {
 
         // get current time
         Duration position = mediaPlayer.getCurrentTime();
+
+        //TODO: possible?
+        timeLine.getAnimation().jumpTo(position);
 
         // init new utterance.
         String      id   = Utils.formatID(position, miscCode.value);
