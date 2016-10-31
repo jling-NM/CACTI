@@ -116,9 +116,6 @@ public class TimeLine extends Group {
      * @param newUtterance
      */
     public void addMarker(Utterance newUtterance) {
-        // sync timeline with player time to marker appears lined up.
-        this.getAnimation().jumpTo(newUtterance.getStartTime());
-
         // insert updated marker
         TimeLineMarker newMarker = new TimeLineMarker(newUtterance.getID(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker());
         this.getChildren().add(newMarker);
@@ -168,6 +165,9 @@ public class TimeLine extends Group {
              */
             Node r = this.lookup("#"+newUtterance.getID());
             if( r == null) {
+                // sync timeline with player time to marker appears lined up.
+                this.getAnimation().jumpTo(newUtterance.getStartTime());
+
                 // new utterance in storage
                 utteranceList.add(newUtterance);
                 // write data

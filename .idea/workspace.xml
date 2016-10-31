@@ -68,21 +68,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MainController.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MainController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="1217" column="24" selection-start-line="1217" selection-start-column="21" selection-end-line="1217" selection-end-column="24" />
-              <folding />
+            <state relative-caret-position="366">
+              <caret line="211" column="90" selection-start-line="211" selection-start-column="90" selection-end-line="211" selection-end-column="90" />
+              <folding>
+                <element signature="e#7643#7680#1" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TimeLine.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="TimeLine.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="172">
-              <caret line="118" column="69" selection-start-line="118" selection-start-column="69" selection-end-line="118" selection-end-column="69" />
+            <state relative-caret-position="306">
+              <caret line="166" column="28" selection-start-line="166" selection-start-column="28" selection-end-line="166" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -148,8 +150,8 @@
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.fxml" />
         <option value="$PROJECT_DIR$/userConfiguration.xml" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.css" />
-        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
         <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java" />
+        <option value="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
       </list>
     </option>
   </component>
@@ -672,7 +674,14 @@
       <option name="project" value="LOCAL" />
       <updated>1477943930029</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Trying to get rendering to work on OSX. i think the video driver on the linux box had failed.">
+      <created>1477945318675</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1477945318675</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -1065,19 +1074,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="1217" column="24" selection-start-line="1217" selection-start-column="21" selection-end-line="1217" selection-end-column="24" />
+        <state relative-caret-position="306">
+          <caret line="166" column="28" selection-start-line="166" selection-start-column="28" selection-end-line="166" selection-end-column="28" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java">
+    <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="172">
-          <caret line="118" column="69" selection-start-line="118" selection-start-column="69" selection-end-line="118" selection-end-column="69" />
-          <folding />
+        <state relative-caret-position="366">
+          <caret line="211" column="90" selection-start-line="211" selection-start-column="90" selection-end-line="211" selection-end-column="90" />
+          <folding>
+            <element signature="e#7643#7680#1" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

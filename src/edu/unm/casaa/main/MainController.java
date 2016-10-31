@@ -184,6 +184,7 @@ public class MainController {
 
 
 
+
     /*********************************************************
      * define lambda runnable later called by player when
      * ready with media
@@ -207,6 +208,11 @@ public class MainController {
         totalDuration = mediaPlayer.getTotalDuration();
         // duration label
         lblDuration.setText(Utils.formatDuration(totalDuration));
+
+        // this also initializes status so that display updates happen correctly at outset
+        mediaPlayer.play();
+        mediaPlayer.pause();
+        mediaPlayer.seek(Duration.ZERO);
 
         // mediaPlayer is ready continue with user controls setup
         initializeUserControls();
@@ -720,11 +726,32 @@ public class MainController {
                     btnPlayImgVw.getStyleClass().add("img-btn-pause");
                 });
 
+
+                /*
+                mediaPlayer.statusProperty().addListener( (invalidated, oldvalue, newvalue) -> {
+
+                    System.out.println("mp status property");
+                    switch (newvalue) {
+                        case PLAYING:
+                            btnPlayImgVw.getStyleClass().add("img-btn-pause");
+                            break;
+                        case PAUSED:
+                            btnPlayImgVw.getStyleClass().remove("img-btn-pause");
+                            System.out.println("mp pause time:"+mediaPlayer.getCurrentTime());
+                            lblTimePos.setText(Utils.formatDuration(mediaPlayer.getCurrentTime()));
+                            break;
+                    }
+                });
+                */
+
+                //mediaPlayer.setOnPaused(playerPaused);
                 /* Status Handler:  OnPaused */
                 mediaPlayer.setOnPaused(() -> {
+                    lblTimePos.setText(Utils.formatDuration(mediaPlayer.getCurrentTime()));
                     // assumes OnPlay has overlayed style class so just remove that to expose pause class
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
                 });
+
 
                 /* Status Handler: OnStop */
                 mediaPlayer.setOnStopped(() -> {
@@ -817,6 +844,9 @@ public class MainController {
          */
         mediaPlayer.statusProperty().addListener( (invalidated, oldvalue, newvalue) -> {
             switch (newvalue) {
+                case READY:
+                    timeLine.getAnimation().pause();
+                    break;
                 case PLAYING:
                     timeLine.getAnimation().play();
                     break;
@@ -846,7 +876,7 @@ public class MainController {
         mediaPlayer.currentTimeProperty().addListener((invalidated, oldValue, newValue) -> {
            timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
         });
-        */
+*/
 
         /**
          * Seek slider should manipulate timeline as it does mediaplayer
