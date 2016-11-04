@@ -261,6 +261,11 @@ public class MainController {
     @SuppressWarnings("UnusedParameters")
     public void btnActReplay(ActionEvent actionEvent) {
 
+        gotoLastMarker();
+    }
+
+
+    private void gotoLastMarker() {
         Utterance   utterance   = getUtteranceList().last();
         Duration    pos         = Duration.ZERO;
 
@@ -271,6 +276,7 @@ public class MainController {
 
         setMediaPlayerPosition( pos );
     }
+
 
 
     /**********************************************************************
@@ -499,6 +505,7 @@ public class MainController {
         }
 
         setPlayerButtonState();
+
     }
 
 
@@ -727,8 +734,7 @@ public class MainController {
 
                 /* Status Handler: OnPlaying - lambda runnable when mediaplayer starts playing */
                 mediaPlayer.setOnPlaying(() -> {
-                    //timeLine.getAnimation().play();
-                    //timeLine.getAnimation().playFrom(mediaPlayer.getCurrentTime());
+                    lblTimePos.setText(Utils.formatDuration(mediaPlayer.getCurrentTime()));
                     btnPlayImgVw.getStyleClass().add("img-btn-pause");
                 });
 
@@ -744,6 +750,7 @@ public class MainController {
 
                 /* Status Handler: OnStop */
                 mediaPlayer.setOnStopped(() -> {
+                    lblTimePos.setText(Utils.formatDuration(mediaPlayer.getCurrentTime()));
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
                 });
 
@@ -859,10 +866,9 @@ public class MainController {
             });
 
 
+        /* this shouldn't happen */
         timeLine.getAnimation().setOnFinished( (e) -> {
-            System.out.println("timeline finished");
             timeLine.getAnimation().pause();
-            //timeLine.getAnimation().jumpTo(timeLine.getAnimation().getDuration());
         });
 
         /*
@@ -872,7 +878,7 @@ public class MainController {
         mediaPlayer.currentTimeProperty().addListener((invalidated, oldValue, newValue) -> {
            timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
         });
-*/
+        */
 
         /**
          * Seek slider should manipulate timeline as it does mediaplayer
@@ -1058,6 +1064,9 @@ public class MainController {
                 // reset some utterance accounting
                 resetUtteranceCoding();
 
+                // force last marker
+                gotoLastMarker();
+
                 break;
 
 
@@ -1119,46 +1128,46 @@ public class MainController {
      * Set mediaplayer position using Duration
      **********************************************************************/
     private synchronized void setMediaPlayerPosition(Duration position){
-        // pause player whether playing or not which enables seek. also enables timeline to detect
-        //MediaPlayer.Status ls = mediaPlayer.getStatus();
-
-        // NOTE: Does not seek when player status is READY. Only when PAUSED or PLAYING
-        mediaPlayer.pause();
-        mediaPlayer.seek(position);
-        lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
-
-        /**
-         * this is unfortunate here but works better than other linking options
-         */
-        if(timeLine != null) {
-            timeLine.getAnimation().pause();
-            timeLine.getAnimation().jumpTo(position);
-        }
 
         /***
          *
-         * can NOT get this to work reliably across platform
-        // start playing again only if that is what the status
-        if(ls.equals(MediaPlayer.Status.PLAYING)){
-
-            if(timeLine != null) {
-                timeLine.getAnimation().pause();
-                timeLine.getAnimation().playFrom(position);
-            }
-
-            mediaPlayer.play();
-
-        } else if(ls.equals(MediaPlayer.Status.PAUSED)) {
-            if(timeLine != null) {
-                timeLine.getAnimation().pause();
-                timeLine.getAnimation().jumpTo(position);
-            }
-
-            mediaPlayer.pause();
-        }
+         * pause player and timeline as needed
          */
 
+        switch (mediaPlayer.getStatus()) {
+
+            case PLAYING:
+                mediaPlayer.seek(position);
+                lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+
+                if(timeLine != null) {
+                    timeLine.getAnimation().playFrom(position);
+                }
+                break;
+
+            case PAUSED:
+                mediaPlayer.seek(position);
+                lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+
+                if(timeLine != null) {
+                    timeLine.getAnimation().jumpTo(position);
+                }
+                break;
+
+            case READY:
+                mediaPlayer.pause();
+
+                mediaPlayer.seek(position);
+                lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+
+                if(timeLine != null) {
+                    timeLine.getAnimation().pause();
+                    timeLine.getAnimation().jumpTo(position);
+                }
+                break;
+        }
     }
+
 
 
     /*******************************************************

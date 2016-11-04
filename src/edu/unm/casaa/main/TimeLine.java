@@ -61,7 +61,6 @@ public class TimeLine extends Group {
         Line h = new Line(0,0,end,0);
         h.setStrokeWidth(thickness);
         h.setTranslateY( (height/2.0) + (thickness/2.0) );
-        //this.getChildren().addAll(v, h);
         this.getChildren().add(h);
 
         renderUtterances();
@@ -266,7 +265,7 @@ public class TimeLine extends Group {
             // initialize utterance code
             markerCode = new Text(code);
             markerCode.setTextAlignment(TextAlignment.CENTER);
-            markerCode.setWrappingWidth(30.0);
+            double markerCodeWidth = markerCode.getBoundsInLocal().getWidth();
 
             // formatting of marker varies on speaker (above/below timeline)
             if( speaker.equals(MiscCode.Speaker.Therapist) ) {
@@ -280,13 +279,16 @@ public class TimeLine extends Group {
                 this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
                 markerCode.getStyleClass().add("unselectedMarkerTextSpeaker2");
                 this.getChildren().addAll(indicatorShape, markerCode);
-                //
                 this.setTranslateY( (height/2.0)+thickness );
             }
 
             // place on timeline
-            this.setTranslateX(tipPos-indicatorWidth);
-            this.setAlignment(Pos.TOP_CENTER);
+            if( markerCodeWidth > this.indicatorShape.getBoundsInLocal().getWidth()) {
+                this.setTranslateX(tipPos - markerCode.getBoundsInParent().getWidth()/2.3);
+            } else {
+                this.setTranslateX(tipPos - indicatorWidth - 0.5);
+            }
+            this.setAlignment(Pos.CENTER);
 
 
 
