@@ -285,7 +285,7 @@ public class TimeLine extends Group {
 
             // place on timeline
             if( markerCodeWidth > this.indicatorShape.getBoundsInLocal().getWidth()) {
-                this.setTranslateX(tipPos - markerCode.getBoundsInParent().getWidth()/2.0);
+                this.setTranslateX(tipPos - markerCode.getBoundsInParent().getWidth()/2.4);
             } else {
                 this.setTranslateX(tipPos - indicatorWidth - 0.5);
             }
@@ -362,14 +362,18 @@ public class TimeLine extends Group {
             MenuItem mniRemoveMarker = new MenuItem("Remove Marker");
             mniRemoveMarker.setOnAction( e -> {
                 try {
-                    remove(getSelectedMarker().getMarkerID());
+                    if( getSelectedMarker() != null) {
+                        remove(getSelectedMarker().getMarkerID());
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             });
 
-            contextMenu.getItems().addAll(mniRemoveMarker);
-            contextMenu.getStyleClass().add("contextMenu");
+            if( getSelectedMarker() != null) {
+                contextMenu.getItems().addAll(mniRemoveMarker);
+                contextMenu.getStyleClass().add("contextMenu");
+            }
 
             return contextMenu;
         }

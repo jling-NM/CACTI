@@ -11,10 +11,12 @@ CHANGES:
 - Changed MISC coding file format. Program reads old and new format but only writes new format.
 - Changed internal MISC code storage for ObservableMap functionality.
 - Reformatted "Last Utterance" display.
+- Built with Java 8u111
 
 
 KNOWN ISSUES:
 - Default Timeline scrolling may be too fast or too slow and need adjustment.
+- marker code width can offset arrow pointer and needs to be tweaked.
 
 
 
