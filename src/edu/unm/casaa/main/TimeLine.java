@@ -92,12 +92,10 @@ public class TimeLine extends Group {
             public void onChanged(MapChangeListener.Change change) {
                 if(change.wasAdded()){
                     Utterance utr = (Utterance) change.getValueAdded();
-                    System.out.println("Add timeline marker:" + utr.toString());
                     addMarker(utr);
 
                 } else if(change.wasRemoved()) {
                     Utterance utr = (Utterance) change.getValueRemoved();
-                    System.out.println("Remove timeline marker:" + utr.toString());
                     removeMarker(utr);
                 }
             }

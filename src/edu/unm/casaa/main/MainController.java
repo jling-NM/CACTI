@@ -23,6 +23,7 @@ import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.*;
 import edu.unm.casaa.globals.*;
 import javafx.animation.Animation;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -137,7 +138,7 @@ public class MainController {
     private int numUninterruptedUncodes  = 0;           // Number of times user has uncoded without doing anything else.
     private String filenameMisc          = null;        // name of active CASAA data file.
     private String filenameGlobals       = null;        // name of active globals data file
-    private String filenameAudio         = null;        // name of active media file
+    private String filenameAudio         = null;        // name of active media file. Used when switching from PLAYBACK to MISC to GLOBALS
     private File currentAudioFile        = null;        // active media file
     private UtteranceList utteranceList  = null;        // MISC coding data
     private GlobalDataModel globalsData  = null;        // GLOBALS scoring data
@@ -466,8 +467,6 @@ public class MainController {
      ******************************************************/
     public void mniResumeCoding(ActionEvent actionEvent) {
 
-        setGuiState(GuiState.MISC_CODING);
-
         // if something be playing, stop it
         if(mediaPlayer != null) {
             mediaPlayer.pause();
@@ -481,23 +480,8 @@ public class MainController {
         }
         filenameMisc = miscFile.getAbsolutePath();
 
-        // now get utterances from code file
-        try {
-            utteranceList = UtteranceList.loadFromFile(miscFile);
-        } catch (Exception e) {
-            showError("Error Loading Casaa File", e.getMessage());
-            return;
-        }
-
-        // load the audio and start the player
-        File audioFile = new File(utteranceList.getAudioFilename());
-        if (audioFile.canRead()) {
-            initializeMediaPlayer(audioFile, playerReady);
-        } else {
-            showError("Error Loading Audio File", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
-        }
-
-        setPlayerButtonState();
+        // the rest is broken out for reuse
+        resumeCoding(miscFile);
 
     }
 
@@ -707,6 +691,37 @@ public class MainController {
     }
 
 
+    /**
+     * Break out code that resume MISC coding state
+     */
+    private void resumeCoding( File miscFile ) {
+
+        setGuiState(GuiState.MISC_CODING);
+
+        // now get utterances from code file
+        try {
+            utteranceList = UtteranceList.loadFromFile(miscFile);
+        } catch (Exception e) {
+            showError("Error Loading Casaa File", e.getMessage());
+            return;
+        }
+
+        // load the audio and start the player
+        File audioFile = new File(utteranceList.getAudioFilename());
+        filenameAudio = audioFile.getAbsolutePath();
+
+        if (audioFile.canRead()) {
+            // store reference so other states can reuse
+            currentAudioFile = audioFile;
+            // start media player
+            initializeMediaPlayer(audioFile, playerReady);
+        } else {
+            showError("Error Loading Audio File", format("Could not load audio file:\n  %s\n\nwhich is specified within:\n  %s\n\nCheck that audio file exists and has read permissions", filenameAudio, filenameMisc));
+        }
+
+        setPlayerButtonState();
+
+    }
 
 
 
@@ -1376,17 +1391,11 @@ public class MainController {
                     }
 
 
-
-
-
                 } catch( SAXParseException e ) {
                     handleUserCodesParseException( file, e );
                 } catch( Exception e ) {
                     handleUserCodesGenericException( file, e );
                 }
-
-
-
 
             } else {
                 // Alert and quit.
@@ -1394,62 +1403,6 @@ public class MainController {
             }
         }
     }
-
-    // Parse user codes and globals from XML.
-/*
-    private void parseUserConfig() {
-
-        // cheap way to check if we need to reload userconfig which we will only allow once per lifecycle
-        if( MiscCode.numCodes() == 0 ){
-
-            // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
-            File file = new File(UserConfig.getPath());
-
-            if( file.canRead() ) {
-                try {
-                    DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder builder = fact.newDocumentBuilder();
-                    Document doc = builder.parse( file.getCanonicalPath() );
-                    Node root = doc.getDocumentElement();
-
-                    // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
-                    for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
-                        if( node.getNodeName().equalsIgnoreCase( "codes" ) )
-                            parseUserCodes( file, node );
-                        else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
-                            parseUserGlobals( file, node );
-                    }
-                } catch( SAXParseException e ) {
-                    handleUserCodesParseException( file, e );
-                } catch( Exception e ) {
-                    handleUserCodesGenericException( file, e );
-                }
-            } else {
-                // Alert and quit.
-                showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
-            }
-        }
-    }
-*/
-
-/*    // Parse codes from given <codes> tag.
-    private void parseUserCodes( File file, Node codes ) {
-        for( Node n = codes.getFirstChild(); n != null; n = n.getNextSibling() ) {
-            if( n.getNodeName().equalsIgnoreCase( "code" ) ) {
-                NamedNodeMap    map         = n.getAttributes();
-                Node            nodeValue   = map.getNamedItem( "value" );
-                int             value       = Integer.parseInt( nodeValue.getTextContent() );
-                String          name        = map.getNamedItem( "name" ).getTextContent();
-
-
-                try {
-                    MiscCode.addCode( new MiscCode( value, name ) );
-                } catch (Exception e) {
-                    handleUserCodesError( file, String.format("Failed to add code.\n%s", e.getMessage()) );
-                }
-            }
-        }
-    }*/
 
     // Parse globals from given <globals> tag.
     private void parseUserGlobals( File file, Node globals ) {
@@ -1893,4 +1846,35 @@ public class MainController {
     }
 
 
+    protected void initLaunchArgs(Application.Parameters appParams) {
+        /**
+         * loop and use the first useful argument
+         */
+        for (String arg : appParams.getRaw()) {
+
+            showError("argument",arg);
+
+            if( arg.endsWith(".wav") ) {
+
+                File audioFile = new File(arg);
+
+                if (audioFile.canRead()) {
+                    filenameAudio = audioFile.getAbsolutePath();
+                    currentAudioFile = audioFile;
+
+                    // launch argument available
+                    setGuiState(GuiState.PLAYBACK);
+                    initializeMediaPlayer(currentAudioFile, playerReady);
+                }
+
+            } else if(arg.endsWith(".casaa")) {
+                File miscFile = new File(arg);
+
+                if (miscFile.canRead()) {
+                    filenameMisc = miscFile.getAbsolutePath();
+                    resumeCoding(miscFile);
+                }
+            }
+        }
+    }
 }

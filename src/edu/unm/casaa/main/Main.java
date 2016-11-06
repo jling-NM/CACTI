@@ -68,13 +68,17 @@ public class Main extends Application {
 
 
         Scene mainScene = new Scene(root);
-        //mainScene.getStylesheets().add("file:///edu/unm/casaa/main/Main.css");
         mainStage.setScene(mainScene);
 
         // set volume to user prefs id
         mainController.sldVolume.adjustValue(appPrefs.getDouble("player.volume",0.5));
-        //
         mainStage.show();
+
+        /**
+         * pass command line arguments to controller
+         * if the argument is a wav or casaa file it will initialize the guistate
+         */
+        mainController.initLaunchArgs(getParameters());
 
     }
 

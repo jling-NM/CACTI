@@ -51,7 +51,10 @@ public class UtteranceList {
     }
 
 
-
+    /**
+     *
+     * @return observable version of utterance map for listeners
+     */
     public ObservableMap getObservableMap() {
         return observableMap;
     }
@@ -63,9 +66,9 @@ public class UtteranceList {
      * @throws IOException
      */
     public void add( Utterance utr ) {
-        System.out.println("UtteranceList ADD:"+utr.displayCoded());
         observableMap.put( Utils.formatID(utr.getStartTime(), utr.getMiscCode().value), utr);
     }
+
 
 	/**
 	 * Remove last utterance, if list is non-empty.
@@ -83,7 +86,6 @@ public class UtteranceList {
         System.out.println("UtteranceList REMOVE:"+utr.displayCoded());
         observableMap.remove(utr.getID());
 	}
-
     public void remove(String ID) {
         System.out.println("UtteranceList REMOVE:"+utteranceTreeMap.get(ID).displayCoded());
         observableMap.remove(ID);
@@ -120,7 +122,6 @@ public class UtteranceList {
 	 * Write to file.
 	 */
 	public void writeToFile() throws IOException {
-        System.out.println("Write MISC file");
 		try (BufferedWriter writer = Files.newBufferedWriter(storageFile.toPath(), StandardCharsets.UTF_8)) {
 
             // begin with audio file in header
@@ -230,6 +231,10 @@ public class UtteranceList {
 	}
 
 
+    /**
+     *
+     * @return audiofile name written to data file header
+     */
 	public String getAudioFilename() {
         return this.audioFilename;
     }
