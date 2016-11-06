@@ -1644,14 +1644,17 @@ public class MainController {
                                             // update code with new id
                                             //gc.id = Integer.getInteger(rb.getText());
                                             // update code in data model
-                                            //globalsData.setRating(gc, Integer.getInteger(rb.getText(), gc.defaultRating));
                                             globalsData.setRating(gc, Integer.valueOf(rb.getText()));
-                                            // TODO: duplicate code alert!!! see setGuiState()
-                                            // TODO: use savetextfile or what???
-                                            if( !tfGlobalsNotes.getText().isEmpty() ) {
-                                                globalsData.setNotes(tfGlobalsNotes.getText());
+                                            // update model for notes
+                                            globalsData.setNotes(tfGlobalsNotes.getText());
+
+                                            // save to file
+                                            try {
+                                                globalsData.writeToFile();
+                                            }catch (IOException e) {
+                                                showFatalWarning("Error writing Globals file", e.getMessage());
                                             }
-                                            globalsData.writeToFile();
+
                                         });
 
                                         // set toggle group label
@@ -1671,6 +1674,20 @@ public class MainController {
                             }
 
                         }
+
+                        /**
+                         * listen to notes field. If focus is lost and notes are not empty, save all out to the globals file.
+                         */
+                        tfGlobalsNotes.focusedProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean lostFocus, Boolean hasFocus) -> {
+                            if(lostFocus) {
+                                globalsData.setNotes(tfGlobalsNotes.getText());
+                                try {
+                                    globalsData.writeToFile();
+                                }catch (IOException e) {
+                                    showFatalWarning("Error writing Globals file", e.getMessage());
+                                }
+                            }
+                        });
 
                         break;
                 }
@@ -1739,19 +1756,13 @@ public class MainController {
 
     private void setGuiState( GuiState gs) {
 
+        // do stuff before changing state
+
+        /*
         if( guiState != null ) {
 
-            // do stuff before changing state
-            if (getGuiState().equals(GuiState.GLOBAL_CODING)) {
-                if( globalsData != null ) {
-                    if( !tfGlobalsNotes.getText().isEmpty() ) {
-                        globalsData.setNotes(tfGlobalsNotes.getText());
-                    }
-                    globalsData.writeToFile();
-                }
-            }
-
         }
+        */
 
         // change state
         guiState = gs;

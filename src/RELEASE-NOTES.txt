@@ -13,7 +13,6 @@ CHANGES:
 - Reformatted "Last Utterance" display.
 
 
-
 KNOWN ISSUES:
 - Default Timeline scrolling may be too fast or too slow and need adjustment.
 

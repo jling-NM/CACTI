@@ -273,6 +273,7 @@ public class TimeLine extends Group {
                 this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
                 markerCode.getStyleClass().add("unselectedMarkerTextSpeaker1");
                 this.getChildren().addAll(markerCode, indicatorShape);
+                this.setTranslateY(-1.0);
             } else {
                 // speaker 2
                 this.indicatorShape = new Polygon(0,indicatorWidth, indicatorWidth,0, indicatorWidth*2,indicatorWidth);
@@ -284,12 +285,11 @@ public class TimeLine extends Group {
 
             // place on timeline
             if( markerCodeWidth > this.indicatorShape.getBoundsInLocal().getWidth()) {
-                this.setTranslateX(tipPos - markerCode.getBoundsInParent().getWidth()/2.3);
+                this.setTranslateX(tipPos - markerCode.getBoundsInParent().getWidth()/2.0);
             } else {
                 this.setTranslateX(tipPos - indicatorWidth - 0.5);
             }
             this.setAlignment(Pos.CENTER);
-
 
 
             /**

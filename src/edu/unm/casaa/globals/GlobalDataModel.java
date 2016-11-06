@@ -18,10 +18,11 @@ This source code file is part of the CASAA Treatment Coding System Utility
 
 package edu.unm.casaa.globals;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import edu.unm.casaa.utterance.Utterance;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 /**
@@ -82,22 +83,27 @@ public class GlobalDataModel {
         return notes;
     }
 
-	public void writeToFile() {
+    /**
+     * Write globals data to file
+     * @throws IOException
+     */
+	public void writeToFile() throws IOException {
 
-		PrintWriter writer = null;
-		try {
-			writer = new PrintWriter( new FileWriter( globalsFile, false ) );
-			writer.println( "Global Ratings\n" );
-			writer.println( "Audio File:\t" + filenameAudio );
-			writer.println( toString() );
-			if( !"".equals( notes ) ) {
-				writer.println( "Notes:\n" + notes );
-			}
-		} catch( IOException e ) {
-			e.printStackTrace();
-		} finally {
-			writer.close();
-		}
+        try (BufferedWriter writer = Files.newBufferedWriter(globalsFile.toPath(), StandardCharsets.UTF_8)) {
 
+            // begin with audio file in header
+            writer.write("Global Ratings");
+            writer.newLine();
+            writer.write("Audio File:\t" + filenameAudio);
+            writer.newLine();
+            writer.write( toString() );
+            if( !"".equals( notes ) ) {
+                writer.write( "Notes:\n" + notes );
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            throw e;
+        }
 	}
 }
