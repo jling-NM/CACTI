@@ -19,8 +19,8 @@ This source code file is part of the CASAA Treatment Coding System Utility
 package edu.unm.casaa.globals;
 
 import java.util.Vector;
-
 import edu.unm.casaa.main.MainController;
+
 
 public class GlobalCode { 
     private static final long           serialVersionUID = 1L;

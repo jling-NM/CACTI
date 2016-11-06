@@ -18,8 +18,6 @@ This source code file is part of the CASAA Treatment Coding System Utility
 
 package edu.unm.casaa.globals;
 
-import edu.unm.casaa.utterance.Utterance;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -47,11 +45,9 @@ public class GlobalDataModel {
         this.globalsFile = globalsFile;
         this.filenameAudio = filenameAudio;
 
-
 		// Initialize to default ratings as defined by GlobalCode.
 	    for( int i = 0; i < GlobalCode.numCodes(); i++ ) {
 	        GlobalCode code = GlobalCode.codeAtIndex( i );
-
 	        ratings.put( code.id, code.defaultRating );
 		}
 	}
@@ -64,16 +60,17 @@ public class GlobalDataModel {
 		ratings.put( new Integer( code.id), rating );
 	}
 
+
 	public String toString() {
 		String result = new String();
 		
         for( int i = 0; i < GlobalCode.numCodes(); i++ ) {
             GlobalCode code = GlobalCode.codeAtIndex( i );
-
             result += code.name + ":\t" + getRating( code ) + "\n";
         }
 		return result;
 	}
+
 
     public void setNotes(String notes) {
         this.notes = notes;
@@ -82,6 +79,7 @@ public class GlobalDataModel {
     public String getNotes() {
         return notes;
     }
+
 
     /**
      * Write globals data to file
@@ -96,9 +94,17 @@ public class GlobalDataModel {
             writer.newLine();
             writer.write("Audio File:\t" + filenameAudio);
             writer.newLine();
-            writer.write( toString() );
+
+            // insert each code line
+            for( int i = 0; i < GlobalCode.numCodes(); i++ ) {
+                GlobalCode code = GlobalCode.codeAtIndex( i );
+                writer.write(String.format("%s:\t%s", code.name, getRating(code) ));
+                writer.newLine();
+            }
+
+            // insert notes
             if( !"".equals( notes ) ) {
-                writer.write( "Notes:\n" + notes );
+                writer.write( "Notes: " + notes );
                 writer.newLine();
             }
 

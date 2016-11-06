@@ -42,7 +42,6 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -52,13 +51,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
-
 import static java.lang.String.format;
-
-import javafx.collections.ObservableMap;
-import javafx.collections.MapChangeListener;
-import javafx.collections.FXCollections;
-
 
 
 public class MainController {
@@ -1256,7 +1249,7 @@ public class MainController {
             // button state different if 0 ver > 0 utterances
             setPlayerButtonState();
         } catch (IOException e) {
-            showFatalWarning("File Error", e.getMessage());
+            showError("Error writing casaa file", e.getMessage());
         }
     }
 
@@ -1269,7 +1262,7 @@ public class MainController {
         try {
             utteranceList.writeToFile();
         } catch (IOException e) {
-            showFatalWarning("File Error", e.getMessage());
+            showError("Error writing casaa file", e.getMessage());
         }
     }
 
@@ -1652,7 +1645,8 @@ public class MainController {
                                             try {
                                                 globalsData.writeToFile();
                                             }catch (IOException e) {
-                                                showFatalWarning("Error writing Globals file", e.getMessage());
+                                                showError("Error writing Globals file", e.getMessage());
+                                                return;
                                             }
 
                                         });
@@ -1684,7 +1678,8 @@ public class MainController {
                                 try {
                                     globalsData.writeToFile();
                                 }catch (IOException e) {
-                                    showFatalWarning("Error writing Globals file", e.getMessage());
+                                    showError("Error writing to Globals file", e.getMessage());
+                                    return;
                                 }
                             }
                         });
@@ -1729,7 +1724,7 @@ public class MainController {
 
                         Button button = new Button(codeName);
                         button.setOnAction(this::btnActCode);
-                        // TODO: make varible or class for this button widths
+                        // TODO: make variable or class for this button widths
 
                         button.setMinWidth(utrCodeButtonWidth);
                         button.setMinHeight(22);
