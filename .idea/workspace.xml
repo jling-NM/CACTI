@@ -7,13 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/misc/MiscAction.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/MISC_CODING.fxml" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/MISC_CODING.fxml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/main/TimeLine.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/edu/unm/casaa/utterance/UtteranceList.java" afterPath="$PROJECT_DIR$/src/edu/unm/casaa/utterance/UtteranceList.java" />
     </list>
     <ignored path="JavaFxApplication.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -75,24 +70,11 @@
       <file leaf-file-name="MainController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="426">
-              <caret line="1879" column="1" selection-start-line="1879" selection-start-column="1" selection-end-line="1879" selection-end-column="1" />
+            <state relative-caret-position="441">
+              <caret line="1884" column="0" selection-start-line="1884" selection-start-column="0" selection-end-line="1884" selection-end-column="0" />
               <folding>
                 <element signature="e#55285#55286#0" expanded="true" />
                 <element signature="e#55328#55329#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-969">
-              <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="method#stop#0;class#Main#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -726,7 +708,14 @@
       <option name="project" value="LOCAL" />
       <updated>1478398274686</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Add support for command line arguments. Does not handle openfilesevent in OSX.">
+      <created>1478420656696</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1478420656696</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -804,7 +793,8 @@
     <MESSAGE value="Fixed timeline runout.&#10;Casaa file is now overwritten write away." />
     <MESSAGE value="Markers and operations work well on OSX now. Others untested." />
     <MESSAGE value="Markers compromise OSX/Windows10" />
-    <option name="LAST_COMMIT_MESSAGE" value="Markers compromise OSX/Windows10" />
+    <MESSAGE value="Add support for command line arguments. Does not handle openfilesevent in OSX." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add support for command line arguments. Does not handle openfilesevent in OSX." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1137,8 +1127,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-969">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+        <state relative-caret-position="435">
+          <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#stop#0;class#Main#0" expanded="false" />
@@ -1148,8 +1138,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/unm/casaa/main/MainController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="426">
-          <caret line="1879" column="1" selection-start-line="1879" selection-start-column="1" selection-end-line="1879" selection-end-column="1" />
+        <state relative-caret-position="441">
+          <caret line="1884" column="0" selection-start-line="1884" selection-start-column="0" selection-end-line="1884" selection-end-column="0" />
           <folding>
             <element signature="e#55285#55286#0" expanded="true" />
             <element signature="e#55328#55329#0" expanded="true" />

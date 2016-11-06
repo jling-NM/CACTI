@@ -1846,6 +1846,10 @@ public class MainController {
     }
 
 
+    /**
+     * Meant to provide support for command line and open files eventss
+     * @param appParams
+     */
     protected void initLaunchArgs(Application.Parameters appParams) {
         /**
          * loop and use the first useful argument
