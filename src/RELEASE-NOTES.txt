@@ -16,7 +16,7 @@ CHANGES:
 
 KNOWN ISSUES:
 - Default Timeline scrolling may be too fast or too slow and need adjustment.
-- marker code width can offset arrow pointer and needs to be tweaked.
+- marker code width can offset arrow pointer and needs to be tweaked along with above item.
 
 
 

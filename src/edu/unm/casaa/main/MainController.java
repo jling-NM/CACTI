@@ -66,7 +66,7 @@ public class MainController {
     @FXML
     private VBox vbApp;                                 // control holding non-playback controls (misc/globals)
     @FXML
-    private Label lblAudioFilename;                     //
+    private Label lblAudioFilename;
     @FXML
     private Button btnPlayPause;
     @FXML
@@ -146,71 +146,11 @@ public class MainController {
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
-    private GuiState guiState;                          // for referencing state
+    private GuiState guiState;                          //
 
     private TimeLine timeLine;
 
 
-    /******************************************************************
-     * controller initialization tasks
-     ******************************************************************/
-    @FXML
-    private void initialize() {
-
-        // Use OS X standard menus no Java window menus
-        if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
-            menuBar.setUseSystemMenuBar(true);
-        }
-
-        //
-        setGuiState(GuiState.PLAYBACK);
-
-        // initialize app persistence
-        appPrefs = Preferences.userNodeForPackage(Main.class);
-
-        // check for required config to offer generation
-        verifyUserConfig();
-
-        // load user config file to load user specific edited codes
-        parseUserConfig();
-
-    }
-
-
-
-
-    /*********************************************************
-     * define lambda runnable later called by player when
-     * ready with media
-     *********************************************************/
-    private final Runnable playerReady = () -> {
-
-        // enable all the media controls
-        apMediaCtrls.setDisable(false);
-
-        // bind the volume slider to the mediaplayer volume
-        mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
-        // bind display playback volume label with volume slider id
-        lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
-        // bind display playback rate with rate slider id
-        lblRate.textProperty().bind(sldRate.valueProperty().asString("%.1f"));
-        // set mediaplayer rate with slider id
-        mediaPlayer.setRate(sldRate.getValue());
-
-        // i'm not sure it is worth having this as private member unless it helps inside
-        // the listener code to avoid making the duration call repeatedly.
-        totalDuration = mediaPlayer.getTotalDuration();
-        // duration label
-        lblDuration.setText(Utils.formatDuration(totalDuration));
-
-        // this also initializes status so that display updates happen correctly at outset
-        mediaPlayer.play();
-        mediaPlayer.pause();
-        mediaPlayer.seek(Duration.ZERO);
-
-        // mediaPlayer is ready continue with user controls setup
-        initializeUserControls();
-    };
 
 
 
@@ -254,7 +194,6 @@ public class MainController {
      **********************************************************************/
     @SuppressWarnings("UnusedParameters")
     public void btnActReplay(ActionEvent actionEvent) {
-
         gotoLastMarker();
     }
 
@@ -657,7 +596,10 @@ public class MainController {
 
 
 
-
+    /************************************************************************
+     * Specify a Config file
+     * @return File object
+     ************************************************************************/
     private void selectConfigFile(String newFileName) {
 
         // set code file chooser
@@ -692,7 +634,7 @@ public class MainController {
 
 
     /**
-     * Break out code that resume MISC coding state
+     * Break out code to resume MISC coding state
      */
     private void resumeCoding( File miscFile ) {
 
@@ -722,6 +664,66 @@ public class MainController {
         setPlayerButtonState();
 
     }
+
+
+
+    /******************************************************************
+     * controller initialization tasks
+     ******************************************************************/
+    @FXML
+    private void initialize() {
+
+        // Use OS X standard menus no Java window menus
+        if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
+            menuBar.setUseSystemMenuBar(true);
+        }
+
+        // default startup state
+        setGuiState(GuiState.PLAYBACK);
+
+        // initialize app persistence
+        appPrefs = Preferences.userNodeForPackage(Main.class);
+
+        // check for required config to offer generation
+        verifyUserConfig();
+
+        // load user config file to load user specific edited codes
+        parseUserConfig();
+
+    }
+
+
+
+
+    /*********************************************************
+     * define lambda runnable later called by player when
+     * ready with media
+     *********************************************************/
+    private final Runnable playerReady = () -> {
+
+        // enable all the media controls
+        apMediaCtrls.setDisable(false);
+
+        // bind the volume slider to the mediaplayer volume
+        mediaPlayer.volumeProperty().bind(sldVolume.valueProperty());
+        // bind display playback volume label with volume slider id
+        lblVolume.textProperty().bind(sldVolume.valueProperty().asString("%.1f"));
+        // bind display playback rate with rate slider id
+        lblRate.textProperty().bind(sldRate.valueProperty().asString("%.1f"));
+        // set mediaplayer rate with slider id
+        mediaPlayer.setRate(sldRate.getValue());
+        totalDuration = mediaPlayer.getTotalDuration();
+        // duration label
+        lblDuration.setText(Utils.formatDuration(totalDuration));
+
+        // this also initializes status so that display updates happen correctly at outset
+        mediaPlayer.play();
+        mediaPlayer.pause();
+        mediaPlayer.seek(Duration.ZERO);
+
+        // mediaPlayer is ready continue with user controls setup
+        initializeUserControls();
+    };
 
 
 
@@ -777,7 +779,6 @@ public class MainController {
 
                     /*
                         option 2: pause at end so user can code
-                        However, have to click play twice???
                      */
                     timeLine.getAnimation().pause();
                     mediaPlayer.pause();
@@ -856,10 +857,7 @@ public class MainController {
                     timeLine.getAnimation().play();
                     break;
                 case PAUSED:
-                    // first pause
                     timeLine.getAnimation().pause();
-                    // then, match to media position
-                    //timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
                     break;
                 case STOPPED:
                     timeLine.getAnimation().stop();
@@ -879,14 +877,6 @@ public class MainController {
             timeLine.getAnimation().pause();
         });
 
-        /*
-        This works for linking timeline to player when seek happens on player which is a challenge
-        However, this cause timeline to jump on PLAY which is annoying so i might go about this a less elegant way.
-
-        mediaPlayer.currentTimeProperty().addListener((invalidated, oldValue, newValue) -> {
-           timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
-        });
-        */
 
         /**
          * Seek slider should manipulate timeline as it does mediaplayer
@@ -1179,7 +1169,7 @@ public class MainController {
 
 
     /*******************************************************
-     * Reusable method to display runtime errors
+     * display runtime errors
      * @param title Window title
      * @param message Window message
      *******************************************************/
@@ -1194,7 +1184,7 @@ public class MainController {
 
 
     /*******************************************************
-     * Reusable method to display runtime errors
+     * display fatal errors
      * @param title Window title
      * @param message Window message
      *******************************************************/
@@ -1218,7 +1208,7 @@ public class MainController {
     //TODO: this needs to be replaced perhaps; no longer needed?
     private synchronized UtteranceList getUtteranceList() {
         if( utteranceList == null )
-            showFatalWarning("Error", "UtteranceList is null");
+            showError("Error", "UtteranceList is null");
         return utteranceList;
     }
 
@@ -1227,12 +1217,10 @@ public class MainController {
         See if uncoding is currently an option
      **/
     private boolean isUncodeAvailable() {
-
         Utterance l = getUtteranceList().last();
 
-        if( l != null ) {
-            return true;
-        } else return false;
+        if( l != null ) return true;
+        else return false;
     }
 
 
@@ -1246,7 +1234,10 @@ public class MainController {
     }
 
 
-
+    /**
+     * New utterance
+     * @param miscCode
+     */
     private synchronized void insertUtterance(MiscCode miscCode) {
 
         // get current time
@@ -1269,6 +1260,10 @@ public class MainController {
     }
 
 
+    /**
+     *
+     * @param utr
+     */
     private synchronized void removeUtterance(Utterance utr){
         utteranceList.remove(utr);
         // refresh last utterance display
@@ -1282,9 +1277,9 @@ public class MainController {
     }
 
 
-    /********************************************************
-     * Undo the actions of pressing a MISC code button.
-     ********************************************************/
+    /**
+     * More specific remove
+     */
     private synchronized void removeLastUtterance(){
         // Remove last utterance
         Utterance u = getUtteranceList().last();
@@ -1315,7 +1310,9 @@ public class MainController {
     }
 
 
-    // Parse user codes and globals from XML.
+    /**
+     * Parse user codes and globals from user config file.
+     */
     private void parseUserConfig() {
 
         // cheap way to check if we need to reload userconfig which we will only allow once per lifecycle
@@ -1441,8 +1438,9 @@ public class MainController {
     }
 
 
-
-
+    /**
+     * Clear utterance counter
+     */
     private void resetUtteranceCoding() {
         numUninterruptedUncodes = 0;
     }
@@ -1678,7 +1676,6 @@ public class MainController {
                         Button button = new Button(codeName);
                         button.setOnAction(this::btnActCode);
                         // TODO: make variable or class for this button widths
-
                         button.setMinWidth(utrCodeButtonWidth);
                         button.setMinHeight(22);
                         button.setMaxWidth(utrCodeButtonWidth);
@@ -1847,7 +1844,8 @@ public class MainController {
 
 
     /**
-     * Meant to provide support for command line and open files eventss
+     * Meant to provide support for command line and open files events
+     * in the future
      * @param appParams
      */
     protected void initLaunchArgs(Application.Parameters appParams) {

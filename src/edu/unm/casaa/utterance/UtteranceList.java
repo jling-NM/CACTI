@@ -83,11 +83,9 @@ public class UtteranceList {
 	 * Remove utterance
 	 */
 	public void remove(Utterance utr) {
-        System.out.println("UtteranceList REMOVE:"+utr.displayCoded());
         observableMap.remove(utr.getID());
 	}
     public void remove(String ID) {
-        System.out.println("UtteranceList REMOVE:"+utteranceTreeMap.get(ID).displayCoded());
         observableMap.remove(ID);
     }
 

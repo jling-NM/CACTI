@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\josef\projects\cacti2\out\artifacts\cacti2\cacti2.jar</jar>
-  <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti2.exe</outfile>
+  <jar>C:\Users\josef\projects\cacti2\out\artifacts\CACTI\cacti.jar</jar>
+  <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -24,16 +24,16 @@
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <versionInfo>
-    <fileVersion>0.20.1.0</fileVersion>
-    <txtFileVersion>0.20.1</txtFileVersion>
+    <fileVersion>0.30.0.0</fileVersion>
+    <txtFileVersion>0.30.0</txtFileVersion>
     <fileDescription>The CASAA Application for Coding Treatment Interactions</fileDescription>
     <copyright>Copyright 2009</copyright>
-    <productVersion>0.20.1.0</productVersion>
-    <txtProductVersion>0.20.1</txtProductVersion>
-    <productName>CACTI2</productName>
+    <productVersion>0.30.0.0</productVersion>
+    <txtProductVersion>0.30.0</txtProductVersion>
+    <productName>CACTI</productName>
     <companyName>Center on Alcoholism, Substance Abuse and Addictions at the University of New Mexico Albuquerque</companyName>
-    <internalName>CACTI2</internalName>
-    <originalFilename>CACTI2.exe</originalFilename>
+    <internalName>CACTI</internalName>
+    <originalFilename>CACTI.exe</originalFilename>
   </versionInfo>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
