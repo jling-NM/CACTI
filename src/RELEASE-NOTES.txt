@@ -1,3 +1,16 @@
+------ 0.31.0 ------
+20170207 - jl
+--------------------
+
+CHANGES:
+- Remove "uncode 4 times" notice
+- MISC code underscore was being interpreted as mnemonic
+- Add support for mp3 audio format
+- Build script and icons for OSX
+- Windows JRE subversion is not enforced
+
+
+
 ------ 0.30.0 ------
 201600909 - jl
 --------------------

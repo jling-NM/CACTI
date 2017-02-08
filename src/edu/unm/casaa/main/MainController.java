@@ -135,14 +135,12 @@ public class MainController {
 
     // mediaplayer attributes
     private Duration totalDuration;                     // duration of active media
-    private int numUninterruptedUncodes  = 0;           // Number of times user has uncoded without doing anything else.
     private String filenameMisc          = null;        // name of active CASAA data file.
     private String filenameGlobals       = null;        // name of active globals data file
     private String filenameAudio         = null;        // name of active media file. Used when switching from PLAYBACK to MISC to GLOBALS
     private File currentAudioFile        = null;        // active media file
     private UtteranceList utteranceList  = null;        // MISC coding data
     private GlobalDataModel globalsData  = null;        // GLOBALS scoring data
-    private final int utrCodeButtonWidth = 70;          // fixed width of code generated utterace buttons. Could be CSS.
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
@@ -219,8 +217,6 @@ public class MainController {
     public void btnActUncode(ActionEvent actionEvent) {
         // remove the last code
         removeLastUtterance();
-        // update counter of how many time user uncoded
-        incrementUncodeCount();
         // uncoding may exhaust available codes so update button state
         setPlayerButtonState();
     }
@@ -241,8 +237,6 @@ public class MainController {
 
             // remove the last code
             removeLastUtterance();
-            // update counter of how many time user uncoded
-            incrementUncodeCount();
 
             // uncoding may exhaust available codes so update button state
             setPlayerButtonState();
@@ -491,7 +485,10 @@ public class MainController {
 
         FileChooser fc = new FileChooser();
         fc.setTitle("Open audio file");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Wav Files", "*.wav"));
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Wav Files", "*.wav"),
+                new FileChooser.ExtensionFilter("Mp3 Files", "*.mp3")
+        );
 
         // set initial directory to preferences or users home directory
         File initDir = new File(appPrefs.get("lastAudioPath", System.getProperty("user.home")));
@@ -1059,9 +1056,6 @@ public class MainController {
                 // display coding file path in gui
                 lblCurMiscFile.setText(filenameMisc);
 
-                // reset some utterance accounting
-                resetUtteranceCoding();
-
                 // force last marker
                 gotoLastMarker();
 
@@ -1205,7 +1199,6 @@ public class MainController {
      *
      * @return list of utterances
      **********************************************************/
-    //TODO: this needs to be replaced perhaps; no longer needed?
     private synchronized UtteranceList getUtteranceList() {
         if( utteranceList == null )
             showError("Error", "UtteranceList is null");
@@ -1224,14 +1217,6 @@ public class MainController {
     }
 
 
-
-    private synchronized void incrementUncodeCount() {
-        numUninterruptedUncodes++;
-        if( numUninterruptedUncodes >= 4 ) {
-            showError( "Uncode Warning", "You have uncoded 4 times in a row." );
-            numUninterruptedUncodes = 0;
-        }
-    }
 
 
     /**
@@ -1435,14 +1420,6 @@ public class MainController {
                     handleUserCodesError( file, "Failed to add global code." );
             }
         }
-    }
-
-
-    /**
-     * Clear utterance counter
-     */
-    private void resetUtteranceCoding() {
-        numUninterruptedUncodes = 0;
     }
 
 
@@ -1674,12 +1651,9 @@ public class MainController {
                         String codeName = map.getNamedItem( "code" ).getTextContent();
 
                         Button button = new Button(codeName);
+                        // show underscores in codes; do not trigger Mnemonic parsings
+                        button.setMnemonicParsing(false);
                         button.setOnAction(this::btnActCode);
-                        // TODO: make variable or class for this button widths
-                        button.setMinWidth(utrCodeButtonWidth);
-                        button.setMinHeight(22);
-                        button.setMaxWidth(utrCodeButtonWidth);
-                        button.setMaxHeight(22);
                         button.getStyleClass().add("btn-dark-blue");
                         panel.add(button, activeCol, activeRow, 1, 1);
                     }
