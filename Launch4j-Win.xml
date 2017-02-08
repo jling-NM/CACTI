@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\josef\projects\cacti2\out\artifacts\CACTI\cacti.jar</jar>
+  <jar>C:\Users\josef\projects\cacti2\out\artifacts\CACTI_jar\CACTI.jar</jar>
   <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
@@ -18,18 +18,18 @@
     <path></path>
     <bundledJre64Bit>false</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.8.0_60</minVersion>
+    <minVersion>1.8.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <versionInfo>
-    <fileVersion>0.30.0.0</fileVersion>
-    <txtFileVersion>0.30.0</txtFileVersion>
+    <fileVersion>0.31.0.0</fileVersion>
+    <txtFileVersion>0.31.0</txtFileVersion>
     <fileDescription>The CASAA Application for Coding Treatment Interactions</fileDescription>
     <copyright>Copyright 2009</copyright>
-    <productVersion>0.30.0.0</productVersion>
-    <txtProductVersion>0.30.0</txtProductVersion>
+    <productVersion>0.31.0.0</productVersion>
+    <txtProductVersion>0.31.0</txtProductVersion>
     <productName>CACTI</productName>
     <companyName>Center on Alcoholism, Substance Abuse and Addictions at the University of New Mexico Albuquerque</companyName>
     <internalName>CACTI</internalName>

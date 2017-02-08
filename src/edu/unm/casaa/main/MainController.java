@@ -485,9 +485,8 @@ public class MainController {
 
         FileChooser fc = new FileChooser();
         fc.setTitle("Open audio file");
-        fc.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Wav Files", "*.wav"),
-                new FileChooser.ExtensionFilter("Mp3 Files", "*.mp3")
+        fc.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Audio Files (*.wav, *.mp3)", "*.wav","*.mp3")
         );
 
         // set initial directory to preferences or users home directory
