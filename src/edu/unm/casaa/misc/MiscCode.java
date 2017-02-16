@@ -135,4 +135,8 @@ public class MiscCode {
 	public MiscCode.Speaker getSpeaker(){
 		return this.speaker;
 	}
+
+	public static void clear() {
+		list.clear();
+	}
 }

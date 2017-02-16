@@ -108,4 +108,7 @@ public class GlobalCode {
         return "(label: " + label + ", id: " + id + ")";
     }
 
+    public static void clear() {
+        list.clear();
+    }
 };

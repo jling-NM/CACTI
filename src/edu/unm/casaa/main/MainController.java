@@ -32,6 +32,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -45,6 +47,7 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
@@ -111,6 +114,8 @@ public class MainController {
     @FXML
     private Label lblCurMiscFile;
     @FXML
+    private Label lblCurConfigFile;
+    @FXML
     private Label lblCurUtrEnum;
     @FXML
     private Label lblCurUtrCode;
@@ -149,6 +154,55 @@ public class MainController {
     private TimeLine timeLine;
 
 
+
+
+
+    /*****************************************************************
+     * controller constructor
+     *
+     * called once at start. Include things here that need to run
+     * once at start but doesn't need access to FXML.
+     * After this, initialize() is called
+     *****************************************************************/
+    public MainController() {
+
+        // initialize app persistence
+        appPrefs = Preferences.userNodeForPackage(Main.class);
+
+        // default startup state
+        setGuiState(GuiState.PLAYBACK);
+
+        // check for required config to offer generation
+        verifyUserConfig();
+
+        // load user config file to load user specific edited codes
+        parseUserConfig();
+    }
+
+
+
+    /******************************************************************
+     * controller initialization tasks
+     *
+     * Called to initialize a controller after its root element has been completely processed.
+     * The initialize method is called after all @FXML annotated members have been injected.
+     *
+     * This is called on any FXMLLoader, NOT just when
+     * app or MainController is first loaded.
+     *
+     * e.g.
+     * loader = new FXMLLoader(getClass().getResource("MISC_CODING.fxml"), resourceStrings);
+     * loader.setController(this);
+     ******************************************************************/
+    @FXML
+    private void initialize() {
+
+        // Use OS X standard menus no Java window menus
+        if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
+            menuBar.setUseSystemMenuBar(true);
+        }
+
+    }
 
 
 
@@ -420,9 +474,60 @@ public class MainController {
 
 
 
-    public void mniGlobalScoring(ActionEvent actionEvent) {
+    /**
+     * Select a different user config file possibly with different code list
+     *
+     * Update code list. If currently coding, reload controls
+     *
+     */
+    public void mniLoadConfig(ActionEvent actionEvent) {
 
-        setGuiState(GuiState.GLOBAL_CODING);
+        // if something be playing, stop it
+        if(mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+
+        /* select config file */
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CACTI Config files", "*.xml"));
+
+        // get user selection
+        File selectedFile;
+
+        // seed path empty; select existing
+        File initDir = new File(System.getProperty("user.home"));
+        fc.setTitle("Open Config File");
+        fc.setInitialDirectory(initDir);
+        selectedFile = fc.showOpenDialog(null);
+
+        /* if file selected */
+        if( selectedFile != null ) {
+
+            // update path
+            UserConfig.setPath(selectedFile.getAbsolutePath());
+            // parse the file
+            parseUserConfig();
+
+            // if we were MISC coding reload
+            if (getGuiState().equals(GuiState.MISC_CODING)) {
+
+                initializeUserControls();
+
+                // only resume coding if casaa file exists
+                File tmp = new File(filenameMisc);
+                if( tmp.exists() ) {
+                    resumeCoding(tmp);
+                }
+
+            } else if (getGuiState().equals(GuiState.GLOBAL_CODING)) {
+                initializeUserControls();
+            }
+        }
+
+    }
+
+
+    public void mniGlobalScoring(ActionEvent actionEvent) {
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -450,6 +555,8 @@ public class MainController {
 
         // load audio file
         if (audioFile.canRead()) {
+
+            setGuiState(GuiState.GLOBAL_CODING);
 
             // initialize globals data model
             globalsData = new GlobalDataModel(globalsFile, filenameAudio);
@@ -594,7 +701,6 @@ public class MainController {
 
     /************************************************************************
      * Specify a Config file
-     * @return File object
      ************************************************************************/
     private void selectConfigFile(String newFileName) {
 
@@ -619,12 +725,14 @@ public class MainController {
             selectedFile = fc.showSaveDialog(null);
         }
 
+
         // persist path for next time
         if( selectedFile != null) {
             UserConfig.setPath(selectedFile.getAbsolutePath());
         } else {
             System.exit(0);
         }
+
 
     }
 
@@ -634,8 +742,6 @@ public class MainController {
      */
     private void resumeCoding( File miscFile ) {
 
-        setGuiState(GuiState.MISC_CODING);
-
         // now get utterances from code file
         try {
             utteranceList = UtteranceList.loadFromFile(miscFile);
@@ -643,6 +749,7 @@ public class MainController {
             showError("Error Loading Casaa File", e.getMessage());
             return;
         }
+
 
         // load the audio and start the player
         File audioFile = new File(utteranceList.getAudioFilename());
@@ -657,36 +764,15 @@ public class MainController {
             showError("Error Loading Audio File", format("Could not load audio file:\n  %s\n\nwhich is specified within:\n  %s\n\nCheck that audio file exists and has read permissions", filenameAudio, filenameMisc));
         }
 
+        setGuiState(GuiState.MISC_CODING);
+
         setPlayerButtonState();
 
     }
 
 
 
-    /******************************************************************
-     * controller initialization tasks
-     ******************************************************************/
-    @FXML
-    private void initialize() {
 
-        // Use OS X standard menus no Java window menus
-        if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
-            menuBar.setUseSystemMenuBar(true);
-        }
-
-        // default startup state
-        setGuiState(GuiState.PLAYBACK);
-
-        // initialize app persistence
-        appPrefs = Preferences.userNodeForPackage(Main.class);
-
-        // check for required config to offer generation
-        verifyUserConfig();
-
-        // load user config file to load user specific edited codes
-        parseUserConfig();
-
-    }
 
 
 
@@ -803,6 +889,49 @@ public class MainController {
                         mediaPlayer.setRate(newValue.doubleValue());
                     }
                 });
+
+                // TODO: better number for this?
+                // TODO: when slider is focused doesn't move timeline
+                sldSeek.setBlockIncrement(0.001);
+
+                /** handle arrow keys for moving at small increments in audio file **/
+                sldSeek.getScene().setOnKeyPressed((keyEvent) -> {
+
+                    switch (keyEvent.getCode()) {
+
+                        case LEFT:
+                            //Stop letting it do anything else
+                            keyEvent.consume();
+
+                            Duration GoTo = mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5));
+                            timeLine.getAnimation().jumpTo(GoTo);
+                            mediaPlayer.seek(GoTo);
+                            break;
+
+                        case RIGHT:
+                            //Stop letting it do anything else
+                            keyEvent.consume();
+
+                            GoTo = mediaPlayer.getCurrentTime().add(Duration.seconds(0.5));
+                            timeLine.getAnimation().jumpTo(GoTo);
+                            mediaPlayer.seek(GoTo);
+                            break;
+
+                        case SPACE:
+                            keyEvent.consume();
+
+                            System.out.println("space");
+                            if ( mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING) ) {
+                                mediaPlayer.pause();
+                            } else {
+                                mediaPlayer.play();
+                            }
+                            break;
+
+                    }
+                });
+
+
 
             } catch ( MediaException mex ) {
                 if(mex.getType() == MediaException.Type.MEDIA_UNSUPPORTED) {
@@ -921,6 +1050,7 @@ public class MainController {
         // save this window's stage for resizing new controls
         Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
+
         // common control updates; file name in mediaplayer
         lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
 
@@ -975,36 +1105,26 @@ public class MainController {
 
             case MISC_CODING:
 
-                /*
-                   detect if already in MISC_CODING
-                   Somethings will not have to be reloaded and make user experience snappier
-                 */
-                if( ! currentUserControls.equals(getGuiState().name()) ) {
+                resetUserControlsContainer();
 
-                    resetUserControlsContainer();
-
-                    // load new controls
-                    loader = new FXMLLoader(getClass().getResource("MISC_CODING.fxml"), resourceStrings);
-                    loader.setController(this);
-                    try {
-                        vbApp.getChildren().add(loader.load());
-                        // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
-                        // if i set controller in coding.fxml then it has not reference to local members down below
-                        // Therefore, i reset it.
-                        setGuiState(GuiState.MISC_CODING);
-                    } catch (IOException ex) {
-                        showError("Error", ex.toString());
-                    }
-
-                    // display controls needed for coding
-                    setPlayerButtonState();
-
-                    // load coding buttons from userConfiguration.xml appropriate for GuiState
-                    parseUserControls();
-
-                    // resize app window
-                    ourTown.sizeToScene();
+                // load new controls
+                loader = new FXMLLoader(getClass().getResource("MISC_CODING.fxml"), resourceStrings);
+                loader.setController(this);
+                try {
+                    vbApp.getChildren().add(loader.load());
+                } catch (IOException ex) {
+                    showError("Error", ex.toString());
                 }
+
+                // display controls needed for coding
+                setPlayerButtonState();
+
+                // load coding buttons from userConfiguration.xml appropriate for GuiState
+                parseUserControls();
+
+                // resize app window
+                ourTown.sizeToScene();
+
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -1055,6 +1175,9 @@ public class MainController {
                 // display coding file path in gui
                 lblCurMiscFile.setText(filenameMisc);
 
+                // dispaly config file path in gui
+                lblCurConfigFile.setText(UserConfig.getPath());
+
                 // force last marker
                 gotoLastMarker();
 
@@ -1092,9 +1215,6 @@ public class MainController {
 
                 try {
                     vbApp.getChildren().add(loader.load());
-                    // NOTE: for some reason guiState is reset to BASE when i do this while other members survive just fine.
-                    // Therefore, i reset it.
-                    setGuiState(GuiState.GLOBAL_CODING);
                 } catch (IOException ex) {
                     showError("Error", ex.toString());
                 }
@@ -1295,12 +1415,21 @@ public class MainController {
 
 
     /**
-     * Parse user codes and globals from user config file.
+     * Parse user codes and globals from user config file
+     * into vectors of MiscCode and GlobalCode
+     *
+     * <userConfiguration>
+     *  <codes>
+     *      contain code label and value
+     *      goes into MiscCode
      */
     private void parseUserConfig() {
 
+        // reset codes vector
+        MiscCode.clear();
+
         // cheap way to check if we need to reload userconfig which we will only allow once per lifecycle
-        if( MiscCode.numCodes() == 0 ){
+        //if( MiscCode.numCodes() == 0 ){
 
             // NOTE: We display parse errors to user before quiting so user knows to correct XML file.
             File file = new File(UserConfig.getPath());
@@ -1331,6 +1460,7 @@ public class MainController {
                                 }
                             }
                         else if( node.getNodeName().equalsIgnoreCase( "globals" ) )
+                            /* handle global code */
                             parseUserGlobals( file, node );
                     }
 
@@ -1382,11 +1512,25 @@ public class MainController {
                 // Alert and quit.
                 showFatalWarning("Failed to load user codes","Failed to find required file.\n" + file.getAbsolutePath());
             }
-        }
+        //}
     }
 
-    // Parse globals from given <globals> tag.
+
+
+    /**
+     * Parse globals from user config file
+     * into vector GlobalCode
+     * <userConfiguration>
+     *  <globals>
+     *      contain code label and value
+     *      goes into GlobalCode
+     */
     private void parseUserGlobals( File file, Node globals ) {
+
+        // reset code vector
+        GlobalCode.clear();
+
+
         for( Node n = globals.getFirstChild(); n != null; n = n.getNextSibling() ) {
             if( n.getNodeName().equalsIgnoreCase( "global" ) ) {
                 NamedNodeMap    map         = n.getAttributes();
@@ -1422,6 +1566,7 @@ public class MainController {
     }
 
 
+
     /************************************************************
      * Update utterance displays (e.g. current, last, etc) in active template view
      */
@@ -1433,7 +1578,18 @@ public class MainController {
 
 
     /*************************************************************
-     * Parse user controls from XML file.
+     * Parse user controls from XML file to create GUI buttons in app
+     * Legacy config file had separate section <codeControls> that
+     * define which code label goes to which button in the screen
+     *
+     * This function checks each code against MiscCode or GlobalCode
+     * vectors (that is where the code value is) and then adds the
+     * button to the screen in the column and row.
+     *
+     * <userConfiguration>
+     *  <codeControls panel="left" label="Therapist">
+     *      button
+     *
      *************************************************************/
     private void parseUserControls() {
 
@@ -1654,7 +1810,12 @@ public class MainController {
                         button.setMnemonicParsing(false);
                         button.setOnAction(this::btnActCode);
                         button.getStyleClass().add("btn-dark-blue");
+                        // width and height of button expands with grid resizing
+                        button.prefWidthProperty().bind(panel.widthProperty());
+                        button.prefHeightProperty().bind(panel.heightProperty());
+
                         panel.add(button, activeCol, activeRow, 1, 1);
+
                     }
                 }
 

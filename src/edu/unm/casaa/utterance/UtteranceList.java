@@ -176,6 +176,7 @@ public class UtteranceList {
 
                 Duration startTime  = Utils.parseDuration(st.nextToken());
                 int codeId          = Integer.parseInt( st.nextToken() );
+                String codeName     = st.nextToken();
                 MiscDataItem item 	= new MiscDataItem(Utils.formatID(startTime,codeId), startTime);
 
                 // look up parsed code in user config codes loaded at init
@@ -184,9 +185,9 @@ public class UtteranceList {
                 } catch (Exception e) {
                     // if lookup failed there is a possible disconnect between codes in casaa file
                     // and codes in user config file
-                    throw new Exception( String.format("Code(%d) in casaa file not found in user configuration file", codeId) );
+                    throw new Exception( String.format("The code (%s) with value (%d) in file (%s) was not found in the current user configuration file.\n\nIf you uncode (%s) you will not be able to recode it with the current config file.", codeName, codeId, MISCfile.getName(), codeName ) );
                 }
-				st.nextToken(); // throw away the code string
+				//st.nextToken(); // throw away the code string
 
                 utteranceList.add(item);
 

@@ -76,19 +76,38 @@
                   </TitledPane>
                </children>
             </HBox>
-      
-            <HBox alignment="CENTER_LEFT">
+            <VBox>
                <children>
-                  <Label fx:id="lblCurMiscFile" text="">
-                     <padding>
-                        <Insets bottom="4.0" left="8.0" />
-                     </padding>
-                  </Label>
+                  <HBox>
+                     <children>
+                        <Label fx:id="lblMiscFile" text="%lbl.miscFile">
+                           <padding>
+                              <Insets bottom="4.0" left="8.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="lblCurMiscFile" text="">
+                           <padding>
+                              <Insets bottom="4.0" left="2.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox layoutX="10.0" layoutY="10.0">
+                     <children>
+                        <Label fx:id="lblConfigFile" text="%lbl.configFile">
+                           <padding>
+                              <Insets bottom="4.0" left="8.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="lblCurConfigFile" text="">
+                           <padding>
+                              <Insets bottom="4.0" left="2.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
                </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </HBox>
+            </VBox>
          </children>
          <VBox.margin>
             <Insets />

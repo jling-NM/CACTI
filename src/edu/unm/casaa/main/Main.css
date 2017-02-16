@@ -139,9 +139,7 @@
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-padding: 4 8 4 8;
-    -fx-max-width: 70px;
     -fx-min-width: 70px;
-    -fx-max-height: 22px;
     -fx-min-height: 22px;
 }
 .btn-dark-blue:hover {
