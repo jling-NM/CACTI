@@ -239,7 +239,8 @@ public class MainController {
 
 
     /**********************************************************************
-     *  button event: Seek to beginning of current utterance.  Seek a little further back
+     *  button event:
+     *  Seek to beginning of current utterance.  Seek a little further back
      *  to ensure audio synchronization issues don't cause player to actually
      *  seek later than beginning of utterance.
      *  @param actionEvent not used
@@ -265,7 +266,8 @@ public class MainController {
 
 
     /**********************************************************************
-     *  button event: Remove last utterance
+     *  button event:
+     *  Remove last utterance
      **********************************************************************/
     @SuppressWarnings("UnusedParameters")
     public void btnActUncode(ActionEvent actionEvent) {
@@ -277,20 +279,33 @@ public class MainController {
 
 
     /**********************************************************************
-     *  button event: Uncode last utterance and replay it
+     *  button event:
+     *  Uncode last utterance.
+     *  If more utterances exist then move to 1 second prior to the
+     *  previous code. Otherwise, move to 1 second prior to that last code
+     *
      *  @param actionEvent not used
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
 
-        Utterance utterance = getUtteranceList().last();
-        if (utterance != null) {
-            // Position one second before start of utterance.
-            Duration pos = utterance.getStartTime().subtract(Duration.ONE);
+        Utterance lastUtterance = getUtteranceList().last();
+        if (lastUtterance != null) {
 
-            setMediaPlayerPosition(pos);
+            // new playback position defaults to 1 second before the last code before we remove it
+            Duration newPlaybackTimePos = lastUtterance.getStartTime().subtract(Duration.ONE);
 
             // remove the last code
             removeLastUtterance();
+
+            // get last utterance now
+            Utterance prevUtterance = getUtteranceList().last();
+            if (prevUtterance != null) {
+                // Position one second before start of this previous utterance.
+                newPlaybackTimePos = prevUtterance.getStartTime().subtract(Duration.ONE);
+            }
+
+            // move to new position
+            setMediaPlayerPosition(newPlaybackTimePos);
 
             // uncoding may exhaust available codes so update button state
             setPlayerButtonState();
@@ -299,7 +314,8 @@ public class MainController {
 
 
     /**********************************************************************
-     *  button event: Apply utterance code
+     *  button event:
+     *  Apply utterance code
      **********************************************************************/
     private void btnActCode(ActionEvent actionEvent) {
         Button src = (Button) actionEvent.getSource();
@@ -918,6 +934,7 @@ public class MainController {
                             break;
 
                         case SPACE:
+                            //TODO: this doesn't work. somthing is blocking?
                             keyEvent.consume();
 
                             System.out.println("space");
@@ -1903,7 +1920,6 @@ public class MainController {
                 btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(96.0);
                 btnReplay.setVisible(true);
-                btnReplay.setDisable(false);
                 btnUncode.setMinWidth(96.0);
                 btnUncode.setVisible(true);
                 btnUncodeReplay.setMinWidth(96.0);
@@ -1911,9 +1927,11 @@ public class MainController {
                 btnRewind.setDisable(false);
                 btnReplay.getParent().autosize();
                 if(!isUncodeAvailable()){
+                    btnReplay.setDisable(true);
                     btnUncodeReplay.setDisable(true);
                     btnUncode.setDisable(true);
                 } else {
+                    btnReplay.setDisable(false);
                     btnUncodeReplay.setDisable(false);
                     btnUncode.setDisable(false);
                 }
