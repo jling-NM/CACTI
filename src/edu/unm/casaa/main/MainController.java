@@ -32,8 +32,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -47,7 +45,6 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXParseException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
@@ -819,6 +816,10 @@ public class MainController {
         mediaPlayer.pause();
         mediaPlayer.seek(Duration.ZERO);
 
+        // arrow keys move by half second when player has focus
+        Double blockIncrement = ( ((Duration.ONE.toSeconds()/totalDuration.toSeconds())/2)*1000 );
+        sldSeek.setBlockIncrement(blockIncrement);
+
         // mediaPlayer is ready continue with user controls setup
         initializeUserControls();
     };
@@ -893,58 +894,21 @@ public class MainController {
                  * not as smooth*/
                 sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
                     /* if dragging slider, update media position */
-                    if (sldSeek.isValueChanging()) {
+
+                    if(! mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
+                        mediaPlayer.seek(totalDuration.multiply(newValue.doubleValue()));
+                    } else if (sldSeek.isValueChanging()) {
                         // multiply duration by percentage calculated by slider position
                         mediaPlayer.seek(totalDuration.multiply(newValue.doubleValue()));
                     }
                 });
 
+
+
                 /** if dragging slider, update media playback rate */
                 sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
                     if (sldRate.isValueChanging()) {
                         mediaPlayer.setRate(newValue.doubleValue());
-                    }
-                });
-
-                // TODO: better number for this?
-                // TODO: when slider is focused doesn't move timeline
-                sldSeek.setBlockIncrement(0.001);
-
-                /** handle arrow keys for moving at small increments in audio file **/
-                sldSeek.getScene().setOnKeyPressed((keyEvent) -> {
-
-                    switch (keyEvent.getCode()) {
-
-                        case LEFT:
-                            //Stop letting it do anything else
-                            keyEvent.consume();
-
-                            Duration GoTo = mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5));
-                            timeLine.getAnimation().jumpTo(GoTo);
-                            mediaPlayer.seek(GoTo);
-                            break;
-
-                        case RIGHT:
-                            //Stop letting it do anything else
-                            keyEvent.consume();
-
-                            GoTo = mediaPlayer.getCurrentTime().add(Duration.seconds(0.5));
-                            timeLine.getAnimation().jumpTo(GoTo);
-                            mediaPlayer.seek(GoTo);
-                            break;
-
-                        case SPACE:
-                            //TODO: this doesn't work. somthing is blocking?
-                            keyEvent.consume();
-
-                            System.out.println("space");
-                            if ( mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING) ) {
-                                mediaPlayer.pause();
-                            } else {
-                                mediaPlayer.play();
-                            }
-                            break;
-
                     }
                 });
 
@@ -1025,7 +989,16 @@ public class MainController {
          */
         sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
             /* if dragging slider, update timeline position */
-            if (sldSeek.isValueChanging()) {
+            //if (sldSeek.isValueChanging()) {
+                //timeLine.getAnimation().pause();
+                // multiply duration by percentage calculated by slider position
+                //timeLine.getAnimation().jumpTo(totalDuration.multiply(newValue.doubleValue()));
+            //}
+            if (! mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING) ) {
+                timeLine.getAnimation().pause();
+                // multiply duration by percentage calculated by slider position
+                timeLine.getAnimation().jumpTo(totalDuration.multiply(newValue.doubleValue()));
+            } else if (sldSeek.isValueChanging()) {
                 timeLine.getAnimation().pause();
                 // multiply duration by percentage calculated by slider position
                 timeLine.getAnimation().jumpTo(totalDuration.multiply(newValue.doubleValue()));
@@ -1116,6 +1089,8 @@ public class MainController {
 
                 // resize window
                 ourTown.sizeToScene();
+                double windW = appPrefs.getDouble("main.wind.w", 800.0);
+                ourTown.setWidth(windW);
 
                 break;
 
@@ -1138,9 +1113,6 @@ public class MainController {
 
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
-
-                // resize app window
-                ourTown.sizeToScene();
 
 
                 /* Listener: currentTime
@@ -1198,7 +1170,80 @@ public class MainController {
                 // force last marker
                 gotoLastMarker();
 
+                // resize app window
+                windW = appPrefs.getDouble("main.wind.w", 800.0);
+                ourTown.setWidth(windW);
+                // enforce 600 min height for coding window
+                double windH = appPrefs.getDouble("main.wind.h", 600.0);
+                if( windH < 600.0) {
+                    ourTown.setHeight(600.0);
+                } else {
+                    ourTown.setHeight(windH);
+                }
+
+
+
+
+                /**
+                 * Key operation override
+                 *
+                 * handle arrow keys for moving at small increments in audio file
+                 * handle Shift+Space of pause/play when mediaplayer does not have focus.
+                 * handle Shift+U for Uncode
+                 **/
+                sldSeek.getScene().setOnKeyPressed((keyEvent) -> {
+
+                    switch (keyEvent.getCode()) {
+
+                        case LEFT:
+                            // move media play left
+                            keyEvent.consume();
+
+                            Duration GoTo = mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5));
+                            timeLine.getAnimation().jumpTo(GoTo);
+                            mediaPlayer.seek(GoTo);
+                            break;
+
+                        case RIGHT:
+                            // move media play right
+                            keyEvent.consume();
+
+                            GoTo = mediaPlayer.getCurrentTime().add(Duration.seconds(0.5));
+                            timeLine.getAnimation().jumpTo(GoTo);
+                            mediaPlayer.seek(GoTo);
+                            break;
+
+                        case SPACE:
+                            // play/pause
+                            // Shift+Space let mediaplayer or textarea handle SPACE
+                            if (keyEvent.isShiftDown()) {
+
+                                keyEvent.consume();
+
+                                if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
+                                    mediaPlayer.pause();
+                                } else {
+                                    mediaPlayer.play();
+                                }
+                            }
+                            break;
+
+                        case U:
+                            // uncode
+                            if (keyEvent.isShiftDown()) {
+                                keyEvent.consume();
+
+                                // remove the last code
+                                removeLastUtterance();
+                                // uncoding may exhaust available codes so update button state
+                                setPlayerButtonState();
+                            }
+                            break;
+                    }
+                });
+
                 break;
+
 
 
             case GLOBAL_CODING:
@@ -1241,8 +1286,16 @@ public class MainController {
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
 
-                // resize window
-                ourTown.sizeToScene();
+                // resize app window
+                windW = appPrefs.getDouble("main.wind.w", 800.0);
+                ourTown.setWidth(windW);
+                // enforce 600 min height for coding window
+                windH = appPrefs.getDouble("main.wind.h", 600.0);
+                if( windH < 600.0) {
+                    ourTown.setHeight(600.0);
+                } else {
+                    ourTown.setHeight(windH);
+                }
 
                 break;
 

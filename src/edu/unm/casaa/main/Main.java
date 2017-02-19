@@ -53,12 +53,13 @@ public class Main extends Application {
         // main window position and size from preferences
         double windX = appPrefs.getDouble("main.wind.x", 0.0);
         double windY = appPrefs.getDouble("main.wind.y", 0.0);
-        //double windH = appPrefs.getDouble("main.wind.h", 0.0);
-        double windW = appPrefs.getDouble("main.wind.w", 640.0);
+        //double windH = appPrefs.getDouble("main.wind.h", 600.0);
+        double windW = appPrefs.getDouble("main.wind.w", 800.0);
         mainStage.setX(windX);
         mainStage.setY(windY);
         //mainStage.setHeight(windH);
         mainStage.setWidth(windW);
+        //mainStage.sizeToScene();
         mainStage.setTitle(resourceStrings.getString("wind.title.main"));
 
         // application window icon is set
