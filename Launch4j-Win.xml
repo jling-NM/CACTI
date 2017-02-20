@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\josef\projects\cacti2\out\artifacts\CACTI_jar\CACTI.jar</jar>
-  <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti.exe</outfile>
+  <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti-0_31_0.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -14,6 +14,10 @@
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
   <icon>C:\Users\josef\projects\cacti2\media\cacti.ico</icon>
+  <singleInstance>
+    <mutexName>CACTI_2_0310</mutexName>
+    <windowTitle></windowTitle>
+  </singleInstance>
   <jre>
     <path></path>
     <bundledJre64Bit>false</bundledJre64Bit>

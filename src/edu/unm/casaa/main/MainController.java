@@ -30,8 +30,11 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -893,17 +896,32 @@ public class MainController {
                  * but when i use "valueChangingProperty" this performance is
                  * not as smooth*/
                 sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-                    /* if dragging slider, update media position */
 
+                    /* first part only applied to arrow key change */
                     if(! mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
                         mediaPlayer.seek(totalDuration.multiply(newValue.doubleValue()));
                     } else if (sldSeek.isValueChanging()) {
+                        /* this only applies if user click on slider know and drags it
+                           if dragging slider, update media position
+                         */
                         // multiply duration by percentage calculated by slider position
                         mediaPlayer.seek(totalDuration.multiply(newValue.doubleValue()));
                     }
                 });
 
-
+                /**
+                 * grab keypress only from focused sldSeek
+                 * heavy handed approach; pause
+                 * arrow keys work as expected when sldSeek does NOT have focus as that is handled by coding keypress events
+                 */
+                sldSeek.setOnKeyPressed((event) -> {
+                    if ( (event.getCode() == KeyCode.LEFT) || (event.getCode() == KeyCode.RIGHT) ){
+                        //if (sldSeek.isValueChanging()) {
+                        //    mediaPlayer.pause();
+                        //}
+                        mediaPlayer.seek(totalDuration.multiply( sldSeek.getValue() ));
+                    }
+                });
 
                 /** if dragging slider, update media playback rate */
                 sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -1028,6 +1046,7 @@ public class MainController {
         timeLine.getAnimation().play(); // have to start before jumpto will work
         timeLine.getAnimation().pause();
         timeLine.getAnimation().jumpTo(mediaPlayer.getCurrentTime());
+
     }
 
 
@@ -1182,8 +1201,6 @@ public class MainController {
                 }
 
 
-
-
                 /**
                  * Key operation override
                  *
@@ -1191,7 +1208,7 @@ public class MainController {
                  * handle Shift+Space of pause/play when mediaplayer does not have focus.
                  * handle Shift+U for Uncode
                  **/
-                sldSeek.getScene().setOnKeyPressed((keyEvent) -> {
+                sldRate.getScene().setOnKeyPressed((keyEvent) -> {
 
                     switch (keyEvent.getCode()) {
 
