@@ -1,7 +1,26 @@
+------ 0.40.0 ------
+20170220 - jl
+--------------------
+CHANGES:
+- Coding buttons expand with window resize
+- Uncode/Rewind button behavior change: 1) remove last code; 2) move back to time of previous code;
+- File Menu item for changing user config file in use
+- Coding screen now displays active user config file
+- Key mapping now active in the Coding Screen:
+      Left Arrow:       Move back in audio file by 0.5 seconds
+      Right Arrow:      Move forward in audio file by 0.5 seconds
+      Up Arrow:         Increase application volume
+      Down Arrow:       Decrease application volume
+      Shift+Space Bar:  Play/pause
+      Shift+y:          Replay last utterance
+      Shift+u:          Uncode last utterance
+      Shift+p:          Uncode/Rewind (see above)
+
+
+
 ------ 0.31.0 ------
 20170207 - jl
 --------------------
-
 CHANGES:
 - Remove "uncode 4 times" notice
 - MISC code underscore was being interpreted as mnemonic
@@ -14,7 +33,6 @@ CHANGES:
 ------ 0.30.0 ------
 201600909 - jl
 --------------------
-
 CHANGES:
 - Updated file write to NIO BufferWriter as an minimum to make more network friendly.
 - Discontinue writing *.backup files.

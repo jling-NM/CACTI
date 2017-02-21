@@ -18,10 +18,12 @@ This source code file is part of the CASAA Treatment Coding System Utility
 
 package edu.unm.casaa.main;
 
+import edu.unm.casaa.globals.GlobalCode;
+import edu.unm.casaa.globals.GlobalDataModel;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
-import edu.unm.casaa.utterance.*;
-import edu.unm.casaa.globals.*;
+import edu.unm.casaa.utterance.Utterance;
+import edu.unm.casaa.utterance.UtteranceList;
 import javafx.animation.Animation;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,11 +32,8 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -44,8 +43,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -55,6 +58,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
+
 import static java.lang.String.format;
 
 
@@ -271,10 +275,7 @@ public class MainController {
      **********************************************************************/
     @SuppressWarnings("UnusedParameters")
     public void btnActUncode(ActionEvent actionEvent) {
-        // remove the last code
-        removeLastUtterance();
-        // uncoding may exhaust available codes so update button state
-        setPlayerButtonState();
+        uncode();
     }
 
 
@@ -287,30 +288,9 @@ public class MainController {
      *  @param actionEvent not used
      **********************************************************************/
     public void btnActUncodeReplay(ActionEvent actionEvent) {
-
-        Utterance lastUtterance = getUtteranceList().last();
-        if (lastUtterance != null) {
-
-            // new playback position defaults to 1 second before the last code before we remove it
-            Duration newPlaybackTimePos = lastUtterance.getStartTime().subtract(Duration.ONE);
-
-            // remove the last code
-            removeLastUtterance();
-
-            // get last utterance now
-            Utterance prevUtterance = getUtteranceList().last();
-            if (prevUtterance != null) {
-                // Position one second before start of this previous utterance.
-                newPlaybackTimePos = prevUtterance.getStartTime().subtract(Duration.ONE);
-            }
-
-            // move to new position
-            setMediaPlayerPosition(newPlaybackTimePos);
-
-            // uncoding may exhaust available codes so update button state
-            setPlayerButtonState();
-        }
+        uncodeReplay();
     }
+
 
 
     /**********************************************************************
@@ -894,7 +874,8 @@ public class MainController {
                  * Otherwise, do nothing. See sldSeekMousePressed() for when slider is clicked with mouse
                  * Seems odd to bind to valueProperty and check isValueChanging
                  * but when i use "valueChangingProperty" this performance is
-                 * not as smooth*/
+                 * not as smooth
+                 **/
                 sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
 
                     /* first part only applied to arrow key change */
@@ -910,18 +891,18 @@ public class MainController {
                 });
 
                 /**
-                 * grab keypress only from focused sldSeek
-                 * heavy handed approach; pause
-                 * arrow keys work as expected when sldSeek does NOT have focus as that is handled by coding keypress events
+                 * KEYPRESS behavior not changed here see initializeUserControls()
+                 * There a better behavior is mapped.
+                 * i couldn't get the arrow key behavior to work smoothly when sldSeek is focus
                  */
-                sldSeek.setOnKeyPressed((event) -> {
+/*                sldSeek.setOnKeyPressed((event) -> {
                     if ( (event.getCode() == KeyCode.LEFT) || (event.getCode() == KeyCode.RIGHT) ){
-                        //if (sldSeek.isValueChanging()) {
-                        //    mediaPlayer.pause();
-                        //}
+                        if ( mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
+                            mediaPlayer.pause();
+                        }
                         mediaPlayer.seek(totalDuration.multiply( sldSeek.getValue() ));
                     }
-                });
+                });*/
 
                 /** if dragging slider, update media playback rate */
                 sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -1064,13 +1045,13 @@ public class MainController {
         lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
 
         // this will store name of loaded set of controls; defaults to PLAYBACK
-        String currentUserControls = GuiState.PLAYBACK.name();
+        //String currentUserControls = GuiState.PLAYBACK.name();
 
         // if we have more than 2 we have user controls
-        if( vbApp.getChildren().size() > 2 ) {
+        //if( vbApp.getChildren().size() > 2 ) {
             // get usercontrols content node name
-            currentUserControls = vbApp.getChildren().get(2).getId();
-        }
+            //currentUserControls = vbApp.getChildren().get(2).getId();
+        //}
 
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
@@ -1114,6 +1095,7 @@ public class MainController {
                 break;
 
 
+
             case MISC_CODING:
 
                 resetUserControlsContainer();
@@ -1128,6 +1110,7 @@ public class MainController {
                 }
 
                 // display controls needed for coding
+
                 setPlayerButtonState();
 
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
@@ -1215,19 +1198,25 @@ public class MainController {
                         case LEFT:
                             // move media play left
                             keyEvent.consume();
-
-                            Duration GoTo = mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5));
-                            timeLine.getAnimation().jumpTo(GoTo);
-                            mediaPlayer.seek(GoTo);
+                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
                             break;
 
                         case RIGHT:
                             // move media play right
                             keyEvent.consume();
+                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
+                            break;
 
-                            GoTo = mediaPlayer.getCurrentTime().add(Duration.seconds(0.5));
-                            timeLine.getAnimation().jumpTo(GoTo);
-                            mediaPlayer.seek(GoTo);
+                        case UP:
+                            // volume up
+                            keyEvent.consume();
+                            sldVolume.adjustValue(sldVolume.getValue() + 0.1);
+                            break;
+
+                        case DOWN:
+                            // volume down
+                            keyEvent.consume();
+                            sldVolume.adjustValue(sldVolume.getValue() - 0.1);
                             break;
 
                         case SPACE:
@@ -1249,15 +1238,35 @@ public class MainController {
                             // uncode
                             if (keyEvent.isShiftDown()) {
                                 keyEvent.consume();
-
-                                // remove the last code
-                                removeLastUtterance();
-                                // uncoding may exhaust available codes so update button state
-                                setPlayerButtonState();
+                                uncode();
                             }
                             break;
+
+                        case P:
+                            // uncode/replay
+                            if (keyEvent.isShiftDown()) {
+                                keyEvent.consume();
+                                uncodeReplay();
+                            }
+                            break;
+
+                        case Y:
+                            // replay last code
+                            if (keyEvent.isShiftDown()) {
+                                keyEvent.consume();
+                                gotoLastMarker();
+                            }
+                            break;
+
                     }
                 });
+
+                /*
+                    here override sldSeek keypress with the above behaviors.
+                    This was chosen because the arrow key navigation with sldSeek focus
+                    doesn't work very smoothly.
+                 */
+                sldSeek.onKeyPressedProperty().bind(sldRate.getScene().onKeyPressedProperty());
 
                 break;
 
@@ -1418,8 +1427,7 @@ public class MainController {
     private boolean isUncodeAvailable() {
         Utterance l = getUtteranceList().last();
 
-        if( l != null ) return true;
-        else return false;
+        return l != null;
     }
 
 
@@ -1449,6 +1457,52 @@ public class MainController {
             showError("Error writing casaa file", e.getMessage());
         }
     }
+
+
+    /**********************************************************************
+     *  shared method:
+     *  Remove last utterance
+     **********************************************************************/
+    private void uncode() {
+        // remove the last code
+        removeLastUtterance();
+        // uncoding may exhaust available codes so update button state
+        setPlayerButtonState();
+    }
+
+
+    /**
+     *  shared method
+     *  Uncode last utterance.
+     *  If more utterances exist then move to 1 second prior to the
+     *  previous code. Otherwise, move to 1 second prior to that last code
+     */
+    private void uncodeReplay() {
+
+        Utterance lastUtterance = getUtteranceList().last();
+        if (lastUtterance != null) {
+
+            // new playback position defaults to 1 second before the last code before we remove it
+            Duration newPlaybackTimePos = lastUtterance.getStartTime().subtract(Duration.ONE);
+
+            // remove the last code
+            removeLastUtterance();
+
+            // get last utterance now
+            Utterance prevUtterance = getUtteranceList().last();
+            if (prevUtterance != null) {
+                // Position one second before start of this previous utterance.
+                newPlaybackTimePos = prevUtterance.getStartTime().subtract(Duration.ONE);
+            }
+
+            // move to new position
+            setMediaPlayerPosition(newPlaybackTimePos);
+
+            // uncoding may exhaust available codes so update button state
+            setPlayerButtonState();
+        }
+    }
+
 
 
     /**
