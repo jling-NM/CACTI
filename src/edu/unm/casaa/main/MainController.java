@@ -34,6 +34,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -157,6 +158,8 @@ public class MainController {
 
     private TimeLine timeLine;
 
+    private Boolean isKeyFilterSet       = Boolean.FALSE; //
+
 
 
 
@@ -181,6 +184,7 @@ public class MainController {
 
         // load user config file to load user specific edited codes
         parseUserConfig();
+
     }
 
 
@@ -200,12 +204,10 @@ public class MainController {
      ******************************************************************/
     @FXML
     private void initialize() {
-
         // Use OS X standard menus no Java window menus
         if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
             menuBar.setUseSystemMenuBar(true);
         }
-
     }
 
 
@@ -1014,7 +1016,6 @@ public class MainController {
         // save this window's stage for resizing new controls
         Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
-
         // common control updates; file name in mediaplayer
         lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
 
@@ -1056,8 +1057,6 @@ public class MainController {
                 ourTown.sizeToScene();
                 double windW = appPrefs.getDouble("main.wind.w", 800.0);
                 ourTown.setWidth(windW);
-
-                mapKeyFunctions();
 
                 break;
 
@@ -1149,9 +1148,6 @@ public class MainController {
                     ourTown.setHeight(windH);
                 }
 
-
-                mapKeyFunctions();
-
                 break;
 
 
@@ -1207,13 +1203,24 @@ public class MainController {
                     ourTown.setHeight(windH);
                 }
 
-                mapKeyFunctions();
-
                 break;
 
         }
 
+
+        /**
+         * capture keypresses at scene level in the event chain
+         * to control some overall key functions
+         */
+        if(!isKeyFilterSet) {
+            ourTown.addEventFilter( KeyEvent.KEY_PRESSED, ke -> { mapKeyFunctions(ke); });
+            isKeyFilterSet = Boolean.TRUE;
+        }
+
     }
+
+
+
 
 
     /**********************************************************************
@@ -1451,6 +1458,8 @@ public class MainController {
     public void handleUserCodesError(File file, String message) {
         showFatalWarning("Failed to load user codes", "Error loading file: " + file.getAbsolutePath() + "\n" + message);
     }
+
+
 
 
     /**
@@ -2020,236 +2029,91 @@ public class MainController {
      * Key operation override
      *
      * handle arrow keys for moving at small increments in audio file
-     * handle Shift+Space of pause/play when mediaplayer does not have focus.
-     * handle Shift+U for Uncode
      *
      */
-    private void mapKeyFunctions() {
+    private void mapKeyFunctions(KeyEvent ke) {
 
-        // GuiState determines action
-        switch (getGuiState()) {
+        switch (ke.getCode()) {
 
-            case PLAYBACK:
-
-                sldRate.getScene().setOnKeyPressed((keyEvent) -> {
-
-                    switch (keyEvent.getCode()) {
-
-                        case LEFT:
-                            // move media play left
-                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
-                            keyEvent.consume();
-                            break;
-
-                        case RIGHT:
-                            // move media play right
-                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
-                            keyEvent.consume();
-                            break;
-
-                        case UP:
-                            // volume up
-                            sldVolume.adjustValue(sldVolume.getValue() + 0.1);
-                            keyEvent.consume();
-                            break;
-
-                        case DOWN:
-                            // volume down
-                            sldVolume.adjustValue(sldVolume.getValue() - 0.1);
-                            keyEvent.consume();
-                            break;
-
-                        case SPACE:
-                            // play/pause
-                            // Shift+Space otherwise highlighted control is activated on SPACE
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
-                                    mediaPlayer.pause();
-                                } else {
-                                    mediaPlayer.play();
-                                }
-                            }
-                            break;
-
-                        case O:
-                            // rewind 5 sec
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                rewind();
-                            }
-                            break;
-
-                    }
-                });
-
-                /*
-                    here override sldSeek keypress with the scene behavior above
-                 */
-                sldSeek.onKeyPressedProperty().bind(sldRate.getScene().onKeyPressedProperty());
-
+            case LEFT:
+                // move media play left
+                ke.consume();
+                setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
                 break;
 
+            case RIGHT:
+                // move media play right
+                ke.consume();
+                setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
+                break;
 
+            case UP:
+                // volume up
+                ke.consume();
+                sldVolume.adjustValue(sldVolume.getValue() + 0.1);
+                break;
 
-            case MISC_CODING:
+            case DOWN:
+                // volume down
+                ke.consume();
+                sldVolume.adjustValue(sldVolume.getValue() - 0.1);
+                break;
 
-                sldRate.getScene().setOnKeyPressed((keyEvent) -> {
-
-                    switch (keyEvent.getCode()) {
-
-                        case LEFT:
-                            // move media play left
-                            //if (keyEvent.isShiftDown()) {
-                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
-                            //};
-                            keyEvent.consume();
-                            break;
-
-                        case RIGHT:
-                            //if (keyEvent.isShiftDown()) {
-                            // move media play right
-                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
-                            //};
-                            keyEvent.consume();
-                            break;
-
-                        case UP:
-                            // volume up
-                            //if (keyEvent.isShiftDown()) {
-                            sldVolume.adjustValue(sldVolume.getValue() + 0.1);
-                            //}
-                            keyEvent.consume();
-                            break;
-
-                        case DOWN:
-                            // volume down
-                            //if (keyEvent.isShiftDown()) {
-                            sldVolume.adjustValue(sldVolume.getValue() - 0.1);
-                            //}
-                            keyEvent.consume();
-                            break;
-
-                        case SPACE:
-                            // play/pause
-                            // Shift+Space otherwise highlighted control is activated on SPACE
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-
-                                if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
-                                    mediaPlayer.pause();
-                                } else {
-                                    mediaPlayer.play();
-                                }
-                            }
-                            break;
-
-                        case Y:
-                            // replay last code
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                gotoLastMarker();
-                            }
-                            break;
-
-                        case U:
-                            // uncode
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                uncode();
-                            }
-                            break;
-
-                        case I:
-                            // uncode/replay
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                uncodeReplay();
-                            }
-                            break;
-
-                        case O:
-                            // rewind 5 sec
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                rewind();
-                            }
-                            break;
-
+            case SPACE:
+                // play/pause
+                if( getGuiState().equals(GuiState.GLOBAL_CODING) && ke.getTarget() instanceof javafx.scene.control.TextArea ) {
+                    break;
+                } else {
+                    ke.consume();
+                    if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
+                        mediaPlayer.pause();
+                    } else {
+                        mediaPlayer.play();
                     }
-                });
+                }
+                break;
 
-                /*
-                    here override sldSeek keypress with the scene behavior above
-                 */
-                sldSeek.onKeyPressedProperty().bind(sldRate.getScene().onKeyPressedProperty());
-
-            break;
-
-
-            case GLOBAL_CODING:
-
-                sldRate.getScene().setOnKeyPressed((keyEvent) -> {
-
-                    switch (keyEvent.getCode()) {
-
-                        case LEFT:
-                            // move media play left
-                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
-                            keyEvent.consume();
-                            break;
-
-                        case RIGHT:
-                            // move media play right
-                            setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
-                            keyEvent.consume();
-                            break;
-
-                        case UP:
-                            // volume up
-                            sldVolume.adjustValue(sldVolume.getValue() + 0.1);
-                            keyEvent.consume();
-                            break;
-
-                        case DOWN:
-                            // volume down
-                            sldVolume.adjustValue(sldVolume.getValue() - 0.1);
-                            keyEvent.consume();
-                            break;
-
-                        case SPACE:
-                            // play/pause
-                            // Shift+Space otherwise highlighted control is activated on SPACE
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
-                                    mediaPlayer.pause();
-                                } else {
-                                    mediaPlayer.play();
-                                }
-                            }
-                            break;
-
-                        case O:
-                            // rewind 5 sec
-                            if (keyEvent.isShiftDown()) {
-                                keyEvent.consume();
-                                rewind();
-                            }
-                            break;
-
+            case Y:
+                // replay last code
+                if (ke.isShiftDown()) {
+                    if( getGuiState().equals(GuiState.MISC_CODING)) {
+                        ke.consume();
+                        gotoLastMarker();
                     }
-                });
+                }
+                break;
 
-                /*
-                    here override sldSeek keypress with the scene behavior above
-                 */
-                sldSeek.onKeyPressedProperty().bind(sldRate.getScene().onKeyPressedProperty());
+            case U:
+                // uncode
+                if (ke.isShiftDown()) {
+                    if( getGuiState().equals(GuiState.MISC_CODING)) {
+                        ke.consume();
+                        uncode();
+                    }
+                }
+                break;
 
+            case I:
+                // uncode/replay
+                if (ke.isShiftDown()) {
+                    if( getGuiState().equals(GuiState.MISC_CODING)) {
+                        ke.consume();
+                        uncodeReplay();
+                    }
+                }
+                break;
+
+            case O:
+                // rewind 5 sec
+                if (ke.isShiftDown()) {
+                    ke.consume();
+                    rewind();
+                }
                 break;
 
         }
     }
+
 
 
 
