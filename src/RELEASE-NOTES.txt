@@ -1,5 +1,5 @@
------- 0.40.0 ------
-20170220 - jl
+------ 0.41.0 ------
+20170307 - jl
 --------------------
 CHANGES:
 - Coding buttons expand with window resize
@@ -11,11 +11,11 @@ CHANGES:
       Right Arrow:      Move forward in audio file by 0.5 seconds
       Up Arrow:         Increase application volume
       Down Arrow:       Decrease application volume
-      Shift+Space Bar:  Play/pause
+      Space Bar:        Play/pause
       Shift+y:          Replay last utterance
       Shift+u:          Uncode last utterance
-      Shift+p:          Uncode/Rewind (see above)
-
+      Shift+i:          Uncode/Rewind (see above)
+      Shift+p:          Rewind 5 secs
 
 
 ------ 0.31.0 ------

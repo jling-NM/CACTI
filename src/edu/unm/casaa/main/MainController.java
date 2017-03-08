@@ -980,6 +980,9 @@ public class MainController {
             }
         });
 
+break here now        mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+            timeLine.getAnimation().playFrom(newValue);
+        });
 
         /**
          * Playback rate binding
@@ -1236,17 +1239,19 @@ public class MainController {
         switch (mediaPlayer.getStatus()) {
 
             case PLAYING:
-                mediaPlayer.seek(position);
-                lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
-
+                break here now
+            System.out.println("setMediaPosition while playing");
+/*                mediaPlayer.seek(position);
+                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
                 if(timeLine != null) {
                     timeLine.getAnimation().playFrom(position);
                 }
-                break;
+
+                break;*/
 
             case PAUSED:
                 mediaPlayer.seek(position);
-                lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
 
                 if(timeLine != null) {
                     timeLine.getAnimation().jumpTo(position);

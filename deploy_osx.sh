@@ -1,7 +1,7 @@
 #!/bin/bash
 
-version=0.40.0
-bundleversion=0.40.0
+version=0.41.0
+bundleversion=0.41.0
 appname=CACTI
 
 ### jar ###
@@ -34,6 +34,6 @@ javapackager \
 -Bruntime=/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home \
 -Bmac.CFBundleIdentifier=edu.unm.casaa.cacti \
 -Bmac.CFBundleName=$appname \
--Bmac.CFBundleVersion=040
+-Bmac.CFBundleVersion=041
 
 
