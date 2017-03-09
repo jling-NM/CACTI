@@ -577,6 +577,15 @@ public class MainController {
         setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
     }
 
+/*    public void onMouseDragReleased(Event event) {
+        System.out.println("onMouseDragReleased");
+        //setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
+    }
+
+    public void onMouseReleased(Event event) {
+        System.out.println("onMouseReleased");
+        //setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
+    }*/
 
     /************************************************************************
      * get and persist audio file
@@ -980,9 +989,6 @@ public class MainController {
             }
         });
 
-break here now        mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-            timeLine.getAnimation().playFrom(newValue);
-        });
 
         /**
          * Playback rate binding
@@ -1239,30 +1245,47 @@ break here now        mediaPlayer.currentTimeProperty().addListener((observable,
         switch (mediaPlayer.getStatus()) {
 
             case PLAYING:
-                break here now
-            System.out.println("setMediaPosition while playing");
-/*                mediaPlayer.seek(position);
-                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+
                 if(timeLine != null) {
                     timeLine.getAnimation().playFrom(position);
                 }
 
-                break;*/
+                    /*Platform.runLater(new Runnable() {
+                        public void run() {
+                            System.out.println("\nPos:" + position.toString());
+                            System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
+                            mediaPlayer.seek(position);
+                            System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
+
+                        }
+                    });*/
+
+                //System.out.println("\nPos:" + position.toString());
+                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
+                mediaPlayer.seek(position);
+                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
+                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+                break;
 
             case PAUSED:
-                mediaPlayer.seek(position);
-                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
 
                 if(timeLine != null) {
                     timeLine.getAnimation().jumpTo(position);
                 }
+
+                //System.out.println("\nPos:" + position.toString());
+                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
+                mediaPlayer.seek(position);
+                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
+
                 break;
 
             case READY:
+
                 mediaPlayer.pause();
 
                 mediaPlayer.seek(position);
-                lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
+                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
 
                 if(timeLine != null) {
                     timeLine.getAnimation().pause();
@@ -2042,14 +2065,14 @@ break here now        mediaPlayer.currentTimeProperty().addListener((observable,
 
             case LEFT:
                 // move media play left
-                ke.consume();
                 setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
+                ke.consume();
                 break;
 
             case RIGHT:
                 // move media play right
-                ke.consume();
                 setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
+                ke.consume();
                 break;
 
             case UP:
@@ -2069,12 +2092,12 @@ break here now        mediaPlayer.currentTimeProperty().addListener((observable,
                 if( getGuiState().equals(GuiState.GLOBAL_CODING) && ke.getTarget() instanceof javafx.scene.control.TextArea ) {
                     break;
                 } else {
-                    ke.consume();
                     if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
                         mediaPlayer.pause();
                     } else {
                         mediaPlayer.play();
                     }
+                    ke.consume();
                 }
                 break;
 
@@ -2082,8 +2105,8 @@ break here now        mediaPlayer.currentTimeProperty().addListener((observable,
                 // replay last code
                 if (ke.isShiftDown()) {
                     if( getGuiState().equals(GuiState.MISC_CODING)) {
-                        ke.consume();
                         gotoLastMarker();
+                        ke.consume();
                     }
                 }
                 break;
@@ -2092,8 +2115,8 @@ break here now        mediaPlayer.currentTimeProperty().addListener((observable,
                 // uncode
                 if (ke.isShiftDown()) {
                     if( getGuiState().equals(GuiState.MISC_CODING)) {
-                        ke.consume();
                         uncode();
+                        ke.consume();
                     }
                 }
                 break;
@@ -2102,8 +2125,8 @@ break here now        mediaPlayer.currentTimeProperty().addListener((observable,
                 // uncode/replay
                 if (ke.isShiftDown()) {
                     if( getGuiState().equals(GuiState.MISC_CODING)) {
-                        ke.consume();
                         uncodeReplay();
+                        ke.consume();
                     }
                 }
                 break;
@@ -2111,8 +2134,8 @@ break here now        mediaPlayer.currentTimeProperty().addListener((observable,
             case O:
                 // rewind 5 sec
                 if (ke.isShiftDown()) {
-                    ke.consume();
                     rewind();
+                    ke.consume();
                 }
                 break;
 

@@ -1,5 +1,5 @@
 ------ 0.41.0 ------
-20170307 - jl
+20170308 - jl
 --------------------
 CHANGES:
 - Coding buttons expand with window resize
@@ -16,6 +16,13 @@ CHANGES:
       Shift+u:          Uncode last utterance
       Shift+i:          Uncode/Rewind (see above)
       Shift+p:          Rewind 5 secs
+
+
+KNOWN ISSUES:
+    mediaplayer.seek() inconsistencies
+    Possibly related to bug scheduled to be fixed in Java 9
+        https://bugs.openjdk.java.net/browse/JDK-8151164
+
 
 
 ------ 0.31.0 ------
