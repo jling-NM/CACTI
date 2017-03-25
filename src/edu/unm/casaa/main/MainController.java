@@ -598,7 +598,7 @@ public class MainController {
         FileChooser fc = new FileChooser();
         fc.setTitle("Open audio file");
         fc.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Audio Files (*.wav, *.mp3)", "*.wav","*.mp3")
+                new FileChooser.ExtensionFilter("Audio Files (*.wav, *.m4a, *.aac)", "*.wav","*.m4a","*.aac")
         );
 
         // set initial directory to preferences or users home directory
@@ -869,11 +869,13 @@ public class MainController {
 
 
                     /*
-                        option 2: pause at end so user can code
+                        option 2: pause at end so user can doing coding in timeline as needed
                      */
-                    timeLine.getAnimation().pause();
+                    if(timeLine != null) {
+                        timeLine.getAnimation().pause();
+                    }
                     mediaPlayer.pause();
-                    // shouldn't have to do this...
+                    // assumes OnPlay has overlayed style class so just remove that to expose pause class
                     btnPlayImgVw.getStyleClass().remove("img-btn-pause");
                 });
 
@@ -1222,7 +1224,7 @@ public class MainController {
          * to control some overall key functions
          */
         if(!isKeyFilterSet) {
-            ourTown.addEventFilter( KeyEvent.KEY_PRESSED, ke -> { mapKeyFunctions(ke); });
+            ourTown.addEventFilter( KeyEvent.KEY_PRESSED, ke ->  mapKeyFunctions(ke) );
             isKeyFilterSet = Boolean.TRUE;
         }
 
@@ -1249,22 +1251,7 @@ public class MainController {
                 if(timeLine != null) {
                     timeLine.getAnimation().playFrom(position);
                 }
-
-                    /*Platform.runLater(new Runnable() {
-                        public void run() {
-                            System.out.println("\nPos:" + position.toString());
-                            System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
-                            mediaPlayer.seek(position);
-                            System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
-
-                        }
-                    });*/
-
-                //System.out.println("\nPos:" + position.toString());
-                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
                 mediaPlayer.seek(position);
-                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
-                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
                 break;
 
             case PAUSED:
@@ -1272,20 +1259,13 @@ public class MainController {
                 if(timeLine != null) {
                     timeLine.getAnimation().jumpTo(position);
                 }
-
-                //System.out.println("\nPos:" + position.toString());
-                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
                 mediaPlayer.seek(position);
-                //System.out.println("mp :" + mediaPlayer.getCurrentTime().toString());
-
                 break;
 
             case READY:
 
                 mediaPlayer.pause();
-
                 mediaPlayer.seek(position);
-                //lblTimePos.setText(Utils.formatDuration(totalDuration.multiply(sldSeek.getValue())));
 
                 if(timeLine != null) {
                     timeLine.getAnimation().pause();
