@@ -19,7 +19,7 @@ CHANGES:
 
 
 KNOWN ISSUES:
-    mediaplayer.seek() inconsistencies
+    mediaplayer.seek() inconsistencies with mp3 file playback
     Possibly related to bug scheduled to be fixed in Java 9
         https://bugs.openjdk.java.net/browse/JDK-8151164
 
