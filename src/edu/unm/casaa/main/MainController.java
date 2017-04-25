@@ -577,15 +577,7 @@ public class MainController {
         setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
     }
 
-/*    public void onMouseDragReleased(Event event) {
-        System.out.println("onMouseDragReleased");
-        //setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
-    }
 
-    public void onMouseReleased(Event event) {
-        System.out.println("onMouseReleased");
-        //setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
-    }*/
 
     /************************************************************************
      * get and persist audio file
@@ -593,12 +585,13 @@ public class MainController {
      ***********************************************************************/
     private File selectAudioFile() {
 
+
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
 
         FileChooser fc = new FileChooser();
         fc.setTitle("Open audio file");
         fc.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Audio Files (*.wav, *.m4a, *.aac)", "*.wav","*.m4a","*.aac")
+                new FileChooser.ExtensionFilter("Audio Files (*.wav, *.m4a)", "*.wav","*.m4a")
         );
 
         // set initial directory to preferences or users home directory

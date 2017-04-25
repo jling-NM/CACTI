@@ -1,7 +1,7 @@
 #!/bin/bash
 
-version=0.41.0
-bundleversion=0.41.0
+version=0.50.0
+bundleversion=0.50.0
 appname=CACTI
 
 ### jar ###

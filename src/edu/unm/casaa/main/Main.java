@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
@@ -63,9 +64,16 @@ public class Main extends Application {
         mainStage.setTitle(resourceStrings.getString("wind.title.main"));
 
         // application window icon is set
-        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_32.png")));
-        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_48.png")));
-        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/UNM_Color_64.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_24x24.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_32x32.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_48x48.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_64x64.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_96x96.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_128x128.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_256x256.png")));
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_512x512.png")));
+
 
 
         Scene mainScene = new Scene(root);
