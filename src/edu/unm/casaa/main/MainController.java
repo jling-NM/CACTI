@@ -323,14 +323,6 @@ public class MainController {
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
 
-/*
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(resourceStrings.getString("wind.title.about"));
-        alert.setHeaderText(null);
-        alert.setContentText(resourceStrings.getString("txt.about"));
-        alert.initStyle(StageStyle.UTILITY);
-        alert.showAndWait();
-*/
         Stage about = new Stage();
         Parent root = null;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("About.fxml"), resourceStrings);
