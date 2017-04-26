@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\josef\projects\cacti2\out\artifacts\CACTI_jar\CACTI.jar</jar>
-  <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti-0_41_0.exe</outfile>
+  <outfile>C:\Users\josef\projects\cacti2\out\artifacts\Cacti-0_50_0.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -13,9 +13,9 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\josef\projects\cacti2\media\cacti.ico</icon>
+  <icon>C:\Users\josef\projects\cacti2\media\windows.iconset\cacti.ico</icon>
   <singleInstance>
-    <mutexName>CACTI_2_0410</mutexName>
+    <mutexName>CACTI_2_0500</mutexName>
     <windowTitle></windowTitle>
   </singleInstance>
   <jre>
@@ -28,12 +28,12 @@
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <versionInfo>
-    <fileVersion>0.41.0.0</fileVersion>
-    <txtFileVersion>0.41.0</txtFileVersion>
+    <fileVersion>0.50.0.0</fileVersion>
+    <txtFileVersion>0.50.0</txtFileVersion>
     <fileDescription>The CASAA Application for Coding Treatment Interactions</fileDescription>
     <copyright>Copyright 2009</copyright>
-    <productVersion>0.41.0.0</productVersion>
-    <txtProductVersion>0.41.0</txtProductVersion>
+    <productVersion>0.50.0.0</productVersion>
+    <txtProductVersion>0.50.0</txtProductVersion>
     <productName>CACTI</productName>
     <companyName>Center on Alcoholism, Substance Abuse and Addictions at the University of New Mexico Albuquerque</companyName>
     <internalName>CACTI</internalName>
