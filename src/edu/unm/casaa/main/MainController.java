@@ -32,7 +32,10 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
@@ -41,6 +44,7 @@ import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -319,12 +323,29 @@ public class MainController {
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
 
+/*
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(resourceStrings.getString("wind.title.about"));
         alert.setHeaderText(null);
         alert.setContentText(resourceStrings.getString("txt.about"));
         alert.initStyle(StageStyle.UTILITY);
         alert.showAndWait();
+*/
+        Stage about = new Stage();
+        Parent root = null;
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("About.fxml"), resourceStrings);
+        try {
+            root = fxmlLoader.load();
+
+        } catch (Exception e){
+            showError("About: fxml Error in About ", format("%s\n", e.toString()));
+        }
+        about.setScene(new Scene(root));
+        about.setTitle(resourceStrings.getString("txt.about.title"));
+        about.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        about.initModality(Modality.APPLICATION_MODAL);
+        about.initStyle(StageStyle.UTILITY);
+        about.showAndWait();
     }
 
 

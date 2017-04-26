@@ -23,6 +23,10 @@
     -fx-image: url("/media/btn_uncodeReplay.png");
 }
 
+.img-about-bg {
+    -fx-image: url("/media/splash.png");
+}
+
 
 /* */
 .btnBarPane {
@@ -167,3 +171,4 @@
      -fx-background-radius: 3px;
      -fx-border-radius: 3px;
  }
+
