@@ -30,11 +30,16 @@
             <MenuItem fx:id="mniGlobalScore" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoring" text="%menu.title.global.score" />
           </items>
         </Menu>
-            <Menu text="%menu.title.help">
+            <Menu text="%menu.title.settings">
               <items>
-                <MenuItem fx:id="mniAbout" mnemonicParsing="false" onAction="#mniActAbout" text="%menu.title.help.about" />
-                  <MenuItem fx:id="mniOnlineHelp" mnemonicParsing="false" onAction="#mniActOnlineHelp" text="%menu.title.help.online" />
+                <MenuItem fx:id="mniSettingsKB" mnemonicParsing="false" onAction="#mniActSettingsKB" text="%menu.title.settings.kb" />
               </items>
+            </Menu>
+            <Menu text="%menu.title.help">
+               <items>
+                  <MenuItem fx:id="mniAbout1" mnemonicParsing="false" onAction="#mniActAbout" text="%menu.title.help.about" />
+                  <MenuItem fx:id="mniOnlineHelp1" mnemonicParsing="false" onAction="#mniActOnlineHelp" text="%menu.title.help.online" />
+               </items>
             </Menu>
       </menus>
     </MenuBar>

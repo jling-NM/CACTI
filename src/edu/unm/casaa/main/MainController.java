@@ -144,6 +144,13 @@ public class MainController {
 
 
 
+    // SETTINGS KB
+    @FXML
+    private TextField codingActionKeyReplay;
+
+
+
+
 
     private Preferences appPrefs;                       // User prefs persistence
 
@@ -307,7 +314,11 @@ public class MainController {
         insertUtterance(mc);
     }
 
-
+    //TODO: document if this is the only way to close none dialog window
+    public void btnSettingsShortcuts(ActionEvent actionEvent) {
+        Button src = (Button) actionEvent.getSource();
+        src.getScene().getWindow().hide();
+    }
 
 
 
@@ -338,6 +349,74 @@ public class MainController {
         about.initModality(Modality.APPLICATION_MODAL);
         about.initStyle(StageStyle.UTILITY);
         about.showAndWait();
+    }
+
+
+
+    /**********************************************************************
+     * menu selection event: About
+     **********************************************************************/
+    public void mniActSettingsKB(ActionEvent actionEvent) {
+
+        // http://http://code.makery.ch/blog/javafx-8-dialogs/
+
+        http://code.makery.ch/blog/javafx-dialogs-official/
+
+        Locale locale = new Locale("en", "US");
+        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+        Stage about = new Stage();
+        Parent root = null;
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("SettingsKeyShortcuts.fxml"), resourceStrings);
+        try {
+            root = fxmlLoader.load();
+        } catch (Exception e){
+            showError("Settings: fxml Error in About ", format("%s\n", e.toString()));
+        }
+
+        about.setScene(new Scene(root));
+        about.setTitle(resourceStrings.getString("menu.title.settings.kb"));
+        about.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        about.initModality(Modality.APPLICATION_MODAL);
+        about.initStyle(StageStyle.UTILITY);
+
+
+        Dialog dlg = new Dialog();
+        dlg.getDialogPane().setContent(root);
+        Optional<ButtonType> result = dlg.showAndWait();
+        if (result.get() == ButtonType.OK){
+            // ... user chose OK
+        } else {
+            // ... user chose CANCEL or closed the dialog
+        }
+
+
+        /**
+         * This event filter insures that only alphanumeric keys can be used
+         * for shortcuts.
+         * Filtering by KEY_TYPED prevents invalid codes from appearing at
+         * all in the textfield
+         */
+        about.getScene().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
+            if( keyEvent.getCharacter().matches("^[\\p{Alnum}]*$")){
+                TextField tf = (TextField) keyEvent.getTarget();
+                tf.setText(keyEvent.getCharacter().toUpperCase());
+
+                appPrefs.put(tf.getId(),keyEvent.getCharacter().toUpperCase());
+
+                keyEvent.consume();
+
+            } else {
+                keyEvent.consume();
+            }
+        });
+
+        //about.getScene().getWindow().setOnShown( (e) -> { System.out.println(about.getScene().getRoot().lookup("codingActionKeyReplay")); });
+
+        //codingActionKeyReplay.setText("Z");
+
+        //about.showAndWait();
+
     }
 
 
@@ -945,16 +1024,16 @@ public class MainController {
 
         /**
          * initialize timeline and add to display
-         */
+         **/
         timeLine = new TimeLine(totalDuration, 30, center, utteranceList);
         pnTimeLine.getChildren().clear();
         pnTimeLine.getChildren().addAll(l, timeLine);
 
         /**
-         * Here we link to mediaplayer status to sync timeline status
-         * This is not done in setOnPlaying() lambda because the mediaplayer
-         * can be initialized without there being a timeline defined.
-         */
+          Here we link to mediaplayer status to sync timeline status
+          This is not done in setOnPlaying() lambda because the mediaplayer
+          can be initialized without there being a timeline defined.
+         **/
         mediaPlayer.statusProperty().addListener( (invalidated, oldvalue, newvalue) -> {
             switch (newvalue) {
                 case READY:
@@ -2047,17 +2126,35 @@ public class MainController {
      */
     private void mapKeyFunctions(KeyEvent ke) {
 
+        /**
+         * Handle keyevents by code
+         */
         switch (ke.getCode()) {
 
             case LEFT:
                 // move media play left
-                setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
+
+                /**
+                 * move by half a second unless shift key is depressed then move by 5 seconds
+                 */
+                if (ke.isShiftDown()) {
+                    setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
+                } else {
+                    setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(0.5)));
+                }
                 ke.consume();
                 break;
 
             case RIGHT:
                 // move media play right
-                setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
+                /**
+                 * move by half a second unless shift key is depressed then move by 5 seconds
+                 */
+                if (ke.isShiftDown()) {
+                    setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(5.0)));
+                } else {
+                    setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(0.5)));
+                }
                 ke.consume();
                 break;
 
@@ -2075,7 +2172,7 @@ public class MainController {
 
             case SPACE:
                 // play/pause
-                if( getGuiState().equals(GuiState.GLOBAL_CODING) && ke.getTarget() instanceof javafx.scene.control.TextArea ) {
+                if (getGuiState().equals(GuiState.GLOBAL_CODING) && ke.getTarget() instanceof javafx.scene.control.TextArea) {
                     break;
                 } else {
                     if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)) {
@@ -2086,46 +2183,51 @@ public class MainController {
                     ke.consume();
                 }
                 break;
+        }
 
-            case Y:
-                // replay last code
-                if (ke.isShiftDown()) {
-                    if( getGuiState().equals(GuiState.MISC_CODING)) {
-                        gotoLastMarker();
-                        ke.consume();
-                    }
-                }
-                break;
 
-            case U:
-                // uncode
-                if (ke.isShiftDown()) {
-                    if( getGuiState().equals(GuiState.MISC_CODING)) {
-                        uncode();
-                        ke.consume();
-                    }
-                }
-                break;
+        /**
+         * Handle user configurable keys by string
+         * assuming SHIFT modifier is fixed
+         */
+        if (ke.isShiftDown()) {
 
-            case I:
-                // uncode/replay
-                if (ke.isShiftDown()) {
-                    if( getGuiState().equals(GuiState.MISC_CODING)) {
-                        uncodeReplay();
-                        ke.consume();
-                    }
-                }
-                break;
+            /**
+             * Only effective while MISC coding
+             */
+            if( getGuiState().equals(GuiState.MISC_CODING)) {
 
-            case O:
-                // rewind 5 sec
-                if (ke.isShiftDown()) {
-                    rewind();
+                /**
+                 * replay last code
+                 */
+                if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyReplay","Y"))){
+                    gotoLastMarker();
                     ke.consume();
+                    return;
                 }
-                break;
+
+                /**
+                 * uncode
+                 */
+                if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyUncode","U"))){
+                    uncode();
+                    ke.consume();
+                    return;
+                }
+
+                /**
+                 * uncode/replay
+                 */
+                if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyUncodeReplay","I"))){
+                    uncodeReplay();
+                    ke.consume();
+                    return;
+                }
+            }
 
         }
+
+
     }
 
 

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="334.0" prefWidth="384.0" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.131" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+   <children>
+      <VBox prefHeight="330.0" prefWidth="384.0">
+         <children>
+            <Label text="%txt.settings.kb.message" wrapText="true">
+               <padding>
+                  <Insets bottom="2.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label text="%txt.settings.kb.instructions" wrapText="true">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="2.0" />
+               </padding>
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+            <GridPane gridLinesVisible="true">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+               <children>
+                  <Label text="%txt.settings.kb.codingbtn">
+                     <GridPane.margin>
+                        <Insets left="4.0" />
+                     </GridPane.margin>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label text="%txt.settings.kb.uncode" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets left="4.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <Label text="%txt.settings.kb.replay" GridPane.rowIndex="2">
+                     <GridPane.margin>
+                        <Insets left="4.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <Label text="%txt.settings.kb.uncode_replay" GridPane.rowIndex="3">
+                     <GridPane.margin>
+                        <Insets left="4.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Shift + ">
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets top="6.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="codingActionKeyUncode" alignment="CENTER" maxWidth="28.0" minWidth="28.0" prefWidth="28.0" promptText="U">
+                           <HBox.margin>
+                              <Insets top="2.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="[0-9,a-z]">
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets top="6.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox layoutX="310.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <children>
+                        <Label text="Shift + ">
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets top="6.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="codingActionKeyReplay" alignment="CENTER" maxWidth="28.0" minWidth="28.0" prefWidth="28.0" promptText="Y">
+                           <HBox.margin>
+                              <Insets top="2.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="[0-9,a-z]">
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets top="6.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox layoutX="310.0" layoutY="70.0" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <children>
+                        <Label text="Shift + ">
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets top="6.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="codingActionKeyUncodeReplay" alignment="CENTER" maxWidth="28.0" minWidth="28.0" prefWidth="28.0" promptText="I">
+                           <HBox.margin>
+                              <Insets top="2.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="[0-9,a-z]">
+                           <padding>
+                              <Insets left="4.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets top="6.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Label text="%txt.settings.kb.shortcut" GridPane.columnIndex="1">
+                     <GridPane.margin>
+                        <Insets left="4.0" />
+                     </GridPane.margin>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </GridPane>
+            <ButtonBar prefHeight="84.0" prefWidth="384.0">
+              <buttons>
+                <Button mnemonicParsing="false" text="Cancel" />
+                  <Button mnemonicParsing="false" onAction="#btnSettingsShortcuts" text="Ok" />
+              </buttons>
+               <padding>
+                  <Insets left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </ButtonBar>
+         </children>
+      </VBox>
+   </children>
+</Pane>
