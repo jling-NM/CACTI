@@ -30,8 +30,11 @@ import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -358,66 +361,127 @@ public class MainController {
      **********************************************************************/
     public void mniActSettingsKB(ActionEvent actionEvent) {
 
-        // http://http://code.makery.ch/blog/javafx-8-dialogs/
-
-        http://code.makery.ch/blog/javafx-dialogs-official/
-
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
 
-        Stage about = new Stage();
-        Parent root = null;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("SettingsKeyShortcuts.fxml"), resourceStrings);
-        try {
-            root = fxmlLoader.load();
-        } catch (Exception e){
-            showError("Settings: fxml Error in About ", format("%s\n", e.toString()));
-        }
-
-        about.setScene(new Scene(root));
-        about.setTitle(resourceStrings.getString("menu.title.settings.kb"));
-        about.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
-        about.initModality(Modality.APPLICATION_MODAL);
-        about.initStyle(StageStyle.UTILITY);
-
-
-        Dialog dlg = new Dialog();
-        dlg.getDialogPane().setContent(root);
-        Optional<ButtonType> result = dlg.showAndWait();
-        if (result.get() == ButtonType.OK){
-            // ... user chose OK
-        } else {
-            // ... user chose CANCEL or closed the dialog
-        }
-
-
         /**
+         * A validation and formatting filter for textfields
          * This event filter insures that only alphanumeric keys can be used
          * for shortcuts.
          * Filtering by KEY_TYPED prevents invalid codes from appearing at
          * all in the textfield
+         *
+         * whole form keyevents are not thrown for dialogs??? so this
+         * shared filter gets attached below
          */
-        about.getScene().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
-            if( keyEvent.getCharacter().matches("^[\\p{Alnum}]*$")){
-                TextField tf = (TextField) keyEvent.getTarget();
-                tf.setText(keyEvent.getCharacter().toUpperCase());
-
-                appPrefs.put(tf.getId(),keyEvent.getCharacter().toUpperCase());
-
-                keyEvent.consume();
-
-            } else {
+        EventHandler<KeyEvent> keyEventTypedFilter = (keyEvent -> {
+            if( keyEvent.getEventType().equals(KeyEvent.KEY_TYPED) ) {
+                if (keyEvent.getCharacter().matches("^[\\p{Alnum}]*$")) {
+                    TextField tf = (TextField) keyEvent.getTarget();
+                    tf.setText(keyEvent.getCharacter().toUpperCase());
+                }
                 keyEvent.consume();
             }
         });
 
-        //about.getScene().getWindow().setOnShown( (e) -> { System.out.println(about.getScene().getRoot().lookup("codingActionKeyReplay")); });
 
-        //codingActionKeyReplay.setText("Z");
+        Dialog dlgSettingsKb = new Dialog();
+        dlgSettingsKb.initOwner(vbApp.getScene().getWindow());
+        dlgSettingsKb.initStyle(StageStyle.UTILITY);
+        dlgSettingsKb.setTitle(resourceStrings.getString("menu.title.settings.kb"));
 
-        //about.showAndWait();
+        Label lblHeaderText = new Label(resourceStrings.getString("txt.settings.kb.instructions"));
+        lblHeaderText.setPadding(new Insets(20, 20, 10, 20));
+        lblHeaderText.setWrapText(true);
+        dlgSettingsKb.getDialogPane().setHeader(lblHeaderText);
+        Stage dlgStage = (Stage) dlgSettingsKb.getDialogPane().getScene().getWindow();
+        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        dlgSettingsKb.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 
+        GridPane gridKb = new GridPane();
+        gridKb.setPadding(new Insets(20, 20, 20, 20));
+        gridKb.setHgap(30);
+        gridKb.setVgap(10);
+        gridKb.setGridLinesVisible(false);
+        gridKb.setAlignment(Pos.CENTER);
+        gridKb.add(new Label(resourceStrings.getString("txt.settings.kb.codingbtn")), 0, 0);
+        gridKb.add(new Label(resourceStrings.getString("txt.settings.kb.shortcut")), 1, 0);
+        gridKb.add(new Label(resourceStrings.getString("txt.settings.kb.uncode")), 0, 1);
+        gridKb.add(new Label(resourceStrings.getString("txt.settings.kb.replay")), 0, 2);
+        gridKb.add(new Label(resourceStrings.getString("txt.settings.kb.uncode_rewind")), 0, 3);
+
+        Label lblShiftU = new Label("Shift +");
+        lblShiftU.setPadding(new Insets(0,2,0,0));
+        Label lblMatchU = new Label("[0-9,a-z]");
+        lblMatchU.setPadding(new Insets(0,0,0,4));
+        TextField tfU = new TextField();
+        tfU.setId("codingActionKeyUncode");
+        tfU.setPromptText(appPrefs.get(tfU.getId(),"U"));
+        tfU.setPrefColumnCount(1);
+        tfU.addEventFilter(KeyEvent.KEY_TYPED, keyEventTypedFilter);
+        HBox hboxU = new HBox(lblShiftU, tfU, lblMatchU);
+        hboxU.setAlignment(Pos.CENTER);
+        gridKb.add(hboxU, 1, 1);
+
+        Label lblShiftR = new Label("Shift +");
+        lblShiftR.setPadding(new Insets(0,2,0,0));
+        Label lblMatchR = new Label("[0-9,a-z]");
+        lblMatchR.setPadding(new Insets(0,0,0,4));
+        TextField tfR = new TextField();
+        tfR.setId("codingActionKeyReplay");
+        tfR.setPromptText(appPrefs.get(tfR.getId(),"Y"));
+        tfR.setPrefColumnCount(1);
+        tfR.addEventFilter(KeyEvent.KEY_TYPED, keyEventTypedFilter);
+        HBox hboxR = new HBox(lblShiftR, tfR, lblMatchR);
+        hboxR.setAlignment(Pos.CENTER);
+        gridKb.add(hboxR, 1, 2);
+
+        Label lblShiftUR = new Label("Shift +");
+        lblShiftUR.setPadding(new Insets(0,2,0,0));
+        Label lblMatchUR = new Label("[0-9,a-z]");
+        lblMatchUR.setPadding(new Insets(0,0,0,6));
+        TextField tfUR = new TextField();
+        tfUR.setId("codingActionKeyUncodeRewind");
+        tfUR.setPromptText(appPrefs.get(tfUR.getId(),"I"));
+        tfUR.setPrefColumnCount(1);
+        tfUR.addEventFilter(KeyEvent.KEY_TYPED, keyEventTypedFilter);
+        HBox hboxUR = new HBox(lblShiftUR, tfUR, lblMatchUR);
+        hboxUR.setAlignment(Pos.CENTER);
+        gridKb.add(hboxUR, 1, 3);
+
+        dlgSettingsKb.getDialogPane().setContent(gridKb);
+
+        Optional<ButtonType> result = dlgSettingsKb.showAndWait();
+        if (result.get() == ButtonType.APPLY){
+            if( !tfU.getText().isEmpty() ){
+                appPrefs.put(tfU.getId(), tfU.getText());
+            }
+            if( !tfR.getText().isEmpty() ){
+                appPrefs.put(tfR.getId(), tfR.getText());
+            }
+            if( !tfUR.getText().isEmpty() ){
+                appPrefs.put(tfUR.getId(), tfUR.getText());
+            }
+        }
+
+/*        dlgStage.addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
+            System.out.println(keyEvent);
+        });
+
+        dlgSettingsKb.getDialogPane().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
+            System.out.println(keyEvent);
+        });
+
+        dlgSettingsKb.getDialogPane().getContent().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
+            System.out.println(keyEvent);
+        });
+
+        dlgSettingsKb.getDialogPane().getContent().getScene().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
+            System.out.println(keyEvent);
+        });*/
     }
+
+
 
 
 
@@ -2216,9 +2280,9 @@ public class MainController {
                 }
 
                 /**
-                 * uncode/replay
+                 * uncode/rewind
                  */
-                if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyUncodeReplay","I"))){
+                if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyUncodeRewind","I"))){
                     uncodeReplay();
                     ke.consume();
                     return;

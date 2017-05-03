@@ -1,3 +1,13 @@
+------ 0.60.0 ------
+20170502 - jl
+--------------------
+CHANGES:
+- Coding button shortcuts user configurable through settings menu.
+- Rewind keyboard shortcut changed to SHIFT+LEFT ARROW.
+- describe here shift arrow vs arrow
+
+
+
 ------ 0.50.0 ------
 20170426 - jl
 --------------------
