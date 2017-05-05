@@ -33,7 +33,7 @@ javapackager \
 -Bicon=/Users/josef/projects/cacti2/media/osx.icns \
 -Bmac.category=Education -BjvmOptions=-Xmx128m \
 -BjvmOptions=-Xms128m \
--Bruntime=/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home \
+-Bruntime=/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home \
 -Bmac.CFBundleIdentifier=edu.unm.casaa.cacti \
 -Bmac.CFBundleName=$appname \
 -Bmac.CFBundleVersion=060
