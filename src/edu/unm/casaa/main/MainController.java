@@ -301,8 +301,8 @@ public class MainController {
      *
      *  @param actionEvent not used
      **********************************************************************/
-    public void btnActUncodeReplay(ActionEvent actionEvent) {
-        uncodeReplay();
+    public void btnActUncodeRewind(ActionEvent actionEvent) {
+        uncodeRewind();
     }
 
 
@@ -317,11 +317,6 @@ public class MainController {
         insertUtterance(mc);
     }
 
-    //TODO: document if this is the only way to close none dialog window
-    public void btnSettingsShortcuts(ActionEvent actionEvent) {
-        Button src = (Button) actionEvent.getSource();
-        src.getScene().getWindow().hide();
-    }
 
 
 
@@ -357,7 +352,11 @@ public class MainController {
 
 
     /**********************************************************************
-     * menu selection event: About
+     * menu selection event: Settings::Keyboard Shortcuts
+     *
+     * This dialog does not load from fxml which might have been better.
+     * This allowed access to form fields and contained all code for the
+     * dialog here rather then mixing it into main controller.
      **********************************************************************/
     public void mniActSettingsKB(ActionEvent actionEvent) {
 
@@ -451,6 +450,8 @@ public class MainController {
 
         dlgSettingsKb.getDialogPane().setContent(gridKb);
 
+
+
         Optional<ButtonType> result = dlgSettingsKb.showAndWait();
         if (result.get() == ButtonType.APPLY){
             if( !tfU.getText().isEmpty() ){
@@ -464,21 +465,6 @@ public class MainController {
             }
         }
 
-/*        dlgStage.addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
-            System.out.println(keyEvent);
-        });
-
-        dlgSettingsKb.getDialogPane().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
-            System.out.println(keyEvent);
-        });
-
-        dlgSettingsKb.getDialogPane().getContent().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
-            System.out.println(keyEvent);
-        });
-
-        dlgSettingsKb.getDialogPane().getContent().getScene().addEventFilter( KeyEvent.KEY_TYPED, keyEvent -> {
-            System.out.println(keyEvent);
-        });*/
     }
 
 
@@ -1526,7 +1512,7 @@ public class MainController {
      *  If more utterances exist then move to 1 second prior to the
      *  previous code. Otherwise, move to 1 second prior to that last code
      */
-    private void uncodeReplay() {
+    private void uncodeRewind() {
 
         Utterance lastUtterance = getUtteranceList().last();
         if (lastUtterance != null) {
@@ -2283,7 +2269,7 @@ public class MainController {
                  * uncode/rewind
                  */
                 if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyUncodeRewind","I"))){
-                    uncodeReplay();
+                    uncodeRewind();
                     ke.consume();
                     return;
                 }

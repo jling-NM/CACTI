@@ -1,10 +1,11 @@
 ------ 0.60.0 ------
-20170502 - jl
+20170505 - jl
 --------------------
 CHANGES:
 - Coding button shortcuts user configurable through settings menu.
 - Rewind keyboard shortcut changed to SHIFT+LEFT ARROW.
-- describe here shift arrow vs arrow
+- Left and Right arrow keys move playback back and forward by half a second. With the shift key down
+while pressing the Left and Right arrow keys, move playback by 5 seconds.
 
 
 

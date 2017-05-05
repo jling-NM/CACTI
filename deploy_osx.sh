@@ -1,7 +1,7 @@
 #!/bin/bash
 
-version=0.50.0
-bundleversion=0.50.0
+version=0.60.0
+bundleversion=0.60.0
 appname=CACTI
 
 ### jar ###
@@ -13,7 +13,9 @@ javapackager \
 -outfile $appname.$version -v
 
 ### package icons ###
-iconutil --convert icns --output /Users/josef/projects/cacti2/media/osx.icns /Users/josef/projects/cacti2/media/osx.iconset
+iconutil \
+--convert icns \
+--output /Users/josef/projects/cacti2/media/osx.icns /Users/josef/projects/cacti2/media/osx.iconset
 
 ### dmg ###
 javapackager \
@@ -34,6 +36,6 @@ javapackager \
 -Bruntime=/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home \
 -Bmac.CFBundleIdentifier=edu.unm.casaa.cacti \
 -Bmac.CFBundleName=$appname \
--Bmac.CFBundleVersion=041
+-Bmac.CFBundleVersion=060
 
 

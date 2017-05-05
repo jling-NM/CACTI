@@ -160,7 +160,7 @@
                               <Font size="10.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnUncodeReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeReplay" prefWidth="0.0" text="Uncode/Rewind" visible="false">
+                        <Button fx:id="btnUncodeReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeRewind" prefWidth="0.0" text="Uncode/Rewind" visible="false">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncodeReplay" />
                            </graphic>
