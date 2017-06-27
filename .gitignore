@@ -1,0 +1,6 @@
+# ignore IDEA files
+.idea/
+*.iml
+
+# ignore output and we'll provide those
+out/
