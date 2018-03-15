@@ -33,6 +33,12 @@ public class Utils {
         return String.format("%02.0f:%02.0f:%04.1f", Math.floor((duration_secs/3600) % 24), Math.floor( (duration_secs/60) % 60), (duration_secs % 60) );
     }
 
+    /**
+     * Generate a unique GUI id for an utterance which combines the timestamp and code
+     * @param startTime
+     * @param codeValue
+     * @return application guid
+     */
     public static String formatID(Duration startTime, int codeValue) {
         return String.format("%s%d", formatDuration(startTime).replaceAll("[^0-9]", ""), codeValue);
     }

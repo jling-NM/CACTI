@@ -32,5 +32,6 @@ public interface Utterance {
 	MiscCode getMiscCode();
 
 	String displayCoded();
+    // TODO: can this be removed now?
 	String writeCoded();
 }

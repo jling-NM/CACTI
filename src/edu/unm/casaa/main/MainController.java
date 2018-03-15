@@ -23,7 +23,6 @@ import edu.unm.casaa.globals.GlobalDataModel;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.Utterance;
-import edu.unm.casaa.utterance.UtteranceList;
 import javafx.animation.Animation;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -61,6 +60,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Optional;
@@ -163,8 +163,11 @@ public class MainController {
     private String filenameGlobals       = null;        // name of active globals data file
     private String filenameAudio         = null;        // name of active media file. Used when switching from PLAYBACK to MISC to GLOBALS
     private File currentAudioFile        = null;        // active media file
-    private UtteranceList utteranceList  = null;        // MISC coding data
+
     private GlobalDataModel globalsData  = null;        // GLOBALS scoring data
+    private SessionData sessionData      = null;        // session persistance
+    private SessionData.UtteranceList utteranceList  = null;        // MISC coding data
+
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
@@ -564,17 +567,28 @@ public class MainController {
         }
         filenameMisc = miscFile.getAbsolutePath();
 
-        // if file is already there we drop it now, not at first code
+        // if file is already there we drop it now
         if( miscFile.exists() ) {
             miscFile.delete();
         }
 
-
-        // reset utteranceList to start fresh
-        utteranceList = new UtteranceList(miscFile, filenameAudio);
-
         if (audioFile.canRead()) {
+
+            try {
+                // if audio file exists proceed to initialize session data
+                sessionData = new SessionData(miscFile, audioFile);
+                // initialize/reset utteranceList
+                utteranceList = sessionData.getUtteranceList();
+            } catch(IOException e)  {
+                showError("Error reading casaa file", e.getMessage());
+            } catch(SQLException e)  {
+                showError("Error reading casaa file", e.getMessage());
+            }
+
+            // initialize player interface
             initializeMediaPlayer(audioFile, playerReady);
+
+
         } else {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
@@ -880,19 +894,24 @@ public class MainController {
     /**
      * Break out code to resume MISC coding state
      */
-    private void resumeCoding( File miscFile ) {
+    private void resumeCoding( File sessionFile ) {
 
-        // now get utterances from code file
+        File audioFile;
+
         try {
-            utteranceList = UtteranceList.loadFromFile(miscFile);
-        } catch (Exception e) {
+            // load session data
+            sessionData = new SessionData(sessionFile);
+            // initialize utteranceList
+            utteranceList = sessionData.getUtteranceList();
+            // initialize audio file object
+            audioFile = new File(sessionData.getAudioFilePath());
+
+        } catch(Exception e)  {
             showError("Error Loading Casaa File", e.getMessage());
             return;
         }
 
-
         // load the audio and start the player
-        File audioFile = new File(utteranceList.getAudioFilename());
         filenameAudio = audioFile.getAbsolutePath();
 
         if (audioFile.canRead()) {
@@ -1449,7 +1468,7 @@ public class MainController {
      *
      * @return list of utterances
      **********************************************************/
-    private synchronized UtteranceList getUtteranceList() {
+    private synchronized SessionData.UtteranceList getUtteranceList() {
         if( utteranceList == null )
             showError("Error", "UtteranceList is null");
         return utteranceList;
@@ -1488,7 +1507,7 @@ public class MainController {
             updateUtteranceDisplays();
             // button state different if 0 ver > 0 utterances
             setPlayerButtonState();
-        } catch (IOException e) {
+        } catch (SQLException e) {
             showError("Error writing casaa file", e.getMessage());
         }
     }
@@ -1558,15 +1577,13 @@ public class MainController {
      * @param utr
      */
     private synchronized void removeUtterance(Utterance utr){
-        utteranceList.remove(utr);
-        // refresh last utterance display
-        updateUtteranceDisplays();
-
         try {
-            utteranceList.writeToFile();
-        } catch (IOException e) {
+            utteranceList.remove(utr);
+        } catch (SQLException e) {
             showError("Error writing casaa file", e.getMessage());
         }
+        // refresh last utterance display
+        updateUtteranceDisplays();
     }
 
 

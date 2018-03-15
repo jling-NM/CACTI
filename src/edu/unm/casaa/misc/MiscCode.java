@@ -18,11 +18,11 @@ This source code file is part of the CASAA Treatment Coding System Utility
 
 package edu.unm.casaa.misc;
 
+import java.util.ListIterator;
 import java.util.Vector;
 
 // MiscCode associates a label, such as "CR+/-" or "ADP", with a numeric value.
-public class MiscCode { 
-	private static final long serialVersionUID 	= 1L;
+public class MiscCode {
 
 	public static final int 			INVALID			= -1;
 	public static final MiscCode		INVALID_CODE	= new MiscCode();
@@ -35,11 +35,20 @@ public class MiscCode {
     private MiscCode.Speaker speaker                    = null;
 
     // possible speakers for MISC codes
-	public enum Speaker { Therapist, Client}
+	public enum Speaker { Therapist, Client }
 
 
 
 	// Class:
+
+
+    /**
+     * Expose list iterator
+     * @return
+     */
+    public static ListIterator<MiscCode> getIterator() {
+	    return list.listIterator();
+    }
 
     /**
      * Add new code

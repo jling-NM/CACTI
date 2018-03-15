@@ -16,7 +16,6 @@ package edu.unm.casaa.main;
 
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.utterance.Utterance;
-import edu.unm.casaa.utterance.UtteranceList;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
@@ -39,6 +38,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 
 /**
@@ -49,12 +49,12 @@ public class TimeLine extends Group {
     private int pixelsPerSecond	          = 50;     // sort of a framerate for the animation
     private TranslateTransition animation = null;   // animation for moving timeline
     private TimeLineMarker selectedMarker = null;   // store currently selected marker, if any
-    private UtteranceList utteranceList   = null;   //
+    private SessionData.UtteranceList utteranceList   = null;   //
     private double height                 = 55.0;   // projected height of timeline. forces Group dimensions early
     private double thickness              = 2.0;    // thickness of line that represents time :)
 
 
-    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, UtteranceList utteranceList) {
+    public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, SessionData.UtteranceList utteranceList) {
 
         this.pixelsPerSecond = pixelsPerSecond;
         this.utteranceList = utteranceList;
@@ -135,7 +135,7 @@ public class TimeLine extends Group {
      *
      * @param newUtterance
      */
-    public void add(Utterance newUtterance) throws IOException {
+    public void add(Utterance newUtterance) throws SQLException {
         /* check for selected timeline marker */
         TimeLineMarker activeMarker = getSelectedMarker();
 
@@ -165,9 +165,6 @@ public class TimeLine extends Group {
                 utteranceList.add(newUtterance);
             }
 
-            // write data
-            utteranceList.writeToFile();
-
         } else {
             /**
              * check if exact utterance is already in list.
@@ -183,8 +180,6 @@ public class TimeLine extends Group {
 
                 // new utterance in storage
                 utteranceList.add(newUtterance);
-                // write data
-                utteranceList.writeToFile();
             }
 
         }
@@ -195,11 +190,10 @@ public class TimeLine extends Group {
     /**
      * Call me when you want to delete an utterance from model
     */
-    public void remove(String markerID) throws IOException {
+    public void remove(String markerID) throws SQLException {
         Node r = this.lookup("#"+markerID);
         if( r != null) {
             utteranceList.remove(markerID);
-            utteranceList.writeToFile();
         }
     }
 
@@ -377,7 +371,7 @@ public class TimeLine extends Group {
                     if( getSelectedMarker() != null) {
                         remove(getSelectedMarker().getMarkerID());
                     }
-                } catch (IOException e1) {
+                } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
             });
