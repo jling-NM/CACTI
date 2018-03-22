@@ -1,13 +1,13 @@
 package edu.unm.casaa.main;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.*;
 import java.util.*;
 
+import edu.unm.casaa.globals.GlobalCode;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.Utterance;
@@ -26,6 +26,10 @@ public class SessionData
     private File sessionFile;
     private final SQLiteDataSource ds;
     private String audioFilePath = "";
+
+    // TODO: possible
+    public UtteranceList utteranceList;
+    public Ratings ratingsList;
 
 
     /**
@@ -79,25 +83,36 @@ public class SessionData
         sessionFile = storageFile;
         ds.setUrl("jdbc:sqlite:" + sessionFile.getAbsolutePath());
 
-
         if( sessionFileExists() ) {
-            // Test selected file format by looking for "SQLite" at beginning of file
-            try ( FileReader textFileReader = new FileReader(sessionFile) ) {
-                char[] buffer = new char[6];
-                int numberOfCharsRead = textFileReader.read(buffer);
-                System.out.println("XX" + String.valueOf(buffer, 0, numberOfCharsRead) + "XX");
-                if (! String.valueOf(buffer, 0, numberOfCharsRead).startsWith("SQLite")) {
-                    throw new IOException("Not an SQLite file format.");
+
+            /*
+            load audio file path from existing db
+             */
+            if( isSQLiteDataFile() ) {
+                try {
+                    // TODO: this take a long time. WHY?
+                    audioFilePath = getAttribute("source_audio_file_path");
+                    utteranceList = new SessionData.UtteranceList();
+                    ratingsList = new SessionData.Ratings();
+                } catch (SQLException e) {
+                    throw new IOException(e);
                 }
-            }
+            } else {
 
-            // load audio file path from existing db
-            try {
-                audioFilePath = getAttribute("source_audio_file_path");
-            } catch (SQLException e) {
-                throw new IOException(e);
-            }
+                // can remove this or replace with file conversion dialog or automated conversion below
+                throw new IOException( "File is not correct format:\n"+sessionFile.getAbsolutePath() );
 
+                // TODO: if not sqlite format we need to:
+                //      - move old format casaa file to same name with "*.casaa.bak" or "*.casaa.txt"
+                //      - move old format globals file to same name with *.globals.bak"
+                //      - how will i find this file?????
+                //       - convert these "bak" files format (MISC and Globals) to new format
+                //       - giving it original casaa file name
+                //       - write new sqlite format
+                //       - perhaps alert user if we didn't ask first
+                //       - once all this is in db, load utterances and ratings as above
+
+            }
         } else {
             throw new IOException("File does not exist.");
         }
@@ -105,15 +120,43 @@ public class SessionData
 
 
 
+    /**
+     * TBD
+     */
+    private boolean isSQLiteDataFile() throws IOException {
+
+        // Test selected file format by looking for "SQLite" at beginning of file
+        try ( FileReader textFileReader = new FileReader(sessionFile) ) {
+            char[] buffer = new char[6];
+            int numberOfCharsRead = textFileReader.read(buffer);
+            System.out.println("XX" + String.valueOf(buffer, 0, numberOfCharsRead) + "XX");
+            return String.valueOf(buffer, 0, numberOfCharsRead).startsWith("SQLite");
+        }
+    }
 
 
     /**
-     * Provides UtteranceList from SessionData persistance
-     * @return session UtteranceList
+     * Retrieve ratings from database
+     * @return HashMap of ratings
+     * @throws SQLException
      */
-    public SessionData.UtteranceList getUtteranceList() throws SQLException {
-        // return utteranceList
-        return new SessionData.UtteranceList();
+    private HashMap< Integer, Integer > getRatings() throws SQLException {
+
+        HashMap< Integer, Integer > ratings = new HashMap<>();
+
+        try ( Connection connection = ds.getConnection();
+              Statement statement = connection.createStatement() ) {
+
+            ResultSet rs = statement.executeQuery("select rating_id, response_value from ratings");
+
+            while (rs.next()) {
+                int ratingId = rs.getInt("rating_id");
+                int responseValue = rs.getInt("response_value");
+                ratings.put(ratingId, responseValue);
+            }
+
+            return ratings;
+        }
     }
 
 
@@ -176,6 +219,11 @@ public class SessionData
 
     public String getAudioFilePath() {
         return this.audioFilePath;
+    }
+
+
+    public String getSessionFilePath() {
+        return this.sessionFile.getAbsolutePath();
     }
 
 
@@ -305,51 +353,22 @@ public class SessionData
     }
 
 
-    private void setGlobalResponseValue(int global_id, int response_value) throws SQLException
+    private void setRatingResponseValue(int rating_id, int response_value) throws SQLException
     {
-        Connection connection = null;
+        String sql = "update ratings set response_value = ? where rating_id = ?";
 
-        try
+        try ( Connection connection = ds.getConnection();
+              PreparedStatement ps = connection.prepareStatement(sql);
+        )
         {
-            connection = ds.getConnection();
-            PreparedStatement ps = connection.prepareStatement("update globals set response_value = ? where global_id = ?");
             ps.setInt(1, response_value);
-            ps.setInt(2, global_id);
+            ps.setInt(2, rating_id);
             ps.executeUpdate();
-        } finally
-        {
-            if(connection != null)
-                connection.close();
         }
     }
 
 
-    private int addGlobal(String global_name, int response_value) throws SQLException
-    {
-        Connection connection = null;
 
-        try
-        {
-            // create a database connection
-            connection = ds.getConnection();
-            PreparedStatement ps = connection.prepareStatement("insert into globals (global_name, response_value) values (?,?)", Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, global_name);
-            ps.setInt(2, response_value);
-            ps.executeUpdate();
-            ResultSet priKeys = ps.getGeneratedKeys();
-
-            int autoIncKey = 0;
-            if (priKeys.next()) {
-                autoIncKey = priKeys.getInt(1);
-            }
-
-            return autoIncKey;
-        } finally
-        {
-            if(connection != null)
-                connection.close();
-        }
-    }
 
 
 
@@ -382,21 +401,21 @@ public class SessionData
                     "annotation string," +
                     "  foreign key (code_id) references codes (code_id)" +
                     ")");
-            statement.executeUpdate("create table if not exists globals ( " +
-                    "global_id integer primary key autoincrement, " +
-                    "global_name string not null unique," +
+            statement.executeUpdate("create table if not exists ratings ( " +
+                    "rating_id integer primary key not null, " +
+                    "rating_name string not null unique," +
                     "response_value integer not null" +
                     ")");
-            statement.executeUpdate("create table if not exists utterances_globals ( " +
+            statement.executeUpdate("create table if not exists utterances_ratings ( " +
                     "utterance_id integer," +
-                    "global_id integer, " +
+                    "rating_id integer, " +
                     "  foreign key (utterance_id) references utterances (utterance_id)," +
-                    "  foreign key (global_id) references globals (global_id)" +
+                    "  foreign key (rating_id) references ratings (rating_id)" +
                     ")");
             statement.executeUpdate("create table if not exists attributes ( name, value )");
             // assumes data file does not exists
             statement.executeUpdate("insert into attributes ( name, value ) values ('source_audio_file_path', '" + this.audioFilePath + "')");
-            statement.executeUpdate("insert into attributes ( name, value ) values ('global_notes', '')");
+            statement.executeUpdate("insert into attributes ( name, value ) values ('rating_notes', '')");
 
 
             /*
@@ -404,9 +423,7 @@ public class SessionData
              */
             connection.setAutoCommit(false);
             PreparedStatement ps = connection.prepareStatement("insert into speakers (speaker_id, speaker_name) values (?,?)");
-
             for (MiscCode.Speaker speaker : MiscCode.Speaker.values() ) {
-                System.out.println(speaker.name());
                 ps.setInt(1, speaker.ordinal());
                 ps.setString(2, speaker.name());
                 ps.addBatch();
@@ -414,7 +431,6 @@ public class SessionData
             ps.executeBatch();
             // apply changes
             connection.commit();
-
 
 
 
@@ -437,6 +453,25 @@ public class SessionData
             // apply changes
             connection.commit();
 
+
+            /*
+            Populate Global Ratings table
+            add codes from user environment
+             */
+            connection.setAutoCommit(false);
+            ps = connection.prepareStatement("insert into ratings (rating_id, rating_name, response_value) values (?,?,?)");
+            ListIterator<GlobalCode> globalCodeListIterator = GlobalCode.getIterator();
+            while(globalCodeListIterator.hasNext()) {
+                GlobalCode rating = globalCodeListIterator.next();
+                ps.setInt(1, rating.id);
+                ps.setString(2, rating.name);
+                ps.setInt(3, rating.defaultRating);
+                ps.addBatch();
+            }
+            //
+            ps.executeBatch();
+            // apply changes
+            connection.commit();
 
         }
     }
@@ -466,7 +501,7 @@ public class SessionData
         /**
          * @throws SQLException
          */
-        public UtteranceList() throws SQLException {
+        private UtteranceList() throws SQLException {
             utteranceTreeMap.putAll(getUtterances());
             observableMap = FXCollections.observableMap(utteranceTreeMap);
         }
@@ -645,5 +680,47 @@ public class SessionData
             }
 
         }
+    }
+
+
+
+
+
+
+
+    public class Ratings {
+
+        //private HashMap< Integer, Integer > ratings = new HashMap< Integer, Integer >();
+        private HashMap< Integer, Integer > ratings;
+        private String notes = "";
+
+        private Ratings() throws SQLException {
+            ratings = getRatings();
+            notes = getAttribute("rating_notes");
+        }
+
+        public int getRating( GlobalCode code ) {
+            return ratings.get(code.id);
+        }
+
+        public void	setRating( GlobalCode code, int rating ) throws SQLException {
+            ratings.put( code.id, rating );
+            setRatingResponseValue( code.id, rating);
+        }
+
+        public void	setRating( GlobalCode code, String rating ) throws SQLException {
+            int rating_value = Integer.parseInt(rating);
+            this.setRating(code, rating_value);
+        }
+
+        public void setNotes(String notes) throws SQLException {
+            this.notes = notes;
+            setAttribute("rating_notes", notes);
+        }
+
+        public String getNotes() {
+            return notes;
+        }
+
     }
 }

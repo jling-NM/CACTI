@@ -40,11 +40,13 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -159,14 +161,14 @@ public class MainController {
 
     // mediaplayer attributes
     private Duration totalDuration;                     // duration of active media
-    private String filenameMisc          = null;        // name of active CASAA data file.
-    private String filenameGlobals       = null;        // name of active globals data file
+    //private String filenameMisc          = null;        // name of active CASAA data file.
+    //private String filenameGlobals       = null;        // name of active globals data file
     private String filenameAudio         = null;        // name of active media file. Used when switching from PLAYBACK to MISC to GLOBALS
     private File currentAudioFile        = null;        // active media file
 
-    private GlobalDataModel globalsData  = null;        // GLOBALS scoring data
+    //private SessionData.Ratings ratings  = null;        // GLOBALS scoring data
     private SessionData sessionData      = null;        // session persistance
-    private SessionData.UtteranceList utteranceList  = null;        // MISC coding data
+    //private SessionData.UtteranceList utteranceList  = null;        // MISC coding data
 
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
@@ -502,6 +504,13 @@ public class MainController {
         // Application.stop() when Platform.exit() is called.
         // Anything else you want to do before leaving???
 
+        /*
+            key command to quit program needs to take focus from notes field
+            or any other text field.
+            just make sure that focus is drawn away on exit
+         */
+        menuBar.requestFocus();
+
         /* Application exit */
         Platform.exit();
     }
@@ -565,7 +574,6 @@ public class MainController {
         if( miscFile == null ) {
             return;
         }
-        filenameMisc = miscFile.getAbsolutePath();
 
         // if file is already there we drop it now
         if( miscFile.exists() ) {
@@ -577,22 +585,16 @@ public class MainController {
             try {
                 // if audio file exists proceed to initialize session data
                 sessionData = new SessionData(miscFile, audioFile);
-                // initialize/reset utteranceList
-                utteranceList = sessionData.getUtteranceList();
-            } catch(IOException e)  {
-                showError("Error reading casaa file", e.getMessage());
-            } catch(SQLException e)  {
+            } catch(IOException e) {
                 showError("Error reading casaa file", e.getMessage());
             }
 
             // initialize player interface
             initializeMediaPlayer(audioFile, playerReady);
 
-
         } else {
             showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
         }
-
     }
 
 
@@ -617,7 +619,6 @@ public class MainController {
             //showError("File Error", "Could not open coding file");
             return;
         }
-        filenameMisc = miscFile.getAbsolutePath();
 
         // the rest is broken out for reuse
         resumeCoding(miscFile);
@@ -666,7 +667,7 @@ public class MainController {
                 initializeUserControls();
 
                 // only resume coding if casaa file exists
-                File tmp = new File(filenameMisc);
+                File tmp = new File(sessionData.getSessionFilePath());
                 if( tmp.exists() ) {
                     resumeCoding(tmp);
                 }
@@ -686,40 +687,12 @@ public class MainController {
             mediaPlayer.pause();
         }
 
-        // user selects a globals file or we leave
-        File globalsFile = selectGlobalsFile();
-        if( globalsFile == null ) {
-            //showError("File Error", "Could not open coding file");
-            return;
-        }
-        filenameGlobals = globalsFile.getAbsolutePath();
-
-        // determine audio file
-        File audioFile = currentAudioFile;
-        // to we have an audio file already?
-        if( audioFile == null ) {
-            // Select audio file.
-            audioFile = selectAudioFile();
-            if( audioFile == null )
-                return;
-            filenameAudio = audioFile.getAbsolutePath();
-        }
-
-        // load audio file
-        if (audioFile.canRead()) {
-
+        if(sessionData != null) {
             setGuiState(GuiState.GLOBAL_CODING);
 
-            // initialize globals data model
-            globalsData = new GlobalDataModel(globalsFile, filenameAudio);
             // take care of media player
-            initializeMediaPlayer(audioFile, playerReady);
-
-        } else {
-            showError("File Error", format("%s\n%s\n%s", "Could not load audio file:", filenameAudio, "Check that it exists and has read permissions"));
+            initializeMediaPlayer(currentAudioFile, playerReady);
         }
-
-
     }
 
 
@@ -901,8 +874,6 @@ public class MainController {
         try {
             // load session data
             sessionData = new SessionData(sessionFile);
-            // initialize utteranceList
-            utteranceList = sessionData.getUtteranceList();
             // initialize audio file object
             audioFile = new File(sessionData.getAudioFilePath());
 
@@ -920,7 +891,8 @@ public class MainController {
             // start media player
             initializeMediaPlayer(audioFile, playerReady);
         } else {
-            showError("Error Loading Audio File", format("Could not load audio file:\n  %s\n\nwhich is specified within:\n  %s\n\nCheck that audio file exists and has read permissions", filenameAudio, filenameMisc));
+            showError("Error Loading Audio File", format("Could not load audio file:\n  %s\n\nwhich is specified within:\n  %s\n\nCheck that audio file exists\nand has read permissions", filenameAudio, sessionData.getSessionFilePath() ));
+            return;
         }
 
         setGuiState(GuiState.MISC_CODING);
@@ -1091,18 +1063,18 @@ public class MainController {
         l.setStrokeWidth(0.5);
         l.setTranslateX(center + l.getStrokeWidth());
 
-        /**
-         * initialize timeline and add to display
-         **/
-        timeLine = new TimeLine(totalDuration, 30, center, utteranceList);
+        /*
+          initialize timeline and add to display
+         */
+        timeLine = new TimeLine(totalDuration, 30, center, sessionData.utteranceList);
         pnTimeLine.getChildren().clear();
         pnTimeLine.getChildren().addAll(l, timeLine);
 
-        /**
+        /*
           Here we link to mediaplayer status to sync timeline status
           This is not done in setOnPlaying() lambda because the mediaplayer
           can be initialized without there being a timeline defined.
-         **/
+        */
         mediaPlayer.statusProperty().addListener( (invalidated, oldvalue, newvalue) -> {
             switch (newvalue) {
                 case READY:
@@ -1294,7 +1266,7 @@ public class MainController {
                 initializeTimeLine();
 
                 // display coding file path in gui
-                lblCurMiscFile.setText(filenameMisc);
+                lblCurMiscFile.setText(sessionData.getSessionFilePath());
 
                 // dispaly config file path in gui
                 lblCurConfigFile.setText(UserConfig.getPath());
@@ -1441,6 +1413,7 @@ public class MainController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        //alert.getDialogPane().setContent( new Text(message));
         alert.initStyle(StageStyle.UTILITY);
         alert.showAndWait();
     }
@@ -1469,9 +1442,9 @@ public class MainController {
      * @return list of utterances
      **********************************************************/
     private synchronized SessionData.UtteranceList getUtteranceList() {
-        if( utteranceList == null )
+        if( sessionData.utteranceList == null )
             showError("Error", "UtteranceList is null");
-        return utteranceList;
+        return sessionData.utteranceList;
     }
 
 
@@ -1578,7 +1551,7 @@ public class MainController {
      */
     private synchronized void removeUtterance(Utterance utr){
         try {
-            utteranceList.remove(utr);
+            sessionData.utteranceList.remove(utr);
         } catch (SQLException e) {
             showError("Error writing casaa file", e.getMessage());
         }
@@ -1903,14 +1876,11 @@ public class MainController {
                                         tg.setUserData(code.name);
 
                                         // create radio buttons with values and defaults
-                                        // do this after radio buttons added
-                                        // here i'm just using this to fire a save of globals data
-                                        // right away instead of as previously where we waited until
-                                        // user left scene
                                         for(int i = code.minRating; i <= code.maxRating; i++) {
                                             RadioButton rb = createRadioButton(i, tg);
-                                            // set selected id
-                                            if( i == code.defaultRating ) {
+                                            // set radio button selected to user response value
+                                            // which would be default value if not changed by user
+                                            if( i == sessionData.ratingsList.getRating(code)) {
                                                 tg.selectToggle(rb);
                                             }
                                             hb.getChildren().add(rb);
@@ -1925,19 +1895,11 @@ public class MainController {
                                             GlobalCode gc = GlobalCode.codeWithName(codeName);
                                             // cast Toggle to source class to get selected id
                                             RadioButton rb = (RadioButton) newValue;
-                                            // update code with new id
-                                            //gc.id = Integer.getInteger(rb.getText());
-                                            // update code in data model
-                                            globalsData.setRating(gc, Integer.valueOf(rb.getText()));
-                                            // update model for notes
-                                            globalsData.setNotes(tfGlobalsNotes.getText());
-
-                                            // save to file
                                             try {
-                                                globalsData.writeToFile();
-                                            }catch (IOException e) {
-                                                showError("Error writing Globals file", e.getMessage());
-                                                return;
+                                                // update code in data model
+                                                sessionData.ratingsList.setRating(gc, rb.getText());
+                                            } catch ( SQLException e ) {
+                                                showError("Error Writing Casaa File", e.getMessage());
                                             }
 
                                         });
@@ -1960,18 +1922,22 @@ public class MainController {
 
                         }
 
-                        /**
+                        /*
+                         * Load user notes into notes field
+                         */
+                        tfGlobalsNotes.setText(sessionData.ratingsList.getNotes());
+
+                        /*
                          * listen to notes field. If focus is lost and notes are not empty, save all out to the globals file.
                          */
                         tfGlobalsNotes.focusedProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean lostFocus, Boolean hasFocus) -> {
                             if(lostFocus) {
-                                globalsData.setNotes(tfGlobalsNotes.getText());
                                 try {
-                                    globalsData.writeToFile();
-                                }catch (IOException e) {
-                                    showError("Error writing to Globals file", e.getMessage());
-                                    return;
+                                    sessionData.ratingsList.setNotes(tfGlobalsNotes.getText());
+                                } catch ( SQLException e ) {
+                                    showError("Error Writing Casaa File", e.getMessage());
                                 }
+
                             }
                         });
 
@@ -2330,10 +2296,11 @@ public class MainController {
                 File miscFile = new File(arg);
 
                 if (miscFile.canRead()) {
-                    filenameMisc = miscFile.getAbsolutePath();
                     resumeCoding(miscFile);
                 }
             }
         }
     }
+
+
 }

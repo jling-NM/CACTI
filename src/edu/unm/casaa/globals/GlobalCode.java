@@ -18,12 +18,13 @@ This source code file is part of the CASAA Treatment Coding System Utility
 
 package edu.unm.casaa.globals;
 
+import java.util.ListIterator;
 import java.util.Vector;
 import edu.unm.casaa.main.MainController;
 
 
 public class GlobalCode { 
-    private static final long           serialVersionUID = 1L;
+
 
     // List of available codes. Built when we parse XML file.
     private static Vector< GlobalCode > list             = new Vector< GlobalCode >();
@@ -35,7 +36,19 @@ public class GlobalCode {
     public int                          minRating        = 1;
     public int                          maxRating        = 5;
 
+
+
     // Class:
+
+
+    /**
+     * Expose list iterator
+     * @return
+     */
+    public static ListIterator<GlobalCode> getIterator() {
+        return list.listIterator();
+    }
+
 
     // Add new code.  Returns true on success, shows warning dialog on failure.
     public static boolean   addCode( GlobalCode newCode ) {
@@ -65,7 +78,7 @@ public class GlobalCode {
     }
 
     // PRE: code exists with given id.
-    public static GlobalCode codeWithId(int value ) {
+    public static GlobalCode codeWithId( int value ) {
         // Check user codes.
         for( int i = 0; i < list.size(); i++ ) {
             GlobalCode code = list.get( i );
