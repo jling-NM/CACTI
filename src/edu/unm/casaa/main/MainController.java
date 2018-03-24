@@ -19,7 +19,6 @@ This source code file is part of the CASAA Treatment Coding System Utility
 package edu.unm.casaa.main;
 
 import edu.unm.casaa.globals.GlobalCode;
-import edu.unm.casaa.globals.GlobalDataModel;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.Utterance;
@@ -40,13 +39,11 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Line;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -158,17 +155,10 @@ public class MainController {
 
 
     private Preferences appPrefs;                       // User prefs persistence
-
-    // mediaplayer attributes
     private Duration totalDuration;                     // duration of active media
-    //private String filenameMisc          = null;        // name of active CASAA data file.
-    //private String filenameGlobals       = null;        // name of active globals data file
     private String filenameAudio         = null;        // name of active media file. Used when switching from PLAYBACK to MISC to GLOBALS
     private File currentAudioFile        = null;        // active media file
-
-    //private SessionData.Ratings ratings  = null;        // GLOBALS scoring data
-    private SessionData sessionData      = null;        // session persistance
-    //private SessionData.UtteranceList utteranceList  = null;        // MISC coding data
+    private SessionData sessionData      = null;        // session persistence
 
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
@@ -860,7 +850,6 @@ public class MainController {
             System.exit(0);
         }
 
-
     }
 
 
@@ -870,35 +859,64 @@ public class MainController {
     private void resumeCoding( File sessionFile ) {
 
         File audioFile;
-
         try {
             // load session data
             sessionData = new SessionData(sessionFile);
             // initialize audio file object
             audioFile = new File(sessionData.getAudioFilePath());
-
         } catch(Exception e)  {
             showError("Error Loading Casaa File", e.getMessage());
             return;
         }
 
-        // load the audio and start the player
-        filenameAudio = audioFile.getAbsolutePath();
 
         if (audioFile.canRead()) {
+            // load the audio and start the player
+            filenameAudio = audioFile.getAbsolutePath();
             // store reference so other states can reuse
             currentAudioFile = audioFile;
             // start media player
             initializeMediaPlayer(audioFile, playerReady);
         } else {
-            showError("Error Loading Audio File", format("Could not load audio file:\n  %s\n\nwhich is specified within:\n  %s\n\nCheck that audio file exists\nand has read permissions", filenameAudio, sessionData.getSessionFilePath() ));
-            return;
+
+            /*
+             show an error dialog to inform user and offer opportunity to locate the missing audio file
+             */
+            Locale locale = new Locale("en", "US");
+            ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(resourceStrings.getString("alert.missingAudioFile.title"));
+            alert.setContentText(String.format("Could not load the session audio file:\n%s\nIf you know where the audio file is,\nclick the 'Locate File' button.", sessionData.getAudioFilePath()) );
+            ButtonType buttonTypeLoc = new ButtonType(resourceStrings.getString("alert.missingAudioFile.btn1.text"));
+            ButtonType buttonTypeCancel = new ButtonType(resourceStrings.getString("alert.missingAudioFile.btn2.text"), ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(buttonTypeLoc, buttonTypeCancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == buttonTypeLoc){
+                // locate audio file
+                audioFile = selectAudioFile();
+                try {
+                    // load the audio and start the player
+                    filenameAudio = audioFile.getAbsolutePath();
+                    // update session
+                    sessionData.setAudioFilePath(audioFile.getAbsolutePath());
+                } catch (NullPointerException e) {
+                    return;
+                } catch(SQLException e) {
+                    showError("Error Updating Casaa File", e.getMessage());
+                    return;
+                }
+                // start media player
+                initializeMediaPlayer(audioFile, playerReady);
+            } else {
+                return;
+            }
         }
 
         setGuiState(GuiState.MISC_CODING);
 
         setPlayerButtonState();
-
     }
 
 
@@ -1434,6 +1452,32 @@ public class MainController {
 
         // just kill JVM as we don't need to stop cleanly and Platform.exit() won't work here.
         System.exit(1);
+    }
+
+
+    private void showAudioFileLocationError() {
+
+        //showError("Error Loading Audio File", format("Could not load audio file:\n  %s\n\nwhich is specified within:\n  %s\n\nCheck that audio file exists\nand has read permissions", filenameAudio, sessionData.getSessionFilePath() ));
+
+        Locale locale = new Locale("en", "US");
+        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(resourceStrings.getString("alert.config.title"));
+        alert.setContentText(resourceStrings.getString("alert.config.text"));
+
+        ButtonType buttonTypeLoc = new ButtonType(resourceStrings.getString("alert.config.btn2.text"));
+        ButtonType buttonTypeCancel = new ButtonType(resourceStrings.getString("alert.config.btn3.text"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeLoc, buttonTypeCancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeLoc){
+            // locate audio file
+        } else {
+            System.exit(0);
+        }
+
     }
 
 

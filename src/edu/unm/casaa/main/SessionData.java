@@ -1,12 +1,6 @@
 package edu.unm.casaa.main;
 
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.sql.*;
-import java.util.*;
-
 import edu.unm.casaa.globals.GlobalCode;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
@@ -16,35 +10,53 @@ import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 import org.sqlite.SQLiteDataSource;
 import org.sqlite.SQLiteConfig;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.*;
+import java.util.*;
 
 
-
-
+/**
+ * Session Data Model
+ */
 public class SessionData
 {
-
     private File sessionFile;
     private final SQLiteDataSource ds;
     private String audioFilePath = "";
 
-    // TODO: possible
+    /**
+     * Store and manipulate list of utterances for session
+     */
     public UtteranceList utteranceList;
+
+    /**
+     * Store and manipulate list of global ratings for session
+     */
     public Ratings ratingsList;
+
+    /**
+     * Available session attributes
+     */
+    private enum SessionAttributes {
+        AUDIO_FILE_PATH,
+        GLOBAL_NOTES
+    }
 
 
     /**
      * Common init code
      */
     private SessionData () {
-        /*
-          datasource config
-          - enable foreign key constraints
-          - give database a version
-         */
+        // database config
         SQLiteConfig config = new SQLiteConfig();
+        // enable foreign key constraints
         config.enforceForeignKeys(true);
+        // give database a version
         config.setUserVersion(1);
-
+        // attach config to our datasource
         ds = new SQLiteDataSource(config);
     }
 
@@ -64,6 +76,8 @@ public class SessionData
 
         try {
             init();
+            utteranceList = new SessionData.UtteranceList();
+            ratingsList = new SessionData.Ratings();
         } catch (SQLException e) {
             // constructor can fail for basic IO or SQL
             // convert SQLException as we don't need the SQL details here
@@ -91,7 +105,7 @@ public class SessionData
             if( isSQLiteDataFile() ) {
                 try {
                     // TODO: this take a long time. WHY?
-                    audioFilePath = getAttribute("source_audio_file_path");
+                    audioFilePath = getAttribute(SessionAttributes.AUDIO_FILE_PATH);
                     utteranceList = new SessionData.UtteranceList();
                     ratingsList = new SessionData.Ratings();
                 } catch (SQLException e) {
@@ -121,7 +135,7 @@ public class SessionData
 
 
     /**
-     * TBD
+     * Test if current session file is a SQLite database
      */
     private boolean isSQLiteDataFile() throws IOException {
 
@@ -144,8 +158,8 @@ public class SessionData
 
         HashMap< Integer, Integer > ratings = new HashMap<>();
 
-        try ( Connection connection = ds.getConnection();
-              Statement statement = connection.createStatement() ) {
+        try (Connection connection = ds.getConnection();
+             Statement statement = connection.createStatement() ) {
 
             ResultSet rs = statement.executeQuery("select rating_id, response_value from ratings");
 
@@ -173,7 +187,10 @@ public class SessionData
     }
 
 
-
+    /**
+     * @return A populated map of utterances
+     * @throws SQLException
+     */
     private SortedMap< String, Utterance > getUtterances() throws SQLException
     {
         SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
@@ -202,8 +219,12 @@ public class SessionData
     }
 
 
-
-    private void setAttribute(String name, String value) throws SQLException
+    /**
+     * @param attribute
+     * @param value
+     * @throws SQLException
+     */
+    private void setAttribute(SessionAttributes attribute, String value) throws SQLException
     {
         String sql = "update attributes set value = ? where name = ?";
 
@@ -211,30 +232,51 @@ public class SessionData
               PreparedStatement ps = connection.prepareStatement(sql)  )
         {
             ps.setString(1, value);
-            ps.setString(2, name);
+            ps.setString(2, attribute.name());
             ps.executeUpdate();
         }
     }
 
 
+    /**
+     * Audio file path associated with this session
+     * @return full file path
+     */
     public String getAudioFilePath() {
         return this.audioFilePath;
     }
 
 
+    /**
+     * @param filePath
+     */
+    public void setAudioFilePath(String filePath) throws SQLException {
+        this.audioFilePath = filePath;
+        setAttribute(SessionAttributes.AUDIO_FILE_PATH, this.audioFilePath);
+    }
+
+
+    /**
+     * @return Session file path
+     */
     public String getSessionFilePath() {
         return this.sessionFile.getAbsolutePath();
     }
 
 
-    private String getAttribute(String name) throws SQLException
+    /**
+     * @param sessionAttribute
+     * @return current value for session attribute
+     * @throws SQLException
+     */
+    private String getAttribute(SessionAttributes sessionAttribute) throws SQLException
     {
         String sql = "select value from attributes where name = ?";
 
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps = connection.prepareStatement(sql) )
         {
-            ps.setString(1, name);
+            ps.setString(1, sessionAttribute.name());
             ResultSet rs = ps.executeQuery();
 
             if( rs.next() ) {
@@ -323,7 +365,11 @@ public class SessionData
     }
 
 
-
+    /**
+     * Remove utterance from datasource
+     * @param utterance_id
+     * @throws SQLException
+     */
     private void removeUtterance(String utterance_id) throws SQLException
     {
         String sql = "delete from utterances where utterance_id = ?";
@@ -337,6 +383,14 @@ public class SessionData
     }
 
 
+    /**
+     * Insert utterance into datasource
+     * @param utterance_id
+     * @param code_id
+     * @param audio_file_time_marker
+     * @param annotation
+     * @throws SQLException
+     */
     private void addUtterance(String utterance_id, int code_id, String audio_file_time_marker, String annotation) throws SQLException
     {
         String sql = "insert into utterances (utterance_id, code_id, audio_file_time_marker, annotation) values (?,?,?,?)";
@@ -353,6 +407,12 @@ public class SessionData
     }
 
 
+    /**
+     * Set global rating value in datasource
+     * @param rating_id
+     * @param response_value
+     * @throws SQLException
+     */
     private void setRatingResponseValue(int rating_id, int response_value) throws SQLException
     {
         String sql = "update ratings set response_value = ? where rating_id = ?";
@@ -368,12 +428,11 @@ public class SessionData
     }
 
 
-
-
-
-
-
-
+    /**
+     * Initialize datasource schema and default values
+     * Codes and their defaults initialized from UserConfig
+     * @throws SQLException
+     */
     private void init() throws SQLException
     {
 
@@ -414,8 +473,8 @@ public class SessionData
                     ")");
             statement.executeUpdate("create table if not exists attributes ( name, value )");
             // assumes data file does not exists
-            statement.executeUpdate("insert into attributes ( name, value ) values ('source_audio_file_path', '" + this.audioFilePath + "')");
-            statement.executeUpdate("insert into attributes ( name, value ) values ('rating_notes', '')");
+            statement.executeUpdate("insert into attributes ( name, value ) values ( '" + SessionAttributes.AUDIO_FILE_PATH + "', '" + this.audioFilePath + "')");
+            statement.executeUpdate("insert into attributes ( name, value ) values ('" + SessionAttributes.GLOBAL_NOTES + "', '')");
 
 
             /*
@@ -485,20 +544,19 @@ public class SessionData
 
 
 
-
-    //
-    //Nested Session Data classes
-    //
-
     /**
-     * A sortedMap of utterances, sorted by id which should be a string representation of start time
+     * Session Utterance Markers
      */
     public class UtteranceList {
 
+        /*
+         * A sortedMap of utterances, sorted by id which should be a string representation of start time
+         */
         private SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
         private ObservableMap<String, Utterance> observableMap;
 
         /**
+         * Constructor initializes utterance map
          * @throws SQLException
          */
         private UtteranceList() throws SQLException {
@@ -507,7 +565,6 @@ public class SessionData
         }
 
         /**
-         *
          * @return observable version of utterance map for listeners
          */
         public ObservableMap getObservableMap() {
@@ -542,7 +599,7 @@ public class SessionData
         }
 
         /**
-         * Remove utterance
+         * Remove utterance from list
          * @param utr
          * @throws SQLException
          */
@@ -551,6 +608,12 @@ public class SessionData
             removeUtterance(utr.getID());
         }
 
+
+        /**
+         * Remove utterance from list
+         * @param ID
+         * @throws SQLException
+         */
         public void remove(String ID) throws SQLException {
             observableMap.remove(ID);
             removeUtterance(ID);
@@ -571,6 +634,9 @@ public class SessionData
             return utteranceTreeMap.isEmpty() ? null : utteranceTreeMap.get(utteranceTreeMap.lastKey());
         }
 
+        /**
+         * @return utterance map values
+         */
         public Collection<Utterance> values() {
             return utteranceTreeMap.values();
         }
@@ -587,15 +653,17 @@ public class SessionData
     }
 
 
-
-    private class Compatibility {
+       /**
+        * Possible future for provide backwards storage compatibility
+        */
+ /*    private class Compatibility {
 
         /**
          * This will load data from old, text-based format into new sql data file
          * @param MISCfile casaa file
          * @throws Exception
          */
-        public void loadFromFile(File MISCfile ) throws Exception {
+  /*      public void loadFromFile(File MISCfile ) throws Exception {
 
             edu.unm.casaa.utterance.UtteranceList utteranceList = new edu.unm.casaa.utterance.UtteranceList(MISCfile);
 
@@ -624,7 +692,7 @@ public class SessionData
                 StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
                 int 			lineSize 	= st.countTokens();
 
-                /* new data format */
+                *//* new data format *//*
                 if( lineSize == 3 ){
 
                     Duration startTime  = Utils.parseDuration(st.nextToken());
@@ -645,19 +713,19 @@ public class SessionData
                     utteranceList.add(item);
 
                 }
-                /* read 7 to handle old data format */
+                *//* read 7 to handle old data format *//*
                 else if( lineSize == 7 ) {
 
-                    /* throw away useless index number, start time*/
+                    *//* throw away useless index number, start time*//*
                     st.nextToken();
                     st.nextToken();
-                    /* start time */
+                    *//* start time *//*
                     Duration startTime  = Utils.parseDuration(st.nextToken());
 
-                    /* skip time zero utterances from this format */
+                    *//* skip time zero utterances from this format *//*
                     if(!startTime.equals(Duration.ZERO)) {
 
-                        /* throw away useless, byte data */
+                        *//* throw away useless, byte data *//*
                         st.nextToken();
                         st.nextToken();
 
@@ -681,43 +749,72 @@ public class SessionData
 
         }
     }
+*/
 
-
-
-
-
-
-
+    /**
+     * Global Session Ratings
+     */
     public class Ratings {
 
-        //private HashMap< Integer, Integer > ratings = new HashMap< Integer, Integer >();
+        // list for all ratings
         private HashMap< Integer, Integer > ratings;
-        private String notes = "";
+        // notes field for ratings overall. Could just be session notes at this point.
+        private String notes;
 
+
+        /**
+         * @throws SQLException
+         */
         private Ratings() throws SQLException {
             ratings = getRatings();
-            notes = getAttribute("rating_notes");
+            notes = getAttribute(SessionAttributes.GLOBAL_NOTES);
         }
 
+
+        /**
+         * @param code
+         * @return rating for one of the global questions
+         */
         public int getRating( GlobalCode code ) {
             return ratings.get(code.id);
         }
 
+
+        /**
+         * @param code
+         * @param rating
+         * @throws SQLException
+         */
         public void	setRating( GlobalCode code, int rating ) throws SQLException {
             ratings.put( code.id, rating );
             setRatingResponseValue( code.id, rating);
         }
 
+
+        /**
+         * @param code
+         * @param rating
+         * @throws SQLException
+         */
         public void	setRating( GlobalCode code, String rating ) throws SQLException {
             int rating_value = Integer.parseInt(rating);
             this.setRating(code, rating_value);
         }
 
+
+        /**
+         * @param notes
+         * @throws SQLException
+         */
         public void setNotes(String notes) throws SQLException {
             this.notes = notes;
-            setAttribute("rating_notes", notes);
+            setAttribute(SessionAttributes.GLOBAL_NOTES, notes);
         }
 
+
+        /**
+         * @return
+         */
         public String getNotes() {
             return notes;
         }
