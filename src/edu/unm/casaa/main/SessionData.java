@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.*;
 import java.util.*;
 
@@ -63,8 +64,8 @@ public class SessionData
 
     /**
      * Initialize new session data
-     * @param storageFile
-     * @param audioFile
+     * @param storageFile session data file
+     * @param audioFile session audio file
      * @throws IOException
      */
     public SessionData(File storageFile, File audioFile) throws IOException {
@@ -88,7 +89,7 @@ public class SessionData
 
     /**
      * Initialize with existing session file
-     * @param storageFile
+     * @param storageFile session data file
      * @throws IOException
      */
     public SessionData(File storageFile) throws IOException {
@@ -97,12 +98,11 @@ public class SessionData
         sessionFile = storageFile;
         ds.setUrl("jdbc:sqlite:" + sessionFile.getAbsolutePath());
 
+        // check file exists
         if( sessionFileExists() ) {
-
-            /*
-            load audio file path from existing db
-             */
+            // check file format
             if( isSQLiteDataFile() ) {
+                // try loading file
                 try {
                     // TODO: this take a long time. WHY?
                     audioFilePath = getAttribute(SessionAttributes.AUDIO_FILE_PATH);
@@ -112,23 +112,12 @@ public class SessionData
                     throw new IOException(e);
                 }
             } else {
-
-                // can remove this or replace with file conversion dialog or automated conversion below
-                throw new IOException( "File is not correct format:\n"+sessionFile.getAbsolutePath() );
-
-                // TODO: if not sqlite format we need to:
-                //      - move old format casaa file to same name with "*.casaa.bak" or "*.casaa.txt"
-                //      - move old format globals file to same name with *.globals.bak"
-                //      - how will i find this file?????
-                //       - convert these "bak" files format (MISC and Globals) to new format
-                //       - giving it original casaa file name
-                //       - write new sqlite format
-                //       - perhaps alert user if we didn't ask first
-                //       - once all this is in db, load utterances and ratings as above
-
+                // wrong file format
+                throw new FileFormatException( "File is not correct format:\n"+sessionFile.getAbsolutePath() );
             }
         } else {
-            throw new IOException("File does not exist.");
+            // file not found
+            throw new FileNotFoundException("File not found.");
         }
     }
 
@@ -143,7 +132,7 @@ public class SessionData
         try ( FileReader textFileReader = new FileReader(sessionFile) ) {
             char[] buffer = new char[6];
             int numberOfCharsRead = textFileReader.read(buffer);
-            System.out.println("XX" + String.valueOf(buffer, 0, numberOfCharsRead) + "XX");
+            //System.out.println("XX" + String.valueOf(buffer, 0, numberOfCharsRead) + "XX");
             return String.valueOf(buffer, 0, numberOfCharsRead).startsWith("SQLite");
         }
     }
@@ -220,8 +209,51 @@ public class SessionData
 
 
     /**
-     * @param attribute
-     * @param value
+     * Reset utterance list to contents of list
+     * @param utteranceList List of utterances to load
+     * @throws SQLException
+     */
+    public void setUtteranceList(List<Utterance> utteranceList) throws SQLException {
+        String sql = "insert into utterances (utterance_id, code_id, audio_file_time_marker, annotation) values (?,?,?,?)";
+
+        try ( Connection connection = ds.getConnection();
+              PreparedStatement ps = connection.prepareStatement(sql)  )
+        {
+            connection.setAutoCommit(false);
+            for (Utterance utr : utteranceList) {
+                ps.setInt(1, Integer.parseInt(utr.getID()));
+                ps.setInt(2, utr.getMiscCode().value);
+                ps.setString(3, Utils.formatDuration(utr.getStartTime()));
+                ps.setString(4, utr.getAnnotation());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            // apply changes
+            connection.commit();
+        }
+
+        /* reload from now populated db */
+        this.utteranceList = new SessionData.UtteranceList();
+
+    }
+
+
+
+    public void setRatingsList(HashMap<String, Integer> ratingsMap) throws SQLException {
+        for (Map.Entry<String, Integer> entry : ratingsMap.entrySet()) {
+            addRating(entry.getKey(), entry.getValue());
+        }
+
+        /* reload from now populated db */
+        this.ratingsList = new SessionData.Ratings();
+
+    }
+
+
+    /**
+     * @param attribute SessionAttribute to update
+     * @param value new value
      * @throws SQLException
      */
     private void setAttribute(SessionAttributes attribute, String value) throws SQLException
@@ -248,7 +280,7 @@ public class SessionData
 
 
     /**
-     * @param filePath
+     * @param filePath new audio file path
      */
     public void setAudioFilePath(String filePath) throws SQLException {
         this.audioFilePath = filePath;
@@ -265,7 +297,7 @@ public class SessionData
 
 
     /**
-     * @param sessionAttribute
+     * @param sessionAttribute SessionAttribute to get
      * @return current value for session attribute
      * @throws SQLException
      */
@@ -407,6 +439,43 @@ public class SessionData
     }
 
 
+    private void addRating(String rating_name, int response_value) throws SQLException
+    {
+
+        String sql = "select rating_id from ratings where rating_name = ?";
+
+        int rating_id = -1;
+
+        try ( Connection connection = ds.getConnection();
+              PreparedStatement ps = connection.prepareStatement(sql) )
+        {
+            ps.setString(1, rating_name);
+            ResultSet rs = ps.executeQuery();
+
+            if( rs.next() ) {
+                rating_id = rs.getInt("rating_id");
+            }
+        }
+
+
+        if( rating_id == -1 ){
+
+            sql = "insert into ratings (rating_name, response_value) values (?,?)";
+
+            try ( Connection connection = ds.getConnection();
+                  PreparedStatement ps = connection.prepareStatement(sql) )
+            {
+                ps.setString(1, rating_name);
+                ps.setInt(2, response_value);
+                ps.executeUpdate();
+            }
+        } else {
+          setRatingResponseValue(rating_id, response_value);
+        }
+    }
+
+
+
     /**
      * Set global rating value in datasource
      * @param rating_id
@@ -544,6 +613,10 @@ public class SessionData
 
 
 
+
+
+
+
     /**
      * Session Utterance Markers
      */
@@ -592,7 +665,7 @@ public class SessionData
             if( !utteranceTreeMap.isEmpty() ) {
                 // update map
                 observableMap.remove(utteranceTreeMap.lastKey());
-                // update persistance
+                // update persistence
                 Utterance utr = utteranceTreeMap.get(utteranceTreeMap.lastKey());
                 removeUtterance(utr.getID());
             }
@@ -653,103 +726,7 @@ public class SessionData
     }
 
 
-       /**
-        * Possible future for provide backwards storage compatibility
-        */
- /*    private class Compatibility {
 
-        /**
-         * This will load data from old, text-based format into new sql data file
-         * @param MISCfile casaa file
-         * @throws Exception
-         */
-  /*      public void loadFromFile(File MISCfile ) throws Exception {
-
-            edu.unm.casaa.utterance.UtteranceList utteranceList = new edu.unm.casaa.utterance.UtteranceList(MISCfile);
-
-            Scanner in;
-
-            try {
-                in = new Scanner(MISCfile);
-            } catch (FileNotFoundException e) {
-                throw e;
-            }
-
-            //////utteranceList.storageFile = MISCfile;
-
-            // get the audio filename line.
-            String 			filenameAudio 	= in.nextLine();
-            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
-
-            // Eat  "Audio Filename:"
-            headReader.nextToken();
-            // local reference of audiofilename
-            //////utteranceList.audioFilename = headReader.nextToken();
-
-            while( in.hasNextLine() ){
-
-                String 			nextStr 	= in.nextLine();
-                StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
-                int 			lineSize 	= st.countTokens();
-
-                *//* new data format *//*
-                if( lineSize == 3 ){
-
-                    Duration startTime  = Utils.parseDuration(st.nextToken());
-                    int codeId          = Integer.parseInt( st.nextToken() );
-                    String codeName     = st.nextToken();
-                    MiscDataItem item 	= new MiscDataItem(Utils.formatID(startTime,codeId), startTime);
-
-                    // look up parsed code in user config codes loaded at init
-                    try {
-                        item.setMiscCodeByValue(codeId);
-                    } catch (Exception e) {
-                        // if lookup failed there is a possible disconnect between codes in casaa file
-                        // and codes in user config file
-                        throw new Exception( String.format("The code (%s) with value (%d) in file (%s) was not found in the current user configuration file.\n\nIf you uncode (%s) you will not be able to recode it with the current config file.", codeName, codeId, MISCfile.getName(), codeName ) );
-                    }
-                    //st.nextToken(); // throw away the code string
-
-                    utteranceList.add(item);
-
-                }
-                *//* read 7 to handle old data format *//*
-                else if( lineSize == 7 ) {
-
-                    *//* throw away useless index number, start time*//*
-                    st.nextToken();
-                    st.nextToken();
-                    *//* start time *//*
-                    Duration startTime  = Utils.parseDuration(st.nextToken());
-
-                    *//* skip time zero utterances from this format *//*
-                    if(!startTime.equals(Duration.ZERO)) {
-
-                        *//* throw away useless, byte data *//*
-                        st.nextToken();
-                        st.nextToken();
-
-                        int codeId = Integer.parseInt(st.nextToken());
-                        MiscDataItem item = new MiscDataItem(Utils.formatID(startTime, codeId), startTime);
-
-                        // look up parsed code in user config codes loaded at init
-                        try {
-                            item.setMiscCodeByValue(codeId);
-                        } catch (Exception e) {
-                            // if lookup failed there is a possible disconnect between codes in casaa file
-                            // and codes in user config file
-                            throw new Exception(String.format("Code(%d) in casaa file not found in user configuration file", codeId));
-                        }
-                        st.nextToken(); // throw away the code string
-
-                        utteranceList.add(item);
-                    }
-                }
-            }
-
-        }
-    }
-*/
 
     /**
      * Global Session Ratings
@@ -818,6 +795,293 @@ public class SessionData
         public String getNotes() {
             return notes;
         }
+
+    }
+
+
+    /**
+     * Grouping of static methods that support backwards compatibility in session data storage and could be removed in the future.
+     * Might just be moved into SessionData
+     */
+    public static class Compatibility {
+
+        /**
+         * Separate function for reading audio filename from code file
+         * @param casaaFileTextFormat casaa file
+         * @return filenameAudio
+         */
+        public static String getAudioFilename( File casaaFileTextFormat ) throws IOException {
+
+            Scanner in;
+            try {
+                in = new Scanner(casaaFileTextFormat);
+            } catch (FileNotFoundException e) {
+                throw e;
+            }
+
+            if( !in.hasNext() ){
+                throw new IOException("No Audio File Listed in casaa file");
+            }
+
+            // Get the audio filename line.
+            String 			filenameAudio 	= in.nextLine();
+            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+            headReader.nextToken(); // Eat line heading "Audio Filename:"
+            filenameAudio = headReader.nextToken();
+            if( (filenameAudio.trim()).equalsIgnoreCase("") ){
+                throw new IOException("No Audio File Listed in casaa file");
+            }
+
+            return filenameAudio;
+        }
+
+
+
+        /**
+         * Convert old file format to new
+         * @param sessionFileTextFormat
+         * @throws IOException
+         */
+        static public SessionData sessionDataFromPreviousFileFormat(File sessionFileTextFormat) throws IOException {
+
+            /* move old format casaa file to same name with "*.casaa.bak" or "*.casaa.txt" */
+            String backupFilePath = sessionFileTextFormat.getAbsolutePath().replace("casaa", "casaa.txt.bak");
+            File backupSessionFile = new File(backupFilePath);
+            /* if a backup file by that name already exists we will assume it doesn't need repeating */
+            if( !backupSessionFile.exists() ) {
+                Files.copy(sessionFileTextFormat.toPath(), backupSessionFile.toPath());
+            }
+
+            /* now delete old session file so a new session can be created */
+            Files.delete(sessionFileTextFormat.toPath());
+
+            /* new session file */
+            File sessionFile = new File(sessionFileTextFormat.getAbsolutePath());
+            /* get audioFile from old casaa file format */
+            File audioFile = new File(Compatibility.getAudioFilename(backupSessionFile));
+
+            /* initialize session data */
+            SessionData sessionData = new SessionData(sessionFile, audioFile);
+
+            /* load utterances from old text format into new session data */
+            List<Utterance> utteranceList = utteranceListFromPreviousFileFormat(backupSessionFile);
+
+            try {
+                sessionData.setUtteranceList(utteranceList);
+            } catch (SQLException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            return sessionData;
+
+        }
+
+
+        /**
+         * Convert old file format to new. Include globals file merge
+         * @param sessionFile
+         * @param globalsFile
+         * @throws IOException
+         */
+        static public SessionData sessionDataFromPreviousFileFormat(File sessionFile, File globalsFile) throws IOException {
+
+            SessionData sessionData = sessionDataFromPreviousFileFormat(sessionFile);
+
+            /* import globals file */
+            HashMap<String, Integer> globalsList = globalRatingsListFromPreviousFileFormat(globalsFile);
+
+            try {
+                sessionData.setRatingsList(globalsList);
+            } catch (SQLException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            String globalsNotes = globalNotesListFromPreviousFileFormat(globalsFile);
+            try {
+                sessionData.ratingsList.setNotes(globalsNotes);
+            } catch (SQLException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            return sessionData;
+        }
+
+
+        /**
+         * @param sessionFileTextFormat
+         * @return list of utterances loaded from the text file format
+         * @throws IOException
+         */
+        public static List<Utterance> utteranceListFromPreviousFileFormat(File sessionFileTextFormat) throws IOException {
+
+            List<Utterance> utteranceList = new ArrayList<>();
+
+            Scanner in;
+
+            try {
+                in = new Scanner(sessionFileTextFormat);
+            } catch (FileNotFoundException e) {
+                throw e;
+            }
+
+            // get the audio filename line.
+            String 			filenameAudio 	= in.nextLine();
+            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+            // Eat  "Audio Filename:"
+            headReader.nextToken();
+
+            while( in.hasNextLine() ){
+
+                String 			nextStr 	= in.nextLine();
+                StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
+                int 			lineSize 	= st.countTokens();
+
+                /* new data format */
+                if( lineSize == 3 ){
+
+                    Duration startTime  = Utils.parseDuration(st.nextToken());
+                    int codeId          = Integer.parseInt( st.nextToken() );
+                    String codeName     = st.nextToken();
+                    MiscDataItem item 	= new MiscDataItem(Utils.formatID(startTime,codeId), startTime);
+
+                    // look up parsed code in user config codes loaded at init
+                    try {
+                        item.setMiscCodeByValue(codeId);
+                    } catch (Exception e) {
+                        // if lookup failed there is a possible disconnect between codes in casaa file
+                        // and codes in user config file
+                        throw new IOException( String.format("The code (%s) with value (%d) in file (%s) was not found in the current user configuration file.\n\nIf you uncode (%s) you will not be able to recode it with the current config file.", codeName, codeId, sessionFileTextFormat.getName(), codeName ) );
+                    }
+
+                    utteranceList.add(item);
+
+                }
+                /* read 7 to handle old data format */
+                else if( lineSize == 7 ) {
+
+                    /* throw away useless index number, start time*/
+                    st.nextToken();
+                    st.nextToken();
+                    /* start time */
+                    Duration startTime  = Utils.parseDuration(st.nextToken());
+
+                    /* skip time zero utterances from this format */
+                    if(!startTime.equals(Duration.ZERO)) {
+
+                        /* throw away useless, byte data */
+                        st.nextToken();
+                        st.nextToken();
+
+                        int codeId = Integer.parseInt(st.nextToken());
+                        MiscDataItem item = new MiscDataItem(Utils.formatID(startTime, codeId), startTime);
+
+                        // look up parsed code in user config codes loaded at init
+                        try {
+                            item.setMiscCodeByValue(codeId);
+                        } catch (Exception e) {
+                            // if lookup failed there is a possible disconnect between codes in casaa file
+                            // and codes in user config file
+                            throw new IOException(String.format("Code(%d) in casaa file not found in user configuration file", codeId));
+                        }
+                        st.nextToken(); // throw away the code string
+
+                        utteranceList.add(item);
+                    }
+                }
+            }
+
+            return utteranceList;
+        }
+
+
+        /**
+         * @param globalsFileTextFormat
+         * @return Map of global rating items parsed from text file format
+         * @throws IOException
+         */
+        public static HashMap<String, Integer> globalRatingsListFromPreviousFileFormat(File globalsFileTextFormat) throws IOException {
+
+            HashMap<String, Integer> ratingList = new HashMap<>();
+
+            Scanner in;
+
+            try {
+                in = new Scanner(globalsFileTextFormat);
+            } catch (FileNotFoundException e) {
+                throw e;
+            }
+
+            // get the audio filename line.
+            String 			filenameAudio 	= in.nextLine();
+            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+            // Eat  "Audio Filename:"
+            headReader.nextToken();
+            in.nextLine();
+
+            while( in.hasNextLine() ){
+
+                String 			nextStr 	= in.nextLine();
+                StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
+                int 			lineSize 	= st.countTokens();
+
+                if( lineSize == 2 ){
+                    /* global */
+                    String rating_name = st.nextToken().toUpperCase().replace(":","");
+                    if( !rating_name.equalsIgnoreCase("NOTES") ) {
+                        int response_value = Integer.parseInt( st.nextToken() );
+                        ratingList.put(rating_name, response_value);
+                    }
+                }
+            }
+
+            return ratingList;
+        }
+
+
+        /**
+         * @param globalsFileTextFormat
+         * @return Notes text parsed from text format file
+         * @throws IOException
+         */
+        public static String globalNotesListFromPreviousFileFormat(File globalsFileTextFormat) throws IOException {
+
+            String notes = "";
+
+            Scanner in;
+
+            try {
+                in = new Scanner(globalsFileTextFormat);
+            } catch (FileNotFoundException e) {
+                throw e;
+            }
+
+            // get the audio filename line.
+            String 			filenameAudio 	= in.nextLine();
+            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+            // Eat  "Audio Filename:"
+            headReader.nextToken();
+            in.nextLine();
+
+            while( in.hasNextLine() ){
+
+                String 			nextStr 	= in.nextLine();
+                StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
+                int 			lineSize 	= st.countTokens();
+
+                if( lineSize == 2 ){
+                    String rating_name = st.nextToken().toUpperCase().replace(":","");
+                    if( rating_name.equalsIgnoreCase("NOTES") ) {
+                        notes = st.nextToken();
+                    }
+                }
+            }
+            return notes;
+        }
+
 
     }
 }

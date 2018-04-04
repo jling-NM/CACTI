@@ -27,9 +27,12 @@ public interface Utterance {
 	void setMiscCodeByValue(int value);
 	void setMiscCode(MiscCode code);
 	void setStartTime(double startTime);
+	void setAnnotation(String annotation);
+
 	String getID();
 	Duration getStartTime();
 	MiscCode getMiscCode();
+    String getAnnotation();
 
 	String displayCoded();
     // TODO: can this be removed now?

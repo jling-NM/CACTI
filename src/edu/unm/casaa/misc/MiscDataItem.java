@@ -102,6 +102,17 @@ public class MiscDataItem implements Utterance {
 		return ("" + Utils.formatDuration(startTime) + "\t" +
 				miscCode.name);
 	}
+
+	@Override
+	public void setAnnotation(String annotation) {
+
+	}
+
+	@Override
+	public String getAnnotation() {
+		return null;
+	}
+
 	public String writeCoded(){
 		return ("" + Utils.formatDuration(startTime)	+ "\t" +
 					miscCode.value 	+ "\t" +
