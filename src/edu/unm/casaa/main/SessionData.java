@@ -523,6 +523,7 @@ public class SessionData
                     "speaker_id integer, " +
                     "  foreign key (speaker_id) references speakers (speaker_id)" +
                     ")");
+            /* utterance_id needs to be 'TEXT' to preserve leading zeros used as id in node graph */
             statement.executeUpdate("create table if not exists utterances ( " +
                     "utterance_id TEXT primary key not null unique, " +
                     "time_marker string not null, " +
@@ -654,7 +655,7 @@ public class SessionData
         public void add( Utterance utr ) throws SQLException {
             // update local map
             observableMap.put( Utils.formatID(utr.getStartTime(), utr.getMiscCode().value), utr);
-            // update persistance
+            // update persistence
             addUtterance(utr.getID(), utr.getMiscCode().value, Utils.formatDuration(utr.getStartTime()), "");
         }
 

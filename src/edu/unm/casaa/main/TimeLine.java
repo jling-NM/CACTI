@@ -36,8 +36,6 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
-
-import java.io.IOException;
 import java.sql.SQLException;
 
 
