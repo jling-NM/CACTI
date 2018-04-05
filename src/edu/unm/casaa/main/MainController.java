@@ -19,7 +19,6 @@ This source code file is part of the CASAA Treatment Coding System Utility
 package edu.unm.casaa.main;
 
 import edu.unm.casaa.globals.GlobalCode;
-import edu.unm.casaa.globals.GlobalDataModel;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.Utterance;
@@ -170,7 +169,7 @@ public class MainController {
 
     //private SessionData.Ratings ratings  = null;        // GLOBALS scoring data
     private SessionData sessionData      = null;        // session persistance
-
+    
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
