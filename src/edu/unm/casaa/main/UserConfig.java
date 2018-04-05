@@ -21,19 +21,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.prefs.Preferences;
 
+
+
 /**
- * Move user config data handling out of controller
+ * Interface for user config data. An XML file the user can edit outside of the application to define codes and code layout.
  */
 public class UserConfig {
 
-    // provide access to application preferences
+    /* provide access to application preferences */
     private static final Preferences appPrefs = Preferences.userNodeForPackage(Main.class);
-    // default location of config file
+    /* default location of config file */
     private static final String defaultPath = String.format("%s%s%s", System.getProperty("user.home"), System.getProperty("file.separator"), "CactiUserConfiguration.xml");
 
 
     /**
-     * Writes out a minimal config file
+     * Writes out a default, minimal config file
      */
     public static void writeDefault() throws IOException {
 
@@ -73,7 +75,7 @@ public class UserConfig {
 
 
     /**
-     *
+     * Set config file location
      * @param configPath
      */
     public static void setPath(String configPath) {
@@ -82,7 +84,7 @@ public class UserConfig {
 
 
     /**
-     *
+     * Get config file location
      * @return
      */
     public static String getPath() {
