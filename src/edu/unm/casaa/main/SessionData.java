@@ -2,8 +2,6 @@ package edu.unm.casaa.main;
 
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.sql.*;
 import java.util.*;
 
@@ -33,7 +31,7 @@ public class SessionData
 
 
     /**
-     * Common init code
+     * Common initDB code
      */
     private SessionData () {
         /*
@@ -63,7 +61,9 @@ public class SessionData
         ds.setUrl("jdbc:sqlite:" + sessionFile.getAbsolutePath());
 
         try {
-            init();
+            initDB();
+            utteranceList = new SessionData.UtteranceList();
+            ratingsList = new SessionData.Ratings();
         } catch (SQLException e) {
             // constructor can fail for basic IO or SQL
             // convert SQLException as we don't need the SQL details here
@@ -101,17 +101,6 @@ public class SessionData
 
                 // can remove this or replace with file conversion dialog or automated conversion below
                 throw new IOException( "File is not correct format:\n"+sessionFile.getAbsolutePath() );
-
-                // TODO: if not sqlite format we need to:
-                //      - move old format casaa file to same name with "*.casaa.bak" or "*.casaa.txt"
-                //      - move old format globals file to same name with *.globals.bak"
-                //      - how will i find this file?????
-                //       - convert these "bak" files format (MISC and Globals) to new format
-                //       - giving it original casaa file name
-                //       - write new sqlite format
-                //       - perhaps alert user if we didn't ask first
-                //       - once all this is in db, load utterances and ratings as above
-
             }
         } else {
             throw new IOException("File does not exist.");
@@ -129,7 +118,7 @@ public class SessionData
         try ( FileReader textFileReader = new FileReader(sessionFile) ) {
             char[] buffer = new char[6];
             int numberOfCharsRead = textFileReader.read(buffer);
-            System.out.println("XX" + String.valueOf(buffer, 0, numberOfCharsRead) + "XX");
+            //System.out.println("XX" + String.valueOf(buffer, 0, numberOfCharsRead) + "XX");
             return String.valueOf(buffer, 0, numberOfCharsRead).startsWith("SQLite");
         }
     }
@@ -174,18 +163,18 @@ public class SessionData
 
 
 
-    private SortedMap< String, Utterance > getUtterances() throws SQLException
+    private SortedMap< Integer, Utterance > getUtterances() throws SQLException
     {
-        SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
+        SortedMap< Integer, Utterance > utteranceTreeMap = new TreeMap<>();
 
         try ( Connection connection = ds.getConnection();
               Statement statement = connection.createStatement() ) {
 
-            ResultSet rs = statement.executeQuery("select utterances.*, codes.code_name, codes.speaker_id from utterances inner join codes on utterances.code_id = codes.code_id");
+            ResultSet rs = statement.executeQuery("select utterances.*, codes.code_name, codes.speaker_id from utterances inner join codes on utterances.code_id = codes.code_id order by utterances.utterance_id");
 
             while (rs.next()) {
 
-                String utterance_id = rs.getString("utterance_id");
+                int utterance_id = rs.getInt("utterance_id");
                 Duration startTime = Utils.parseDuration(rs.getString("audio_file_time_marker"));
                 int codeId = rs.getInt("code_id");
                 String codeName = rs.getString("code_name");
@@ -324,27 +313,27 @@ public class SessionData
 
 
 
-    private void removeUtterance(String utterance_id) throws SQLException
+    private void removeUtterance(int utterance_id) throws SQLException
     {
         String sql = "delete from utterances where utterance_id = ?";
 
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps = connection.prepareStatement(sql) )
         {
-            ps.setInt(1, Integer.parseInt(utterance_id));
+            ps.setInt(1, utterance_id);
             ps.executeUpdate();
         }
     }
 
 
-    private void addUtterance(String utterance_id, int code_id, String audio_file_time_marker, String annotation) throws SQLException
+    private void addUtterance(int utterance_id, int code_id, String audio_file_time_marker, String annotation) throws SQLException
     {
         String sql = "insert into utterances (utterance_id, code_id, audio_file_time_marker, annotation) values (?,?,?,?)";
 
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps = connection.prepareStatement(sql) )
         {
-            ps.setInt(1, Integer.parseInt(utterance_id));
+            ps.setInt(1, utterance_id);
             ps.setInt(2, code_id);
             ps.setString(3, audio_file_time_marker);
             ps.setString(4, annotation);
@@ -374,7 +363,7 @@ public class SessionData
 
 
 
-    private void init() throws SQLException
+    private void initDB() throws SQLException
     {
 
         try ( Connection connection = ds.getConnection();
@@ -495,8 +484,8 @@ public class SessionData
      */
     public class UtteranceList {
 
-        private SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
-        private ObservableMap<String, Utterance> observableMap;
+        private SortedMap< Integer, Utterance > utteranceTreeMap = new TreeMap<>();
+        private ObservableMap<Integer, Utterance> observableMap;
 
         /**
          * @throws SQLException
@@ -551,9 +540,13 @@ public class SessionData
             removeUtterance(utr.getID());
         }
 
-        public void remove(String ID) throws SQLException {
+        public void remove(int ID) throws SQLException {
             observableMap.remove(ID);
             removeUtterance(ID);
+        }
+
+        public void remove(String ID) throws SQLException {
+            this.remove(Integer.parseInt(ID));
         }
 
         /**
@@ -597,7 +590,7 @@ public class SessionData
          */
         public void loadFromFile(File MISCfile ) throws Exception {
 
-            edu.unm.casaa.utterance.UtteranceList utteranceList = new edu.unm.casaa.utterance.UtteranceList(MISCfile);
+            SessionData.UtteranceList utteranceList = new UtteranceList();
 
             Scanner in;
 
@@ -632,7 +625,7 @@ public class SessionData
                     String codeName     = st.nextToken();
                     MiscDataItem item 	= new MiscDataItem(Utils.formatID(startTime,codeId), startTime);
 
-                    // look up parsed code in user config codes loaded at init
+                    // look up parsed code in user config codes loaded at initDB
                     try {
                         item.setMiscCodeByValue(codeId);
                     } catch (Exception e) {
@@ -664,7 +657,7 @@ public class SessionData
                         int codeId = Integer.parseInt(st.nextToken());
                         MiscDataItem item = new MiscDataItem(Utils.formatID(startTime, codeId), startTime);
 
-                        // look up parsed code in user config codes loaded at init
+                        // look up parsed code in user config codes loaded at initDB
                         try {
                             item.setMiscCodeByValue(codeId);
                         } catch (Exception e) {

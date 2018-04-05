@@ -20,7 +20,7 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>
@@ -28,20 +28,21 @@
           <items>
             <MenuItem fx:id="mniLoadAudio" accelerator="Shortcut+F" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load.audio" />
               <MenuItem fx:id="mniLoadCasaa" accelerator="Shortcut+C" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.file.load.casaa" />
-                  <MenuItem fx:id="mniLoadConfig" accelerator="Shortcut+U" mnemonicParsing="false" onAction="#mniLoadConfig" text="%menu.title.file.load.config" />
+                  <MenuItem fx:id="mniLoadConfig" mnemonicParsing="false" onAction="#mniLoadConfig" text="%menu.title.file.load.config" />
                   <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem fx:id="mniExit" accelerator="Shortcut+Q" onAction="#mniActExit" text="%menu.title.file.exit" />
           </items>
         </Menu>
-        <Menu fx:id="mnuCodeUterrances" text="%menu.title.code">
+        <Menu fx:id="mnuSession" text="%menu.title.session">
           <items>
-            <MenuItem fx:id="mniCodeStart" accelerator="Shortcut+S" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.code.start" />
-            <MenuItem fx:id="mniCodeResume" accelerator="Shortcut+R" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.code.resume" />
+            <MenuItem fx:id="mniSessionStart" accelerator="Shortcut+S" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.session.start" />
+            <MenuItem fx:id="mniSessionResume" accelerator="Shortcut+R" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.session.resume" />
           </items>
         </Menu>
-        <Menu fx:id="mnuGlobalRatings" text="%menu.title.global.ratings">
+        <Menu fx:id="mnuCoding" disable="true" text="%menu.title.codingview">
           <items>
-            <MenuItem fx:id="mniGlobalScore" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoring" text="%menu.title.global.score" />
+            <MenuItem fx:id="mniCoding" accelerator="Shortcut+U" mnemonicParsing="false" onAction="#mniCodingView" text="%menu.title.codingview.utterances" />
+                  <MenuItem fx:id="mniGlobalScore1" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoringView" text="%menu.title.codingview.ratings" />
           </items>
         </Menu>
             <Menu text="%menu.title.settings">

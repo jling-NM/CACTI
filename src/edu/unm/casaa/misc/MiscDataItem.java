@@ -18,8 +18,8 @@ This source code file is part of the CASAA Treatment Coding System Utility
 
 package edu.unm.casaa.misc;
 
-import edu.unm.casaa.utterance.Utterance;
 import edu.unm.casaa.main.Utils;
+import edu.unm.casaa.utterance.Utterance;
 import javafx.util.Duration;
 
 /**
@@ -30,7 +30,7 @@ import javafx.util.Duration;
  */
 public class MiscDataItem implements Utterance {
 
-	private String      id          = null;
+	private int      id;
 	private Duration    startTime   = Duration.ZERO;
 	private MiscCode 	miscCode	= new MiscCode();
 
@@ -40,12 +40,12 @@ public class MiscDataItem implements Utterance {
 	 * @param id sortable; string representation of start time here
 	 * @param startTime the start time code for this utterance
 	 */
-	public MiscDataItem( String id, double startTime ) {
+	public MiscDataItem( int id, double startTime ) {
 		this.id 	   = id;
 		this.startTime = Duration.seconds(startTime);
 	}
 
-    public MiscDataItem( String id, Duration startTime ) {
+    public MiscDataItem( int id, Duration startTime ) {
 		this.id 	   = id;
         this.startTime = startTime;
     }
@@ -69,7 +69,7 @@ public class MiscDataItem implements Utterance {
 		return miscCode;
 	}
 
-	public void setID(String id) {
+	public void setID(int id) {
 		this.id = id;
 	}
 
@@ -90,22 +90,16 @@ public class MiscDataItem implements Utterance {
 		this.miscCode = code;
 	}
 
-	public String getID() {
+	public int getID() {
 		return this.id;
 	}
 
     public String toString(){
-        return displayCoded();
+        return String.valueOf(this.id);
 	}
 
 	public String displayCoded(){
-		return ("" + Utils.formatDuration(startTime) + "\t" +
-				miscCode.name);
-	}
-	public String writeCoded(){
-		return ("" + Utils.formatDuration(startTime)	+ "\t" +
-					miscCode.value 	+ "\t" +
-					miscCode.name);
+		return ("" + Utils.formatDuration(startTime) + " " + miscCode.name);
 	}
 
 }

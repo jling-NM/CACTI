@@ -126,7 +126,7 @@ public class TimeLine extends Group {
      */
     public void addMarker(Utterance newUtterance) {
         // insert updated marker
-        TimeLineMarker newMarker = new TimeLineMarker(newUtterance.getID(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker());
+        TimeLineMarker newMarker = new TimeLineMarker(newUtterance.toString(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker());
         this.getChildren().add(newMarker);
     }
 
@@ -152,7 +152,7 @@ public class TimeLine extends Group {
             utteranceList.remove(prevId);
 
             /* create new id with previous time and new code value */
-            String newID = Utils.formatID(Duration.seconds(prevPos), newUtterance.getMiscCode().value);
+            String newID = Utils.formatIDstring(Duration.seconds(prevPos), newUtterance.getMiscCode().value);
 
             /* prevent flipping onto existing marker */
             Node r = this.lookup("#"+newUtterance.getID());
@@ -160,7 +160,7 @@ public class TimeLine extends Group {
                 /*
                   update model, id and time = PREVIOUS, the other members can be updated
                  */
-                newUtterance.setID(newID);
+                newUtterance.setID(Integer.parseInt(newID));
                 newUtterance.setStartTime(prevPos);
                 utteranceList.add(newUtterance);
             }

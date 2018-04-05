@@ -105,6 +105,8 @@ public class MainController {
     @FXML
     private MenuBar menuBar;
     @FXML
+    private Menu mnuCoding;
+    @FXML
     private MediaPlayer mediaPlayer;
     @FXML
     private Label lblDuration;
@@ -168,7 +170,6 @@ public class MainController {
 
     //private SessionData.Ratings ratings  = null;        // GLOBALS scoring data
     private SessionData sessionData      = null;        // session persistance
-    //private SessionData.UtteranceList utteranceList  = null;        // MISC coding data
 
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
@@ -622,7 +623,6 @@ public class MainController {
 
         // the rest is broken out for reuse
         resumeCoding(miscFile);
-
     }
 
 
@@ -680,7 +680,30 @@ public class MainController {
     }
 
 
-    public void mniGlobalScoring(ActionEvent actionEvent) {
+    /**
+     * Switch to coding screen or tab
+     * @param actionEvent
+     */
+    public void mniCodingView(ActionEvent actionEvent) {
+
+        // this something be playing, stop it
+        if(mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+
+        if(sessionData != null) {
+            setGuiState(GuiState.MISC_CODING);
+
+            // take care of media player
+            initializeMediaPlayer(currentAudioFile, playerReady);
+        }
+    }
+
+    /**
+     * Switch to rating screen or tab
+     * @param actionEvent
+     */
+    public void mniGlobalScoringView(ActionEvent actionEvent) {
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -876,7 +899,6 @@ public class MainController {
             sessionData = new SessionData(sessionFile);
             // initialize audio file object
             audioFile = new File(sessionData.getAudioFilePath());
-
         } catch(Exception e)  {
             showError("Error Loading Casaa File", e.getMessage());
             return;
@@ -1212,6 +1234,9 @@ public class MainController {
                     showError("Error", ex.toString());
                 }
 
+                // TODO: verify best place for this
+                mnuCoding.setDisable(false);
+
                 // display controls needed for coding
                 setPlayerButtonState();
 
@@ -1442,8 +1467,8 @@ public class MainController {
      * @return list of utterances
      **********************************************************/
     private synchronized SessionData.UtteranceList getUtteranceList() {
-        if( sessionData.utteranceList == null )
-            showError("Error", "UtteranceList is null");
+        //if( sessionData.utteranceList == null )
+        //    showError("Error", "UtteranceList is null");
         return sessionData.utteranceList;
     }
 
@@ -1470,7 +1495,7 @@ public class MainController {
         Duration position = mediaPlayer.getCurrentTime();
 
         // init new utterance.
-        String      id   = Utils.formatID(position, miscCode.value);
+        int      id   = Utils.formatID(position, miscCode.value);
         Utterance   data = new MiscDataItem(id, position);
         data.setMiscCode(miscCode);
 

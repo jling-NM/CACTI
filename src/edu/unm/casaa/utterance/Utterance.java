@@ -23,15 +23,13 @@ import javafx.util.Duration;
 
 public interface Utterance {
 
-	void setID(String id);
+	void setID(int id);
 	void setMiscCodeByValue(int value);
 	void setMiscCode(MiscCode code);
 	void setStartTime(double startTime);
-	String getID();
+	int getID();
 	Duration getStartTime();
 	MiscCode getMiscCode();
 
 	String displayCoded();
-    // TODO: can this be removed now?
-	String writeCoded();
 }

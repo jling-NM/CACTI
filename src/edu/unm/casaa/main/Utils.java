@@ -39,9 +39,14 @@ public class Utils {
      * @param codeValue
      * @return application guid
      */
-    public static String formatID(Duration startTime, int codeValue) {
+    public static int formatID(Duration startTime, int codeValue) {
+        return Integer.valueOf(String.format("%s%d", formatDuration(startTime).replaceAll("[^0-9]", ""), codeValue));
+    }
+
+    public static String formatIDstring(Duration startTime, int codeValue) {
         return String.format("%s%d", formatDuration(startTime).replaceAll("[^0-9]", ""), codeValue);
     }
+
 
     public static Duration parseDuration( String string ) {
         StringTokenizer st 		= new StringTokenizer( string, ":" );
