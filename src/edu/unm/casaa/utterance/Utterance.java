@@ -23,13 +23,16 @@ import javafx.util.Duration;
 
 public interface Utterance {
 
-	void setID(int id);
+	void setID(String id);
 	void setMiscCodeByValue(int value);
 	void setMiscCode(MiscCode code);
 	void setStartTime(double startTime);
-	int getID();
+	void setAnnotation(String annotation);
+
+	String getID();
 	Duration getStartTime();
 	MiscCode getMiscCode();
 
 	String displayCoded();
+    String getAnnotation();
 }

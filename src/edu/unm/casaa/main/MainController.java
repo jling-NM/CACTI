@@ -39,7 +39,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -72,6 +71,7 @@ import static java.lang.String.format;
 
 
 public class MainController {
+
 
 
     // PLAYBACK
@@ -159,17 +159,11 @@ public class MainController {
 
 
     private Preferences appPrefs;                       // User prefs persistence
-
-    // mediaplayer attributes
     private Duration totalDuration;                     // duration of active media
-    //private String filenameMisc          = null;        // name of active CASAA data file.
-    //private String filenameGlobals       = null;        // name of active globals data file
     private String filenameAudio         = null;        // name of active media file. Used when switching from PLAYBACK to MISC to GLOBALS
     private File currentAudioFile        = null;        // active media file
+    private SessionData sessionData      = null;        // session persistence
 
-    //private SessionData.Ratings ratings  = null;        // GLOBALS scoring data
-    private SessionData sessionData      = null;        // session persistance
-    
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING
     }
@@ -230,12 +224,9 @@ public class MainController {
     }
 
 
-
-
-
-    /**********************************************************************
-     * Button event handlers
-     **********************************************************************/
+    /*********************************************************************
+     Button event handlers
+     */
 
     /**********************************************************************
      * btnActPlayPause
@@ -319,6 +310,7 @@ public class MainController {
     private void btnActCode(ActionEvent actionEvent) {
         Button src = (Button) actionEvent.getSource();
         MiscCode mc = MiscCode.codeWithName(src.getText());
+        assert mc != null;
         insertUtterance(mc);
     }
 
@@ -678,7 +670,6 @@ public class MainController {
 
     }
 
-
     /**
      * Switch to coding screen or tab
      * @param actionEvent
@@ -808,10 +799,10 @@ public class MainController {
 
 
     /************************************************************************
-     * Specify a Globals code file for coding
+     * Backwards Compatibility: Select a Globals code file for coding
      * @return Globals File object
      ************************************************************************/
-    private File selectGlobalsFile() {
+    private File selectGlobalsFile(File sessionFile) {
 
         Stage stageTheLabelBelongs = (Stage) menuBar.getScene().getWindow();
 
@@ -820,7 +811,9 @@ public class MainController {
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("GLOBALS files", "*.globals"));
 
         // set initial directory to preferences or users home directory
-        File initDir = new File(appPrefs.get("lastGlobalsPath", System.getProperty("user.home")));
+        //File initDir = new File(appPrefs.get("lastGlobalsPath", System.getProperty("user.home")));
+        File initDir = new File(sessionFile.getParent());
+        //sessionFile.getAbsolutePath()
         // if preference path no longer exists reset to user home directory
         if( !initDir.exists() ) {
             initDir = new File(System.getProperty("user.home"));
@@ -830,12 +823,13 @@ public class MainController {
 
         // get user selection
         File selectedFile;
-        fc.setTitle("Name New GLOBALS File");
-        selectedFile = fc.showSaveDialog(stageTheLabelBelongs);
+        fc.setTitle("Select GLOBALS File");
+        selectedFile = fc.showOpenDialog(stageTheLabelBelongs);
+
         // persist path for next time
         if( selectedFile != null) {
             // update persistence
-            appPrefs.put("lastGlobalsPath", selectedFile.getParent());
+            //appPrefs.put("lastGlobalsPath", selectedFile.getParent());
             // make sure file has proper extension
             String newFile = selectedFile.getAbsolutePath();
             if( !newFile.toLowerCase().endsWith(".globals")) {
@@ -882,8 +876,81 @@ public class MainController {
             System.exit(0);
         }
 
+    }
+
+
+    /**
+     * Notify user of file format issue and ask for permission to convert.
+     * Guide user through selecting globals file for merging into new format.
+     * Call static SessionData methods to archive casaa and globals file to *.bak.
+     * If this all works out, return true
+     */
+    private SessionData getSessionFilePreviousFileFormat(File sessionFile) throws IOException {
+
+        /*
+            Notify user
+         */
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Convert");
+        alert.setHeaderText("Convert Casaa File Format?");
+
+        Text txt = new Text("\nThe casaa file you've selected is an old format which needs to be converted for this version of the program. Once you convert the file it will only work with this and later versions of the program. However, backup versions of the old files will remain.\n\nConvert now?");
+
+        txt.setWrappingWidth(this.vbApp.getWidth()/3.0);
+        alert.getDialogPane().setPadding(new Insets(10.0, 10.0, 10.0, 10.0));
+        alert.getDialogPane().setContent(txt);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+
+            /* get old globals file path, if any */
+            Alert alertGlobals = new Alert(Alert.AlertType.CONFIRMATION);
+            alertGlobals.setTitle("Convert");
+            alertGlobals.setHeaderText("Locate Corresponding Globals File?");
+
+            txt = new Text("\nThe casaa file you've selected may have a corresponding 'globals' file that stored the Global Ratings for this session. To merge these ratings into the new file format you will need to locate this globals file.\n\nLocate Globals file now?");
+
+            ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+            ButtonType buttonTypeNo = new ButtonType("No", ButtonBar.ButtonData.NO);
+            alertGlobals.getButtonTypes().setAll(buttonTypeNo, buttonTypeYes);
+
+            txt.setWrappingWidth(this.vbApp.getWidth()/3.0);
+            alertGlobals.getDialogPane().setPadding(new Insets(10.0, 10.0, 10.0, 10.0));
+            alertGlobals.getDialogPane().setContent(txt);
+
+            Optional<ButtonType> resultGlobals = alertGlobals.showAndWait();
+
+            /* locate globals file? */
+            if (resultGlobals.isPresent() && resultGlobals.get().getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+
+                File oldGlobalsFile = selectGlobalsFile(sessionFile);
+                if(oldGlobalsFile != null){
+                    // call method on sessiondata with casaa file path and globals file path that will convert the files
+                    return SessionData.Compatibility.sessionDataFromPreviousFileFormat(sessionFile, oldGlobalsFile);
+                } else {
+                    /* don't locate globals text format
+                     * create seesion from old text format file
+                     * attempt will throw ioexceptions returned by this method
+                     */
+                    return SessionData.Compatibility.sessionDataFromPreviousFileFormat(sessionFile);
+                }
+
+            } else {
+                /* don't locate globals text format
+                 * create session from old text format file
+                 * attempt will throw ioexceptions returned by this method
+                 */
+                return SessionData.Compatibility.sessionDataFromPreviousFileFormat(sessionFile);
+            }
+        } else {
+            /* user cancelled casaa file conversion */
+            return null;
+        }
 
     }
+
 
 
     /**
@@ -891,35 +958,72 @@ public class MainController {
      */
     private void resumeCoding( File sessionFile ) {
 
-        File audioFile;
-
+        // load session data
         try {
-            // load session data
             sessionData = new SessionData(sessionFile);
-            // initialize audio file object
-            audioFile = new File(sessionData.getAudioFilePath());
+        } catch(FileFormatException e) {
+            try {
+                sessionData = getSessionFilePreviousFileFormat(sessionFile);
+                if(sessionData == null)
+                    return;
+            } catch(IOException ioe) {
+                showError("Casaa File Conversion", ioe.getMessage());
+                return;
+            }
         } catch(Exception e)  {
             showError("Error Loading Casaa File", e.getMessage());
             return;
         }
 
-        // load the audio and start the player
-        filenameAudio = audioFile.getAbsolutePath();
-
+        // initialize audio file object
+        File audioFile = new File(sessionData.getAudioFilePath());
         if (audioFile.canRead()) {
+            // load the audio and start the player
+            filenameAudio = audioFile.getAbsolutePath();
             // store reference so other states can reuse
             currentAudioFile = audioFile;
             // start media player
             initializeMediaPlayer(audioFile, playerReady);
         } else {
-            showError("Error Loading Audio File", format("Could not load audio file:\n  %s\n\nwhich is specified within:\n  %s\n\nCheck that audio file exists\nand has read permissions", filenameAudio, sessionData.getSessionFilePath() ));
-            return;
+
+            /*
+             show an error dialog to inform user and offer opportunity to locate the missing audio file
+             */
+            Locale locale = new Locale("en", "US");
+            ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(resourceStrings.getString("alert.missingAudioFile.title"));
+            alert.setContentText(String.format("Could not load the session audio file:\n%s\nIf you know where the audio file is,\nclick the 'Locate File' button.", sessionData.getAudioFilePath()) );
+            ButtonType buttonTypeLoc = new ButtonType(resourceStrings.getString("alert.missingAudioFile.btn1.text"));
+            ButtonType buttonTypeCancel = new ButtonType(resourceStrings.getString("alert.missingAudioFile.btn2.text"), ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(buttonTypeLoc, buttonTypeCancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == buttonTypeLoc){
+                // locate audio file
+                audioFile = selectAudioFile();
+                try {
+                    // load the audio and start the player
+                    filenameAudio = audioFile.getAbsolutePath();
+                    // update session
+                    sessionData.setAudioFilePath(audioFile.getAbsolutePath());
+                } catch (NullPointerException e) {
+                    return;
+                } catch(SQLException e) {
+                    showError("Error Updating Casaa File", e.getMessage());
+                    return;
+                }
+                // start media player
+                initializeMediaPlayer(audioFile, playerReady);
+            } else {
+                return;
+            }
         }
 
         setGuiState(GuiState.MISC_CODING);
 
         setPlayerButtonState();
-
     }
 
 
@@ -1369,9 +1473,9 @@ public class MainController {
         }
 
 
-        /**
-         * capture keypresses at scene level in the event chain
-         * to control some overall key functions
+        /*
+          capture keypresses at scene level in the event chain
+          to control some overall key functions
          */
         if(!isKeyFilterSet) {
             ourTown.addEventFilter( KeyEvent.KEY_PRESSED, ke ->  mapKeyFunctions(ke) );
@@ -1389,10 +1493,7 @@ public class MainController {
      **********************************************************************/
     private synchronized void setMediaPlayerPosition(Duration position){
 
-        /***
-         *
-         * pause player and timeline as needed
-         */
+        /* pause player and timeline as needed */
 
         switch (mediaPlayer.getStatus()) {
 
@@ -1432,13 +1533,12 @@ public class MainController {
      * @param title Window title
      * @param message Window message
      *******************************************************/
-    public static void showError(String title, String message) {
+    private static void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        //alert.getDialogPane().setContent( new Text(message));
-        alert.initStyle(StageStyle.UTILITY);
+        //alert.initStyle(StageStyle.UTILITY); // what was this for? With this, the ESC and ENTER keys don't work. //TODO: check on other OS
         alert.showAndWait();
     }
 
@@ -1461,13 +1561,15 @@ public class MainController {
     }
 
 
+
+
     /**********************************************************
      *
      * @return list of utterances
      **********************************************************/
     private synchronized SessionData.UtteranceList getUtteranceList() {
-        //if( sessionData.utteranceList == null )
-        //    showError("Error", "UtteranceList is null");
+        if( sessionData.utteranceList == null )
+            showError("Error", "UtteranceList is null");
         return sessionData.utteranceList;
     }
 
@@ -1486,7 +1588,7 @@ public class MainController {
 
     /**
      * New utterance
-     * @param miscCode
+     * @param miscCode code linked to utterance
      */
     private synchronized void insertUtterance(MiscCode miscCode) {
 
@@ -1494,7 +1596,7 @@ public class MainController {
         Duration position = mediaPlayer.getCurrentTime();
 
         // init new utterance.
-        int      id   = Utils.formatID(position, miscCode.value);
+        String      id   = Utils.formatID(position, miscCode.value);
         Utterance   data = new MiscDataItem(id, position);
         data.setMiscCode(miscCode);
 
@@ -1570,7 +1672,6 @@ public class MainController {
 
 
     /**
-     *
      * @param utr
      */
     private synchronized void removeUtterance(Utterance utr){
@@ -1603,16 +1704,16 @@ public class MainController {
      * @param file what was being parsed
      * @param e the Error
      *********************************************************************/
-    public void handleUserCodesParseException(File file, SAXParseException e) {
+    private void handleUserCodesParseException(File file, SAXParseException e) {
         // Alert and quit.
         showFatalWarning("Failed to load user codes","Parse error in " + file.getAbsolutePath() + " (line " + e.getLineNumber() + "):\n" + e.getMessage());
     }
 
-    public void handleUserCodesGenericException(File file, Exception e) {
+    private void handleUserCodesGenericException(File file, Exception e) {
         showFatalWarning("Failed to load user codes","Unknown error parsing file: " + file.getAbsolutePath() + "\n" + e.toString());
     }
 
-    public void handleUserCodesError(File file, String message) {
+    private void handleUserCodesError(File file, String message) {
         showFatalWarning("Failed to load user codes", "Error loading file: " + file.getAbsolutePath() + "\n" + message);
     }
 
@@ -1647,7 +1748,7 @@ public class MainController {
                     Node root = doc.getDocumentElement();
 
                     // first, create lookup list the returns code value for code name
-                    Hashtable<String, Integer> miscCodeValues = new Hashtable<String, Integer>();
+                    Hashtable<String, Integer> miscCodeValues = new Hashtable<>();
 
                     // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
                     for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
@@ -2048,7 +2149,7 @@ public class MainController {
 
     /**
      *
-     * @return
+     * @return current gui state
      */
     private GuiState getGuiState() {
         return guiState;
@@ -2183,16 +2284,16 @@ public class MainController {
      */
     private void mapKeyFunctions(KeyEvent ke) {
 
-        /**
-         * Handle keyevents by code
+        /*
+          Handle keyevents by code
          */
         switch (ke.getCode()) {
 
             case LEFT:
                 // move media play left
 
-                /**
-                 * move by half a second unless shift key is depressed then move by 5 seconds
+                /*
+                  move by half a second unless shift key is depressed then move by 5 seconds
                  */
                 if (ke.isShiftDown()) {
                     setMediaPlayerPosition(mediaPlayer.getCurrentTime().subtract(Duration.seconds(5.0)));
@@ -2204,8 +2305,8 @@ public class MainController {
 
             case RIGHT:
                 // move media play right
-                /**
-                 * move by half a second unless shift key is depressed then move by 5 seconds
+                /*
+                  move by half a second unless shift key is depressed then move by 5 seconds
                  */
                 if (ke.isShiftDown()) {
                     setMediaPlayerPosition(mediaPlayer.getCurrentTime().add(Duration.seconds(5.0)));
@@ -2243,19 +2344,19 @@ public class MainController {
         }
 
 
-        /**
-         * Handle user configurable keys by string
-         * assuming SHIFT modifier is fixed
+        /*
+          Handle user configurable keys by string
+          assuming SHIFT modifier is fixed
          */
         if (ke.isShiftDown()) {
 
-            /**
-             * Only effective while MISC coding
+            /*
+              Only effective while MISC coding
              */
             if( getGuiState().equals(GuiState.MISC_CODING)) {
 
-                /**
-                 * replay last code
+                /*
+                  replay last code
                  */
                 if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyReplay","Y"))){
                     gotoLastMarker();
@@ -2263,8 +2364,8 @@ public class MainController {
                     return;
                 }
 
-                /**
-                 * uncode
+                /*
+                  uncode
                  */
                 if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyUncode","U"))){
                     uncode();
@@ -2272,8 +2373,8 @@ public class MainController {
                     return;
                 }
 
-                /**
-                 * uncode/rewind
+                /*
+                  uncode/rewind
                  */
                 if (ke.getCode().getName().equals(appPrefs.get("codingActionKeyUncodeRewind","I"))){
                     uncodeRewind();
@@ -2296,8 +2397,8 @@ public class MainController {
      * @param appParams
      */
     protected void initLaunchArgs(Application.Parameters appParams) {
-        /**
-         * loop and use the first useful argument
+        /*
+          loop and use the first useful argument
          */
         for (String arg : appParams.getRaw()) {
 

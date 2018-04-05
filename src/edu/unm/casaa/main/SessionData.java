@@ -1,10 +1,6 @@
 package edu.unm.casaa.main;
 
 
-import java.io.*;
-import java.sql.*;
-import java.util.*;
-
 import edu.unm.casaa.globals.GlobalCode;
 import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
@@ -14,43 +10,62 @@ import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 import org.sqlite.SQLiteDataSource;
 import org.sqlite.SQLiteConfig;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.sql.*;
+import java.util.*;
 
 
-
-
+/**
+ * Session Data Model
+ */
 public class SessionData
 {
-
     private File sessionFile;
     private final SQLiteDataSource ds;
     private String audioFilePath = "";
 
-    // TODO: possible
+    /**
+     * Store and manipulate list of utterances for session
+     */
     public UtteranceList utteranceList;
+
+    /**
+     * Store and manipulate list of global ratings for session
+     */
     public Ratings ratingsList;
+
+    /**
+     * Available session attributes
+     */
+    private enum SessionAttributes {
+        AUDIO_FILE_PATH,
+        GLOBAL_NOTES
+    }
 
 
     /**
      * Common initDB code
      */
     private SessionData () {
-        /*
-          datasource config
-          - enable foreign key constraints
-          - give database a version
-         */
+        // database config
         SQLiteConfig config = new SQLiteConfig();
+        // enable foreign key constraints
         config.enforceForeignKeys(true);
+        // give database a version
         config.setUserVersion(1);
-
+        // attach config to our datasource
         ds = new SQLiteDataSource(config);
     }
 
 
     /**
      * Initialize new session data
-     * @param storageFile
-     * @param audioFile
+     * @param storageFile session data file
+     * @param audioFile session audio file
      * @throws IOException
      */
     public SessionData(File storageFile, File audioFile) throws IOException {
@@ -74,7 +89,7 @@ public class SessionData
 
     /**
      * Initialize with existing session file
-     * @param storageFile
+     * @param storageFile session data file
      * @throws IOException
      */
     public SessionData(File storageFile) throws IOException {
@@ -83,34 +98,33 @@ public class SessionData
         sessionFile = storageFile;
         ds.setUrl("jdbc:sqlite:" + sessionFile.getAbsolutePath());
 
+        // check file exists
         if( sessionFileExists() ) {
-
-            /*
-            load audio file path from existing db
-             */
+            // check file format
             if( isSQLiteDataFile() ) {
+                // try loading file
                 try {
                     // TODO: this take a long time. WHY?
-                    audioFilePath = getAttribute("source_audio_file_path");
+                    audioFilePath = getAttribute(SessionAttributes.AUDIO_FILE_PATH);
                     utteranceList = new SessionData.UtteranceList();
                     ratingsList = new SessionData.Ratings();
                 } catch (SQLException e) {
                     throw new IOException(e);
                 }
             } else {
-
-                // can remove this or replace with file conversion dialog or automated conversion below
-                throw new IOException( "File is not correct format:\n"+sessionFile.getAbsolutePath() );
+                // wrong file format
+                throw new FileFormatException( "File is not correct format:\n"+sessionFile.getAbsolutePath() );
             }
         } else {
-            throw new IOException("File does not exist.");
+            // file not found
+            throw new FileNotFoundException("File not found.");
         }
     }
 
 
 
     /**
-     * TBD
+     * Test if current session file is a SQLite database
      */
     private boolean isSQLiteDataFile() throws IOException {
 
@@ -133,8 +147,8 @@ public class SessionData
 
         HashMap< Integer, Integer > ratings = new HashMap<>();
 
-        try ( Connection connection = ds.getConnection();
-              Statement statement = connection.createStatement() ) {
+        try (Connection connection = ds.getConnection();
+             Statement statement = connection.createStatement() ) {
 
             ResultSet rs = statement.executeQuery("select rating_id, response_value from ratings");
 
@@ -162,20 +176,23 @@ public class SessionData
     }
 
 
-
-    private SortedMap< Integer, Utterance > getUtterances() throws SQLException
+    /**
+     * @return A populated map of utterances
+     * @throws SQLException
+     */
+    private SortedMap< String, Utterance > getUtterances() throws SQLException
     {
-        SortedMap< Integer, Utterance > utteranceTreeMap = new TreeMap<>();
+        SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
 
         try ( Connection connection = ds.getConnection();
               Statement statement = connection.createStatement() ) {
 
-            ResultSet rs = statement.executeQuery("select utterances.*, codes.code_name, codes.speaker_id from utterances inner join codes on utterances.code_id = codes.code_id order by utterances.utterance_id");
+            ResultSet rs = statement.executeQuery("select utterances.*, codes.code_name, codes.speaker_id from utterances inner join codes on utterances.code_id = codes.code_id order by utterances.time_marker");
 
             while (rs.next()) {
 
-                int utterance_id = rs.getInt("utterance_id");
-                Duration startTime = Utils.parseDuration(rs.getString("audio_file_time_marker"));
+                String utterance_id = rs.getString("utterance_id");
+                Duration startTime = Utils.parseDuration(rs.getString("time_marker"));
                 int codeId = rs.getInt("code_id");
                 String codeName = rs.getString("code_name");
                 int speakerId = rs.getInt("speaker_id");
@@ -192,7 +209,55 @@ public class SessionData
 
 
 
-    private void setAttribute(String name, String value) throws SQLException
+    /**
+     * Reset utterance list to contents of list
+     * @param utteranceList List of utterances to load
+     * @throws SQLException
+     */
+    public void setUtteranceList(List<Utterance> utteranceList) throws SQLException {
+        String sql = "insert into utterances (utterance_id, code_id, time_marker, annotation) values (?,?,?,?)";
+
+        try ( Connection connection = ds.getConnection();
+              PreparedStatement ps = connection.prepareStatement(sql)  )
+        {
+            connection.setAutoCommit(false);
+            for (Utterance utr : utteranceList) {
+                ps.setString(1, utr.getID());
+                ps.setInt(2, utr.getMiscCode().value);
+                ps.setString(3, Utils.formatDuration(utr.getStartTime()));
+                ps.setString(4, utr.getAnnotation());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            // apply changes
+            connection.commit();
+        }
+
+        /* reload from now populated db */
+        this.utteranceList = new SessionData.UtteranceList();
+
+    }
+
+
+
+    public void setRatingsList(HashMap<String, Integer> ratingsMap) throws SQLException {
+        for (Map.Entry<String, Integer> entry : ratingsMap.entrySet()) {
+            addRating(entry.getKey(), entry.getValue());
+        }
+
+        /* reload from now populated db */
+        this.ratingsList = new SessionData.Ratings();
+
+    }
+
+
+    /**
+     * @param attribute SessionAttribute to update
+     * @param value new value
+     * @throws SQLException
+     */
+    private void setAttribute(SessionAttributes attribute, String value) throws SQLException
     {
         String sql = "update attributes set value = ? where name = ?";
 
@@ -200,30 +265,51 @@ public class SessionData
               PreparedStatement ps = connection.prepareStatement(sql)  )
         {
             ps.setString(1, value);
-            ps.setString(2, name);
+            ps.setString(2, attribute.name());
             ps.executeUpdate();
         }
     }
 
 
+    /**
+     * Audio file path associated with this session
+     * @return full file path
+     */
     public String getAudioFilePath() {
         return this.audioFilePath;
     }
 
 
+    /**
+     * @param filePath new audio file path
+     */
+    public void setAudioFilePath(String filePath) throws SQLException {
+        this.audioFilePath = filePath;
+        setAttribute(SessionAttributes.AUDIO_FILE_PATH, this.audioFilePath);
+    }
+
+
+    /**
+     * @return Session file path
+     */
     public String getSessionFilePath() {
         return this.sessionFile.getAbsolutePath();
     }
 
 
-    private String getAttribute(String name) throws SQLException
+    /**
+     * @param sessionAttribute SessionAttribute to get
+     * @return current value for session attribute
+     * @throws SQLException
+     */
+    private String getAttribute(SessionAttributes sessionAttribute) throws SQLException
     {
         String sql = "select value from attributes where name = ?";
 
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps = connection.prepareStatement(sql) )
         {
-            ps.setString(1, name);
+            ps.setString(1, sessionAttribute.name());
             ResultSet rs = ps.executeQuery();
 
             if( rs.next() ) {
@@ -312,36 +398,91 @@ public class SessionData
     }
 
 
-
-    private void removeUtterance(int utterance_id) throws SQLException
+    /**
+     * Remove utterance from datasource
+     * @param utterance_id
+     * @throws SQLException
+     */
+    private void removeUtterance(String utterance_id) throws SQLException
     {
         String sql = "delete from utterances where utterance_id = ?";
 
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps = connection.prepareStatement(sql) )
         {
-            ps.setInt(1, utterance_id);
+            ps.setString(1, utterance_id);
             ps.executeUpdate();
         }
     }
 
 
-    private void addUtterance(int utterance_id, int code_id, String audio_file_time_marker, String annotation) throws SQLException
+    /**
+     * Insert utterance into datasource
+     * @param utterance_id
+     * @param code_id
+     * @param time_marker
+     * @param annotation
+     * @throws SQLException
+     */
+    private void addUtterance(String utterance_id, int code_id, String time_marker, String annotation) throws SQLException
     {
-        String sql = "insert into utterances (utterance_id, code_id, audio_file_time_marker, annotation) values (?,?,?,?)";
+        String sql = "insert into utterances (utterance_id, code_id, time_marker, annotation) values (?,?,?,?)";
 
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps = connection.prepareStatement(sql) )
         {
-            ps.setInt(1, utterance_id);
+            ps.setString(1, utterance_id);
             ps.setInt(2, code_id);
-            ps.setString(3, audio_file_time_marker);
+            ps.setString(3, time_marker);
             ps.setString(4, annotation);
             ps.executeUpdate();
         }
     }
 
 
+    private void addRating(String rating_name, int response_value) throws SQLException
+    {
+
+        String sql = "select rating_id from ratings where rating_name = ?";
+
+        int rating_id = -1;
+
+        try ( Connection connection = ds.getConnection();
+              PreparedStatement ps = connection.prepareStatement(sql) )
+        {
+            ps.setString(1, rating_name);
+            ResultSet rs = ps.executeQuery();
+
+            if( rs.next() ) {
+                rating_id = rs.getInt("rating_id");
+            }
+        }
+
+
+        if( rating_id == -1 ){
+
+            sql = "insert into ratings (rating_name, response_value) values (?,?)";
+
+            try ( Connection connection = ds.getConnection();
+                  PreparedStatement ps = connection.prepareStatement(sql) )
+            {
+                ps.setString(1, rating_name);
+                ps.setInt(2, response_value);
+                ps.executeUpdate();
+            }
+        } else {
+          setRatingResponseValue(rating_id, response_value);
+        }
+    }
+
+
+
+    /**
+     * Set global rating value in datasource
+     * @param rating_id
+     * @param response_value
+     * @throws SQLException
+     */
     private void setRatingResponseValue(int rating_id, int response_value) throws SQLException
     {
         String sql = "update ratings set response_value = ? where rating_id = ?";
@@ -357,12 +498,11 @@ public class SessionData
     }
 
 
-
-
-
-
-
-
+    /**
+     * Initialize datasource schema and default values
+     * Codes and their defaults initialized from UserConfig
+     * @throws SQLException
+     */
     private void initDB() throws SQLException
     {
 
@@ -384,9 +524,9 @@ public class SessionData
                     "  foreign key (speaker_id) references speakers (speaker_id)" +
                     ")");
             statement.executeUpdate("create table if not exists utterances ( " +
-                    "utterance_id integer primary key not null, " +
+                    "utterance_id TEXT primary key not null unique, " +
+                    "time_marker string not null, " +
                     "code_id integer, " +
-                    "audio_file_time_marker string not null unique, " +
                     "annotation string," +
                     "  foreign key (code_id) references codes (code_id)" +
                     ")");
@@ -403,8 +543,8 @@ public class SessionData
                     ")");
             statement.executeUpdate("create table if not exists attributes ( name, value )");
             // assumes data file does not exists
-            statement.executeUpdate("insert into attributes ( name, value ) values ('source_audio_file_path', '" + this.audioFilePath + "')");
-            statement.executeUpdate("insert into attributes ( name, value ) values ('rating_notes', '')");
+            statement.executeUpdate("insert into attributes ( name, value ) values ( '" + SessionAttributes.AUDIO_FILE_PATH + "', '" + this.audioFilePath + "')");
+            statement.executeUpdate("insert into attributes ( name, value ) values ('" + SessionAttributes.GLOBAL_NOTES + "', '')");
 
 
             /*
@@ -475,19 +615,22 @@ public class SessionData
 
 
 
-    //
-    //Nested Session Data classes
-    //
+
+
 
     /**
-     * A sortedMap of utterances, sorted by id which should be a string representation of start time
+     * Session Utterance Markers
      */
     public class UtteranceList {
 
-        private SortedMap< Integer, Utterance > utteranceTreeMap = new TreeMap<>();
-        private ObservableMap<Integer, Utterance> observableMap;
+        /*
+         * A sortedMap of utterances, sorted by id which should be a string representation of start time
+         */
+        private SortedMap< String, Utterance > utteranceTreeMap = new TreeMap<>();
+        private ObservableMap<String, Utterance> observableMap;
 
         /**
+         * Constructor initializes utterance map
          * @throws SQLException
          */
         private UtteranceList() throws SQLException {
@@ -496,7 +639,6 @@ public class SessionData
         }
 
         /**
-         *
          * @return observable version of utterance map for listeners
          */
         public ObservableMap getObservableMap() {
@@ -524,14 +666,14 @@ public class SessionData
             if( !utteranceTreeMap.isEmpty() ) {
                 // update map
                 observableMap.remove(utteranceTreeMap.lastKey());
-                // update persistance
+                // update persistence
                 Utterance utr = utteranceTreeMap.get(utteranceTreeMap.lastKey());
                 removeUtterance(utr.getID());
             }
         }
 
         /**
-         * Remove utterance
+         * Remove utterance from list
          * @param utr
          * @throws SQLException
          */
@@ -540,14 +682,12 @@ public class SessionData
             removeUtterance(utr.getID());
         }
 
-        public void remove(int ID) throws SQLException {
+
+        public void remove(String ID) throws SQLException {
             observableMap.remove(ID);
             removeUtterance(ID);
         }
 
-        public void remove(String ID) throws SQLException {
-            this.remove(Integer.parseInt(ID));
-        }
 
         /**
          * Return utterance with given id
@@ -564,6 +704,9 @@ public class SessionData
             return utteranceTreeMap.isEmpty() ? null : utteranceTreeMap.get(utteranceTreeMap.lastKey());
         }
 
+        /**
+         * @return utterance map values
+         */
         public Collection<Utterance> values() {
             return utteranceTreeMap.values();
         }
@@ -581,26 +724,203 @@ public class SessionData
 
 
 
-    private class Compatibility {
+
+    /**
+     * Global Session Ratings
+     */
+    public class Ratings {
+
+        // list for all ratings
+        private HashMap< Integer, Integer > ratings;
+        // notes field for ratings overall. Could just be session notes at this point.
+        private String notes;
+
 
         /**
-         * This will load data from old, text-based format into new sql data file
-         * @param MISCfile casaa file
-         * @throws Exception
+         * @throws SQLException
          */
-        public void loadFromFile(File MISCfile ) throws Exception {
+        private Ratings() throws SQLException {
+            ratings = getRatings();
+            notes = getAttribute(SessionAttributes.GLOBAL_NOTES);
+        }
 
-            SessionData.UtteranceList utteranceList = new UtteranceList();
+
+        /**
+         * @param code
+         * @return rating for one of the global questions
+         */
+        public int getRating( GlobalCode code ) {
+            return ratings.get(code.id);
+        }
+
+
+        /**
+         * @param code
+         * @param rating
+         * @throws SQLException
+         */
+        public void	setRating( GlobalCode code, int rating ) throws SQLException {
+            ratings.put( code.id, rating );
+            setRatingResponseValue( code.id, rating);
+        }
+
+
+        /**
+         * @param code
+         * @param rating
+         * @throws SQLException
+         */
+        public void	setRating( GlobalCode code, String rating ) throws SQLException {
+            int rating_value = Integer.parseInt(rating);
+            this.setRating(code, rating_value);
+        }
+
+
+        /**
+         * @param notes
+         * @throws SQLException
+         */
+        public void setNotes(String notes) throws SQLException {
+            this.notes = notes;
+            setAttribute(SessionAttributes.GLOBAL_NOTES, notes);
+        }
+
+
+        /**
+         * @return
+         */
+        public String getNotes() {
+            return notes;
+        }
+
+    }
+
+
+    /**
+     * Grouping of static methods that support backwards compatibility in session data storage and could be removed in the future.
+     * Might just be moved into SessionData
+     */
+    public static class Compatibility {
+
+        /**
+         * Separate function for reading audio filename from code file
+         * @param casaaFileTextFormat casaa file
+         * @return filenameAudio
+         */
+        public static String getAudioFilename( File casaaFileTextFormat ) throws IOException {
 
             Scanner in;
-
             try {
-                in = new Scanner(MISCfile);
+                in = new Scanner(casaaFileTextFormat);
             } catch (FileNotFoundException e) {
                 throw e;
             }
 
-            //////utteranceList.storageFile = MISCfile;
+            if( !in.hasNext() ){
+                throw new IOException("No Audio File Listed in casaa file");
+            }
+
+            // Get the audio filename line.
+            String 			filenameAudio 	= in.nextLine();
+            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+            headReader.nextToken(); // Eat line heading "Audio Filename:"
+            filenameAudio = headReader.nextToken();
+            if( (filenameAudio.trim()).equalsIgnoreCase("") ){
+                throw new IOException("No Audio File Listed in casaa file");
+            }
+
+            return filenameAudio;
+        }
+
+
+
+        /**
+         * Convert old file format to new
+         * @param sessionFileTextFormat
+         * @throws IOException
+         */
+        static public SessionData sessionDataFromPreviousFileFormat(File sessionFileTextFormat) throws IOException {
+
+            /* move old format casaa file to same name with "*.casaa.bak" or "*.casaa.txt" */
+            String backupFilePath = sessionFileTextFormat.getAbsolutePath().replace("casaa", "casaa.txt.bak");
+            File backupSessionFile = new File(backupFilePath);
+            /* if a backup file by that name already exists we will assume it doesn't need repeating */
+            if( !backupSessionFile.exists() ) {
+                Files.copy(sessionFileTextFormat.toPath(), backupSessionFile.toPath());
+            }
+
+            /* now delete old session file so a new session can be created */
+            Files.delete(sessionFileTextFormat.toPath());
+
+            /* new session file */
+            File sessionFile = new File(sessionFileTextFormat.getAbsolutePath());
+            /* get audioFile from old casaa file format */
+            File audioFile = new File(Compatibility.getAudioFilename(backupSessionFile));
+
+            /* initialize session data */
+            SessionData sessionData = new SessionData(sessionFile, audioFile);
+
+            /* load utterances from old text format into new session data */
+            List<Utterance> utteranceList = utteranceListFromPreviousFileFormat(backupSessionFile);
+
+            try {
+                sessionData.setUtteranceList(utteranceList);
+            } catch (SQLException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            return sessionData;
+
+        }
+
+
+        /**
+         * Convert old file format to new. Include globals file merge
+         * @param sessionFile
+         * @param globalsFile
+         * @throws IOException
+         */
+        static public SessionData sessionDataFromPreviousFileFormat(File sessionFile, File globalsFile) throws IOException {
+
+            SessionData sessionData = sessionDataFromPreviousFileFormat(sessionFile);
+
+            /* import globals file */
+            HashMap<String, Integer> globalsList = globalRatingsListFromPreviousFileFormat(globalsFile);
+
+            try {
+                sessionData.setRatingsList(globalsList);
+            } catch (SQLException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            String globalsNotes = globalNotesListFromPreviousFileFormat(globalsFile);
+            try {
+                sessionData.ratingsList.setNotes(globalsNotes);
+            } catch (SQLException e) {
+                throw new IOException(e.getMessage());
+            }
+
+            return sessionData;
+        }
+
+
+        /**
+         * @param sessionFileTextFormat
+         * @return list of utterances loaded from the text file format
+         * @throws IOException
+         */
+        public static List<Utterance> utteranceListFromPreviousFileFormat(File sessionFileTextFormat) throws IOException {
+
+            List<Utterance> utteranceList = new ArrayList<>();
+
+            Scanner in;
+
+            try {
+                in = new Scanner(sessionFileTextFormat);
+            } catch (FileNotFoundException e) {
+                throw e;
+            }
 
             // get the audio filename line.
             String 			filenameAudio 	= in.nextLine();
@@ -608,8 +928,6 @@ public class SessionData
 
             // Eat  "Audio Filename:"
             headReader.nextToken();
-            // local reference of audiofilename
-            //////utteranceList.audioFilename = headReader.nextToken();
 
             while( in.hasNextLine() ){
 
@@ -631,9 +949,8 @@ public class SessionData
                     } catch (Exception e) {
                         // if lookup failed there is a possible disconnect between codes in casaa file
                         // and codes in user config file
-                        throw new Exception( String.format("The code (%s) with value (%d) in file (%s) was not found in the current user configuration file.\n\nIf you uncode (%s) you will not be able to recode it with the current config file.", codeName, codeId, MISCfile.getName(), codeName ) );
+                        throw new IOException( String.format("The code (%s) with value (%d) in file (%s) was not found in the current user configuration file.\n\nIf you uncode (%s) you will not be able to recode it with the current config file.", codeName, codeId, sessionFileTextFormat.getName(), codeName ) );
                     }
-                    //st.nextToken(); // throw away the code string
 
                     utteranceList.add(item);
 
@@ -663,7 +980,7 @@ public class SessionData
                         } catch (Exception e) {
                             // if lookup failed there is a possible disconnect between codes in casaa file
                             // and codes in user config file
-                            throw new Exception(String.format("Code(%d) in casaa file not found in user configuration file", codeId));
+                            throw new IOException(String.format("Code(%d) in casaa file not found in user configuration file", codeId));
                         }
                         st.nextToken(); // throw away the code string
 
@@ -672,48 +989,96 @@ public class SessionData
                 }
             }
 
-        }
-    }
-
-
-
-
-
-
-
-    public class Ratings {
-
-        //private HashMap< Integer, Integer > ratings = new HashMap< Integer, Integer >();
-        private HashMap< Integer, Integer > ratings;
-        private String notes = "";
-
-        private Ratings() throws SQLException {
-            ratings = getRatings();
-            notes = getAttribute("rating_notes");
+            return utteranceList;
         }
 
-        public int getRating( GlobalCode code ) {
-            return ratings.get(code.id);
+
+        /**
+         * @param globalsFileTextFormat
+         * @return Map of global rating items parsed from text file format
+         * @throws IOException
+         */
+        public static HashMap<String, Integer> globalRatingsListFromPreviousFileFormat(File globalsFileTextFormat) throws IOException {
+
+            HashMap<String, Integer> ratingList = new HashMap<>();
+
+            Scanner in;
+
+            try {
+                in = new Scanner(globalsFileTextFormat);
+            } catch (FileNotFoundException e) {
+                throw e;
+            }
+
+            // get the audio filename line.
+            String 			filenameAudio 	= in.nextLine();
+            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+            // Eat  "Audio Filename:"
+            headReader.nextToken();
+            in.nextLine();
+
+            while( in.hasNextLine() ){
+
+                String 			nextStr 	= in.nextLine();
+                StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
+                int 			lineSize 	= st.countTokens();
+
+                if( lineSize == 2 ){
+                    /* global */
+                    String rating_name = st.nextToken().toUpperCase().replace(":","");
+                    if( !rating_name.equalsIgnoreCase("NOTES") ) {
+                        int response_value = Integer.parseInt( st.nextToken() );
+                        ratingList.put(rating_name, response_value);
+                    }
+                }
+            }
+
+            return ratingList;
         }
 
-        public void	setRating( GlobalCode code, int rating ) throws SQLException {
-            ratings.put( code.id, rating );
-            setRatingResponseValue( code.id, rating);
-        }
 
-        public void	setRating( GlobalCode code, String rating ) throws SQLException {
-            int rating_value = Integer.parseInt(rating);
-            this.setRating(code, rating_value);
-        }
+        /**
+         * @param globalsFileTextFormat
+         * @return Notes text parsed from text format file
+         * @throws IOException
+         */
+        public static String globalNotesListFromPreviousFileFormat(File globalsFileTextFormat) throws IOException {
 
-        public void setNotes(String notes) throws SQLException {
-            this.notes = notes;
-            setAttribute("rating_notes", notes);
-        }
+            String notes = "";
 
-        public String getNotes() {
+            Scanner in;
+
+            try {
+                in = new Scanner(globalsFileTextFormat);
+            } catch (FileNotFoundException e) {
+                throw e;
+            }
+
+            // get the audio filename line.
+            String 			filenameAudio 	= in.nextLine();
+            StringTokenizer headReader 		= new StringTokenizer(filenameAudio, "\t");
+
+            // Eat  "Audio Filename:"
+            headReader.nextToken();
+            in.nextLine();
+
+            while( in.hasNextLine() ){
+
+                String 			nextStr 	= in.nextLine();
+                StringTokenizer st 			= new StringTokenizer(nextStr, "\t");
+                int 			lineSize 	= st.countTokens();
+
+                if( lineSize == 2 ){
+                    String rating_name = st.nextToken().toUpperCase().replace(":","");
+                    if( rating_name.equalsIgnoreCase("NOTES") ) {
+                        notes = st.nextToken();
+                    }
+                }
+            }
             return notes;
         }
+
 
     }
 }

@@ -30,7 +30,7 @@ import javafx.util.Duration;
  */
 public class MiscDataItem implements Utterance {
 
-	private int      id;
+	private String      id;
 	private Duration    startTime   = Duration.ZERO;
 	private MiscCode 	miscCode	= new MiscCode();
 
@@ -40,12 +40,12 @@ public class MiscDataItem implements Utterance {
 	 * @param id sortable; string representation of start time here
 	 * @param startTime the start time code for this utterance
 	 */
-	public MiscDataItem( int id, double startTime ) {
+	public MiscDataItem( String id, double startTime ) {
 		this.id 	   = id;
 		this.startTime = Duration.seconds(startTime);
 	}
 
-    public MiscDataItem( int id, Duration startTime ) {
+    public MiscDataItem( String id, Duration startTime ) {
 		this.id 	   = id;
         this.startTime = startTime;
     }
@@ -69,7 +69,7 @@ public class MiscDataItem implements Utterance {
 		return miscCode;
 	}
 
-	public void setID(int id) {
+	public void setID(String id) {
 		this.id = id;
 	}
 
@@ -90,7 +90,7 @@ public class MiscDataItem implements Utterance {
 		this.miscCode = code;
 	}
 
-	public int getID() {
+	public String getID() {
 		return this.id;
 	}
 
@@ -100,6 +100,16 @@ public class MiscDataItem implements Utterance {
 
 	public String displayCoded(){
 		return ("" + Utils.formatDuration(startTime) + " " + miscCode.name);
+	}
+
+	@Override
+	public void setAnnotation(String annotation) {
+
+	}
+
+	@Override
+	public String getAnnotation() {
+		return null;
 	}
 
 }
