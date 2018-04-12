@@ -6,6 +6,7 @@ import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.Utterance;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 import org.sqlite.SQLiteDataSource;
@@ -360,21 +361,38 @@ public class SessionData
     }
 
 
-    private void annotateUtterance(int utterance_id, String annotation) throws SQLException
-    {
-        Connection connection = null;
+    public String getUtteranceAnnotationText(int utterance_id) throws SQLException {
+        try ( Connection connection = ds.getConnection();
+              PreparedStatement ps = connection.prepareStatement("select annotation from utterances where utterance_id = ?") ) {
 
-        try
-        {
-            connection = ds.getConnection();
-            PreparedStatement ps = connection.prepareStatement("update utterances set annotation = ? where utterance_id = ?");
-            ps.setString(1, annotation);
+            // annotation text
+            ps.setInt(1, utterance_id);
+            ResultSet rs = ps.executeQuery();
+            if( rs.next() ) {
+                return rs.getString("annotation");
+            } else {
+                return "";
+            }
+        }
+    }
+
+
+
+
+    public void annotateUtterance(int utterance_id, String annotationText, ObservableList globalsList) throws SQLException
+    {
+        try ( Connection connection = ds.getConnection();
+              PreparedStatement ps = connection.prepareStatement("update utterances set annotation = ? where utterance_id = ?") ) {
+
+            //
+//            connection.setAutoCommit(false);
+            // annotation text
+            ps.setString(1, annotationText);
             ps.setInt(2, utterance_id);
             ps.executeUpdate();
-        } finally
-        {
-            if(connection != null)
-                connection.close();
+
+            // apply changes
+//            connection.commit();
         }
     }
 

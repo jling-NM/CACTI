@@ -26,6 +26,8 @@ import javafx.animation.Animation;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -33,6 +35,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -52,7 +55,6 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
 
@@ -62,17 +64,13 @@ import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.prefs.Preferences;
 
 import static java.lang.String.format;
 
 
 public class MainController {
-
 
 
     // PLAYBACK
@@ -156,6 +154,11 @@ public class MainController {
     private TextField codingActionKeyReplay;
 
 
+    // UTTERANCE EDITOR
+    @FXML
+    private TextArea dlgAnnotation;
+    @FXML
+    private ListView dlgListView;
 
 
 
@@ -1183,48 +1186,69 @@ public class MainController {
         handle request to edit utterance annotation and such
      */
     public void openUtteranceEditor(PropertyChangeEvent evt) {
-        System.out.println("openUtteranceEditor on PropertyChangeEvent");
-        System.out.println("utterance_id:" + evt.getNewValue());
-
         if( evt.getNewValue() != null ) {
 
-            /* open editor */
 
-            /*
-                editor will link rating to utterance when rating item selected
-                editor will unlink rating from utterances with rating item deselected
-                editor will update utterance annotation when textfiled loses focus
-                nope, nope. editor needs to have cancel button and Save button so
-                user can bail on changes. if i did it like above i wouldn't be able to
-                undo, yep. yep.
-             */
+            /* get data */
+            int utterance_id = Integer.parseInt(evt.getNewValue().toString());
+            String existingAnnotation = "";
 
-
-            selectAudioFile();
-            /*
-            Locale locale = new Locale("en", "US");
-            ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
-
-            Stage about = new Stage();
-            Parent root = null;
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("About.fxml"), resourceStrings);
             try {
-                root = fxmlLoader.load();
-
-            } catch (Exception e) {
-                showError("About: fxml Error in About ", format("%s\n", e.toString()));
+                existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
+            } catch ( SQLException e) {
+                showError("Error Annotation", e.getMessage());
             }
-            about.setScene(new Scene(root));
-            about.setTitle(resourceStrings.getString("txt.about.title"));
-            about.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
-            about.initModality(Modality.APPLICATION_MODAL);
-            about.initStyle(StageStyle.UTILITY);
-            about.showAndWait();
-*/
 
-            // TODO: how come wont' close?
 
-            /* save utterance annotation */
+            /* open editor */
+            Dialog<ButtonType> dialog = new Dialog<>();
+            FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource("UtteranceEditor.fxml"));
+            try {
+                dialog.setDialogPane(dialogLoader.load());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // icons?
+            //dialog.setGraphic(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+
+            // reference for later
+            ObservableList<GlobalCode> ratingCode = FXCollections.observableArrayList(new GlobalCode(10, "ick", "ICK"), new GlobalCode(20, "nuts", "NUTS"));
+            ListView<GlobalCode> dlgListView = new ListView<>(ratingCode);
+            dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            //dlgListView.getItems().add(new GlobalCode(10, "ick", "ICK"));
+            //dlgListView.getItems().add(new GlobalCode(20, "nuts", "NUTS"));
+            dlgListView.setPrefHeight(120);
+            //
+            TextArea extTa = null;
+            //
+            for(Node nodeOut:dialog.getDialogPane().getChildren()){
+                if(nodeOut instanceof VBox) {
+                    VBox vb = (VBox) nodeOut;
+                    for (Node nodeIn : vb.getChildren()) {
+                        if (nodeIn instanceof TextArea) {
+                            extTa = (TextArea) nodeIn;
+                            extTa.setText(existingAnnotation);
+                        }
+                    }
+                    vb.getChildren().add(dlgListView);
+                }
+            }
+
+            // Use traditional way to get results as lambda expects 'final' variables
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.isPresent() & (result.get() == ButtonType.APPLY)){
+                ObservableList selectedIndices = dlgListView.getSelectionModel().getSelectedIndices();
+                System.out.println(ratingCode.get(0).id);
+
+                /* save utterance annotation */
+                try {
+                    sessionData.annotateUtterance(utterance_id, extTa.getText(), selectedIndices);
+                } catch (SQLException e) {
+                    showError("Error Annotating Utterance", e.getMessage());
+                }
+            }
+
 
             /* link/unlink ratings to utterance */
 
@@ -1815,19 +1839,19 @@ public class MainController {
                     DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
                     DocumentBuilder builder = fact.newDocumentBuilder();
                     Document doc = builder.parse( file.getCanonicalPath() );
-                    Node root = doc.getDocumentElement();
+                    org.w3c.dom.Node root = doc.getDocumentElement();
 
                     // first, create lookup list the returns code value for code name
                     Hashtable<String, Integer> miscCodeValues = new Hashtable<>();
 
                     // Expected format: <userConfiguration> <codes>...</codes> <globals>...</globals> </userConfiguration>
-                    for( Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
+                    for( org.w3c.dom.Node node = root.getFirstChild(); node != null; node = node.getNextSibling() ) {
                         if( node.getNodeName().equalsIgnoreCase( "codes" ) )
 
-                            for( Node n = node.getFirstChild(); n != null; n = n.getNextSibling() ) {
+                            for( org.w3c.dom.Node n = node.getFirstChild(); n != null; n = n.getNextSibling() ) {
                                 if( n.getNodeName().equalsIgnoreCase( "code" ) ) {
-                                    NamedNodeMap    map         = n.getAttributes();
-                                    Node            nodeValue   = map.getNamedItem( "value" );
+                                    NamedNodeMap map         = n.getAttributes();
+                                    org.w3c.dom.Node            nodeValue   = map.getNamedItem( "value" );
                                     int             value       = Integer.parseInt( nodeValue.getTextContent() );
                                     String          name        = map.getNamedItem( "name" ).getTextContent();
 
@@ -1844,20 +1868,20 @@ public class MainController {
                     // now, store codes use map
                     doc.getDocumentElement().normalize();
                     // just get nodes for controls
-                    NodeList controlNodeList = doc.getElementsByTagName("codeControls");
+                    org.w3c.dom.NodeList controlNodeList = doc.getElementsByTagName("codeControls");
                     // iterate each child node
                     for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
-                        Node node = controlNodeList.item(cn);
+                        org.w3c.dom.Node node = controlNodeList.item(cn);
 
                         // Get panel name.  Must be "left" or "right".
                         NamedNodeMap map = node.getAttributes();
                         String speaker = map.getNamedItem("label").getTextContent().split(" ")[0];
                         // i added ".split(" ")[0];" because one user had other text after that and i just wanted the first word.
 
-                        for( Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
+                        for( org.w3c.dom.Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
                             if( row.getNodeName().equalsIgnoreCase( "row" ) ) {
 
-                                for( Node cell = row.getFirstChild(); cell != null; cell = cell.getNextSibling() ) {
+                                for( org.w3c.dom.Node cell = row.getFirstChild(); cell != null; cell = cell.getNextSibling() ) {
                                     if( cell.getNodeName().equalsIgnoreCase("button")) {
 
                                         NamedNodeMap cellMap = cell.getAttributes();
@@ -1901,20 +1925,20 @@ public class MainController {
      *      contain code label and value
      *      goes into GlobalCode
      */
-    private void parseUserGlobals( File file, Node globals ) {
+    private void parseUserGlobals( File file, org.w3c.dom.Node globals ) {
 
         // reset code vector
         GlobalCode.clear();
 
 
-        for( Node n = globals.getFirstChild(); n != null; n = n.getNextSibling() ) {
+        for( org.w3c.dom.Node n = globals.getFirstChild(); n != null; n = n.getNextSibling() ) {
             if( n.getNodeName().equalsIgnoreCase( "global" ) ) {
                 NamedNodeMap    map         = n.getAttributes();
-                Node            nodeValue   = map.getNamedItem( "value" );
+                org.w3c.dom.Node            nodeValue   = map.getNamedItem( "value" );
                 int             value       = Integer.parseInt( nodeValue.getTextContent() );
-                Node            nodeDefaultRating   = map.getNamedItem( "defaultRating" );
-                Node            nodeMinRating       = map.getNamedItem( "minRating" );
-                Node            nodeMaxRating       = map.getNamedItem( "maxRating" );
+                org.w3c.dom.Node            nodeDefaultRating   = map.getNamedItem( "defaultRating" );
+                org.w3c.dom.Node            nodeMinRating       = map.getNamedItem( "minRating" );
+                org.w3c.dom.Node            nodeMaxRating       = map.getNamedItem( "maxRating" );
                 String          name        = map.getNamedItem( "name" ).getTextContent();
                 String          label       = map.getNamedItem( "label" ).getTextContent();
                 GlobalCode      code        = new GlobalCode( value, name, label );
@@ -2001,7 +2025,7 @@ public class MainController {
                         NodeList controlNodeList = doc.getElementsByTagName("codeControls");
                         // iterate each child node
                         for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
-                            Node node = controlNodeList.item(cn);
+                            org.w3c.dom.Node node = controlNodeList.item(cn);
 
                             // Get panel name.  Must be "left" or "right".
                             NamedNodeMap map = node.getAttributes();
@@ -2041,7 +2065,7 @@ public class MainController {
                         controlNodeList = doc.getElementsByTagName("globalControls");
                         // iterate each child node ("left" or "right")
                         for (int cn = 0; cn < controlNodeList.getLength(); ++cn) {
-                            Node node = controlNodeList.item(cn);
+                            org.w3c.dom.Node node = controlNodeList.item(cn);
 
                             NamedNodeMap map = node.getAttributes();
                             String panelSide = map.getNamedItem("panel").getTextContent();
@@ -2054,7 +2078,7 @@ public class MainController {
                             }
 
 
-                            for( Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
+                            for( org.w3c.dom.Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
 
                                 if( row.getNodeName().equals("slider")){
                                     NamedNodeMap rowMap = row.getAttributes();
@@ -2159,16 +2183,16 @@ public class MainController {
      * @param node xml node
      * @param panel parent fxml node
      *******************************************************************/
-    private void parseControlColumn( Node node, GridPane panel ) {
+    private void parseControlColumn( org.w3c.dom.Node node, GridPane panel ) {
 
         int activeRow = 0;
         int activeCol = 0;
 
-        for( Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
+        for( org.w3c.dom.Node row = node.getFirstChild(); row != null; row = row.getNextSibling() ) {
             if( row.getNodeName().equalsIgnoreCase( "row" ) ) {
                 activeRow ++;
 
-                for( Node cell = row.getFirstChild(); cell != null; cell = cell.getNextSibling() ) {
+                for( org.w3c.dom.Node cell = row.getFirstChild(); cell != null; cell = cell.getNextSibling() ) {
                     if( cell.getNodeName().equalsIgnoreCase("button")) {
                         activeCol ++;
                         NamedNodeMap map = cell.getAttributes();

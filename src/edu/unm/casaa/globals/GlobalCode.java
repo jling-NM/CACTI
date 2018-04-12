@@ -124,4 +124,9 @@ public class GlobalCode {
     public static void clear() {
         list.clear();
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 };
