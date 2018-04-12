@@ -36,11 +36,14 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.sql.SQLException;
 
 
 /**
- * Created by josef on 8/22/16.
+ * Animated timeline of utterances
  */
 public class TimeLine extends Group {
 
@@ -50,6 +53,33 @@ public class TimeLine extends Group {
     private SessionData.UtteranceList utteranceList   = null;   //
     private double height                 = 55.0;   // projected height of timeline. forces Group dimensions early
     private double thickness              = 2.0;    // thickness of line that represents time :)
+
+
+
+    // TODO keep?
+    private String annotateMarkerId       = null;   // test
+    final PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        mPcs.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        mPcs.removePropertyChangeListener(listener);
+    }
+
+    public String getAnnotateMarkerId() {
+        return annotateMarkerId;
+    }
+
+    public void setAnnotateMarkerId(String annotateMarkerId) {
+
+        String prevAnnotateMarkerId = this.annotateMarkerId;
+        this.annotateMarkerId = annotateMarkerId;
+        System.out.println("setAnnotateMarkerId fired");
+        mPcs.firePropertyChange("annotateMarkerId", prevAnnotateMarkerId, annotateMarkerId);
+    }
+    // TODO end keep?
 
 
     public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, SessionData.UtteranceList utteranceList) {
@@ -374,8 +404,18 @@ public class TimeLine extends Group {
                 }
             });
 
+            MenuItem mniAnnotateUtterance = new MenuItem("Annotate");
+            mniAnnotateUtterance.setOnAction( e -> {
+                if( getSelectedMarker() != null) {
+                    System.out.println("call a time line method to display annoation popup");
+                    setAnnotateMarkerId(getMarkerID());
+                }
+            });
+
+
             if( getSelectedMarker() != null) {
                 contextMenu.getItems().addAll(mniRemoveMarker);
+                contextMenu.getItems().addAll(mniAnnotateUtterance);
                 contextMenu.getStyleClass().add("contextMenu");
             }
 

@@ -58,6 +58,7 @@ import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -1150,7 +1151,6 @@ public class MainController {
                 });
 
 
-
                 /** if dragging slider, update media playback rate */
                 sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
                     if (sldRate.isValueChanging()) {
@@ -1158,7 +1158,11 @@ public class MainController {
                     }
                 });
 
-
+                sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                    if (sldRate.isValueChanging()) {
+                        mediaPlayer.setRate(newValue.doubleValue());
+                    }
+                });
 
             } catch ( MediaException mex ) {
                 if(mex.getType() == MediaException.Type.MEDIA_UNSUPPORTED) {
@@ -1172,6 +1176,65 @@ public class MainController {
 
         }
     }
+
+
+    // TODO: move this to where it belongs in the lineup
+    /*
+        handle request to edit utterance annotation and such
+     */
+    public void openUtteranceEditor(PropertyChangeEvent evt) {
+        System.out.println("openUtteranceEditor on PropertyChangeEvent");
+        System.out.println("utterance_id:" + evt.getNewValue());
+
+        if( evt.getNewValue() != null ) {
+
+            /* open editor */
+
+            /*
+                editor will link rating to utterance when rating item selected
+                editor will unlink rating from utterances with rating item deselected
+                editor will update utterance annotation when textfiled loses focus
+                nope, nope. editor needs to have cancel button and Save button so
+                user can bail on changes. if i did it like above i wouldn't be able to
+                undo, yep. yep.
+             */
+
+
+            selectAudioFile();
+            /*
+            Locale locale = new Locale("en", "US");
+            ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+            Stage about = new Stage();
+            Parent root = null;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("About.fxml"), resourceStrings);
+            try {
+                root = fxmlLoader.load();
+
+            } catch (Exception e) {
+                showError("About: fxml Error in About ", format("%s\n", e.toString()));
+            }
+            about.setScene(new Scene(root));
+            about.setTitle(resourceStrings.getString("txt.about.title"));
+            about.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+            about.initModality(Modality.APPLICATION_MODAL);
+            about.initStyle(StageStyle.UTILITY);
+            about.showAndWait();
+*/
+
+            // TODO: how come wont' close?
+
+            /* save utterance annotation */
+
+            /* link/unlink ratings to utterance */
+
+            /* anything else/ */
+
+
+            return;
+        }
+    }
+
 
 
     /**
@@ -1241,6 +1304,13 @@ public class MainController {
                 timeLine.getAnimation().jumpTo(totalDuration.multiply(newValue.doubleValue()));
             }
         });
+
+
+        // TODO verify this is best way to do this
+        /* timeline dispatches changes to annotation property that notify controller to
+           edit utterance annotation.
+         */
+        timeLine.addPropertyChangeListener(this::openUtteranceEditor);
 
 
         /**
