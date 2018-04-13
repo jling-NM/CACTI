@@ -26,10 +26,8 @@ import javafx.animation.Animation;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -39,13 +37,23 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -60,6 +68,7 @@ import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
@@ -169,7 +178,7 @@ public class MainController {
     private SessionData sessionData      = null;        // session persistence
 
     private enum  GuiState {                            // available gui states
-        PLAYBACK, MISC_CODING, GLOBAL_CODING
+        PLAYBACK, MISC_CODING, GLOBAL_CODING, REPORT
     }
     private GuiState guiState;                          //
 
@@ -228,15 +237,15 @@ public class MainController {
     }
 
 
-    /*********************************************************************
+    /*
      Button event handlers
      */
 
-    /**********************************************************************
+    /*
      * btnActPlayPause
      * @param actionEvent
      * button event: play media
-     **********************************************************************/
+     */
     public void btnActPlayPause(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
         if (mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING) ) {
             mediaPlayer.pause();
@@ -246,9 +255,9 @@ public class MainController {
     }
 
 
-    /**********************************************************************
+    /*
      *  button event: 5 second rewind
-     **********************************************************************/
+     */
     @SuppressWarnings("UnusedParameters")
     public void btnActRewind(ActionEvent actionEvent) { rewind(); }
 
@@ -299,9 +308,8 @@ public class MainController {
      *  If more utterances exist then move to 1 second prior to the
      *  previous code. Otherwise, move to 1 second prior to that last code
      *
-     *  @param actionEvent not used
      **********************************************************************/
-    public void btnActUncodeRewind(ActionEvent actionEvent) {
+    public void btnActUncodeRewind() {
         uncodeRewind();
     }
 
@@ -321,14 +329,14 @@ public class MainController {
 
 
 
-    /**********************************************************************
+    /*
      * Menu event handlers
-     **********************************************************************/
+     */
 
     /**********************************************************************
      * menu selection event: About
      **********************************************************************/
-    public void mniActAbout(ActionEvent actionEvent) {
+    public void mniActAbout() {
 
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
@@ -342,6 +350,7 @@ public class MainController {
         } catch (Exception e){
             showError("About: fxml Error in About ", format("%s\n", e.toString()));
         }
+        assert root != null;
         about.setScene(new Scene(root));
         about.setTitle(resourceStrings.getString("txt.about.title"));
         about.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
@@ -359,12 +368,12 @@ public class MainController {
      * This allowed access to form fields and contained all code for the
      * dialog here rather then mixing it into main controller.
      **********************************************************************/
-    public void mniActSettingsKB(ActionEvent actionEvent) {
+    public void mniActSettingsKB() {
 
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
 
-        /**
+        /*
          * A validation and formatting filter for textfields
          * This event filter insures that only alphanumeric keys can be used
          * for shortcuts.
@@ -454,7 +463,7 @@ public class MainController {
 
 
         Optional<ButtonType> result = dlgSettingsKb.showAndWait();
-        if (result.get() == ButtonType.APPLY){
+        if (result.isPresent() && (result.get() == ButtonType.APPLY)){
             if( !tfU.getText().isEmpty() ){
                 appPrefs.put(tfU.getId(), tfU.getText());
             }
@@ -475,7 +484,7 @@ public class MainController {
     /**********************************************************************
      * menu selection event: Help
      **********************************************************************/
-    public void mniActOnlineHelp(ActionEvent actionEvent) {
+    public void mniActOnlineHelp() {
 
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
@@ -494,7 +503,7 @@ public class MainController {
     /**********************************************************************
      * menu selection event: Exit
      **********************************************************************/
-    public void mniActExit(ActionEvent actionEvent) {
+    public void mniActExit() {
 
         // user prefs like current volume setting are saved in
         // Application.stop() when Platform.exit() is called.
@@ -517,7 +526,7 @@ public class MainController {
      * menu selection event: Open Audio File to listen independently of
      * coding
      **********************************************************************/
-    public void mniActOpenFile(ActionEvent actionEvent) {
+    public void mniActOpenFile() {
 
         setGuiState(GuiState.PLAYBACK);
 
@@ -543,9 +552,8 @@ public class MainController {
      * Load audio file and create corresponding coding output file.
      * Initialize the mediaplayer.
      * Activate the coding controls.
-     * @param actionEvent event details
      */
-    public void mniStartCoding(ActionEvent actionEvent) {
+    public void mniStartCoding() {
 
         setGuiState(GuiState.MISC_CODING);
 
@@ -600,9 +608,8 @@ public class MainController {
      * Load coding file and corresponding audio file.
      * Initialize mediaplayer.
      * Activate timeline control updating it for utterance data
-     * @param actionEvent event details
      ******************************************************/
-    public void mniResumeCoding(ActionEvent actionEvent) {
+    public void mniResumeCoding() {
 
         // if something be playing, stop it
         if(mediaPlayer != null) {
@@ -628,7 +635,7 @@ public class MainController {
      * Update code list. If currently coding, reload controls
      *
      */
-    public void mniLoadConfig(ActionEvent actionEvent) {
+    public void mniLoadConfig() {
 
         // if something be playing, stop it
         if(mediaPlayer != null) {
@@ -676,9 +683,8 @@ public class MainController {
 
     /**
      * Switch to coding screen or tab
-     * @param actionEvent
      */
-    public void mniCodingView(ActionEvent actionEvent) {
+    public void mniCodingView() {
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -695,9 +701,8 @@ public class MainController {
 
     /**
      * Switch to rating screen or tab
-     * @param actionEvent
      */
-    public void mniGlobalScoringView(ActionEvent actionEvent) {
+    public void mniGlobalScoringView() {
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -713,13 +718,30 @@ public class MainController {
     }
 
 
+    /**
+     * TODO
+     */
+    public void mniReportView() {
+
+        // this something be playing, stop it
+        if(mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+
+        if(sessionData != null) {
+            setGuiState(GuiState.REPORT);
+
+            // take care of media player
+            initializeMediaPlayer(currentAudioFile, playerReady);
+        }
+    }
+
     /**********************************************************************
      * sldSeek mouse event:
      * change seek time when user clicks on slid bar instead of dragging the controller
      * to change the position
-     * @param event details
      **********************************************************************/
-    public void sldSeekMousePressed(Event event) {
+    public void sldSeekMousePressed() {
         setMediaPlayerPosition(totalDuration.multiply(sldSeek.getValue()));
     }
 
@@ -884,6 +906,104 @@ public class MainController {
 
 
     /**
+     * Display editor for annotating an utterance and handle
+     * update through data model
+     * @param pcEvt Property change event we are listening for
+     */
+    private void openUtteranceEditor(PropertyChangeEvent pcEvt) {
+        if( pcEvt.getNewValue() != null ) {
+
+            /* grab mouse location to position editor window. not ideal but worth a test */
+            Point mousePtrLoc = MouseInfo.getPointerInfo().getLocation();
+
+            /* get data */
+            String utterance_id = pcEvt.getNewValue().toString();
+            String existingAnnotation = "";
+            /* globals list */
+            ArrayList<GlobalCode> ratingCode = null;
+            try {
+                existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
+                ratingCode = sessionData.getRatingsList(utterance_id);
+            } catch ( SQLException e) {
+                showError("Error Annotation", e.getMessage());
+            }
+
+
+            /* open editor */
+            Dialog<ButtonType> dlgUtteranceEditor = new Dialog<>();
+            FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource("UtteranceEditor.fxml"));
+            try {
+                dlgUtteranceEditor.setDialogPane(dialogLoader.load());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            /* only basic layout is in fxml. Further dialog settings here */
+            dlgUtteranceEditor.setTitle("Annotate Utterance");
+            Stage dlgStage = (Stage) dlgUtteranceEditor.getDialogPane().getScene().getWindow();
+            dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+            dlgUtteranceEditor.initStyle(StageStyle.TRANSPARENT);
+            Scene scene = dlgStage.getScene();
+            scene.setFill(Color.TRANSPARENT);
+
+            /* position window */
+            dlgUtteranceEditor.setX(mousePtrLoc.x-20.0);
+            dlgUtteranceEditor.setY(mousePtrLoc.y-60.0);
+
+
+            /* populate listview of global items.
+            * Since we want to reselect previous items i loop through items
+            * instead of just populating with an observablelist */
+            ListView<GlobalCode> dlgListView = new ListView<>();
+            dlgListView.setPrefHeight(120);
+            dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            for(GlobalCode gc : ratingCode){
+                dlgListView.getItems().add(gc);
+                if((gc.label != null) && (gc.label.equals(utterance_id))) {
+                    dlgListView.getSelectionModel().select(gc);
+                }
+            }
+
+            /* local reference for annotation text */
+            TextArea extTa = null;
+            // get annotation reference and populate with existing text
+            for(Node nodeOut:dlgUtteranceEditor.getDialogPane().getChildren()){
+                if(nodeOut instanceof VBox) {
+                    VBox vb = (VBox) nodeOut;
+                    for (Node nodeIn : vb.getChildren()) {
+                        if (nodeIn instanceof TextArea) {
+                            extTa = (TextArea) nodeIn;
+                            extTa.setText(existingAnnotation);
+                        }
+                    }
+                    /* secondarily, add list view to VBox container */
+                    vb.getChildren().add(dlgListView);
+                }
+            }
+
+            // Use traditional way to get results as lambda expects 'final' variables
+            Optional<ButtonType> result = dlgUtteranceEditor.showAndWait();
+            if (result.isPresent() & (result.get() == ButtonType.APPLY)){
+                ObservableList<Integer> selectedIndices = dlgListView.getSelectionModel().getSelectedIndices();
+
+                ArrayList<GlobalCode> globalCodeList = new ArrayList<>();
+                for(int i : selectedIndices){
+                    globalCodeList.add(ratingCode.get(i));
+                }
+
+                /* save utterance annotation */
+                try {
+                    sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
+                } catch (SQLException e) {
+                    showError("Error Annotating Utterance", e.getMessage());
+                }
+            }
+
+        }
+    }
+
+
+    /**
      * Notify user of file format issue and ask for permission to convert.
      * Guide user through selecting globals file for merging into new format.
      * Call static SessionData methods to archive casaa and globals file to *.bak.
@@ -1004,7 +1124,7 @@ public class MainController {
             alert.getButtonTypes().setAll(buttonTypeLoc, buttonTypeCancel);
 
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonTypeLoc){
+            if (result.isPresent() && (result.get() == buttonTypeLoc)){
                 // locate audio file
                 audioFile = selectAudioFile();
                 try {
@@ -1136,12 +1256,12 @@ public class MainController {
 
 
 
-                /** Listener: Update the media position if user is dragging the slider.
+                /* Listener: Update the media position if user is dragging the slider.
                  * Otherwise, do nothing. See sldSeekMousePressed() for when slider is clicked with mouse
                  * Seems odd to bind to valueProperty and check isValueChanging
                  * but when i use "valueChangingProperty" this performance is
                  * not as smooth
-                 **/
+                 */
                 sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
                     /*
                         if dragging slider, update media position
@@ -1154,7 +1274,7 @@ public class MainController {
                 });
 
 
-                /** if dragging slider, update media playback rate */
+                /* if dragging slider, update media playback rate */
                 sldRate.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
                     if (sldRate.isValueChanging()) {
                         mediaPlayer.setRate(newValue.doubleValue());
@@ -1181,93 +1301,6 @@ public class MainController {
     }
 
 
-    // TODO: move this to where it belongs in the lineup
-    /*
-        handle request to edit utterance annotation and such
-     */
-    public void openUtteranceEditor(PropertyChangeEvent evt) {
-        if( evt.getNewValue() != null ) {
-
-            /* get data */
-            String utterance_id = evt.getNewValue().toString();
-            String existingAnnotation = "";
-
-            //ObservableList<GlobalCode> ratingCode = null;
-            /* globals list */
-            ArrayList<GlobalCode> ratingCode = null;
-
-            try {
-                existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
-                ratingCode = sessionData.getRatingsList(utterance_id);
-            } catch ( SQLException e) {
-                showError("Error Annotation", e.getMessage());
-            }
-
-
-            /* open editor */
-            Dialog<ButtonType> dialog = new Dialog<>();
-            FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource("UtteranceEditor.fxml"));
-            try {
-                dialog.setDialogPane(dialogLoader.load());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            /* */
-            dialog.setTitle("Annotate Utterance");
-            Stage dlgStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-            dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
-            dialog.initStyle(StageStyle.UTILITY);
-
-            /* populate listview of global items */
-            ListView<GlobalCode> dlgListView = new ListView<>();
-            dlgListView.setPrefHeight(120);
-            dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            for(GlobalCode gc : ratingCode){
-                dlgListView.getItems().add(gc);
-                if((gc.label != null) && (gc.label.equals(utterance_id))) {
-                    dlgListView.getSelectionModel().select(gc);
-                }
-            }
-
-            /* local reference for annotation text */
-            TextArea extTa = null;
-            // get annotation reference and populate with existing text
-            for(Node nodeOut:dialog.getDialogPane().getChildren()){
-                if(nodeOut instanceof VBox) {
-                    VBox vb = (VBox) nodeOut;
-                    for (Node nodeIn : vb.getChildren()) {
-                        if (nodeIn instanceof TextArea) {
-                            extTa = (TextArea) nodeIn;
-                            extTa.setText(existingAnnotation);
-                        }
-                    }
-                    /* secondarily, add list view to VBox container */
-                    vb.getChildren().add(dlgListView);
-                }
-            }
-
-            // Use traditional way to get results as lambda expects 'final' variables
-            Optional<ButtonType> result = dialog.showAndWait();
-            if (result.isPresent() & (result.get() == ButtonType.APPLY)){
-                ObservableList<Integer> selectedIndices = dlgListView.getSelectionModel().getSelectedIndices();
-
-                ArrayList<GlobalCode> globalCodeList = new ArrayList<>();
-                for(int i : selectedIndices){
-                    globalCodeList.add(ratingCode.get(i));
-                }
-
-                /* save utterance annotation */
-                try {
-                    sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
-                } catch (SQLException e) {
-                    showError("Error Annotating Utterance", e.getMessage());
-                }
-            }
-
-        }
-    }
-
 
 
     /**
@@ -1275,7 +1308,7 @@ public class MainController {
      */
     private void initializeTimeLine() {
 
-        /**
+        /*
          * determine where to put timeline overlay
          */
         double center = vbApp.getScene().getWidth()/2;
@@ -1321,12 +1354,10 @@ public class MainController {
 
 
         /* this shouldn't happen */
-        timeLine.getAnimation().setOnFinished( (e) -> {
-            timeLine.getAnimation().pause();
-        });
+        timeLine.getAnimation().setOnFinished( (e) -> timeLine.getAnimation().pause());
 
 
-        /**
+        /*
          * Seek slider should manipulate timeline as it does mediaplayer
          */
         sldSeek.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -1339,19 +1370,19 @@ public class MainController {
         });
 
 
-        // TODO verify this is best way to do this
-        /* timeline dispatches changes to annotation property that notify controller to
+        /*
+           timeline dispatches changes to annotation property that notify controller to
            edit utterance annotation.
          */
         timeLine.addPropertyChangeListener(this::openUtteranceEditor);
 
 
-        /**
+        /*
          * Playback rate binding
          */
         timeLine.getAnimation().rateProperty().bind(sldRate.valueProperty());
 
-        /**
+        /*
          * timeline can be paused internally by clicking on a marker
          * so this listener pauses mediaplayer in response
          */
@@ -1361,7 +1392,7 @@ public class MainController {
             }
         });
 
-        /**
+        /*
          * timeline currenttime must be set to match mediaplyer's currentime
          * Following sequence seems to be best way to do that
          */
@@ -1464,9 +1495,9 @@ public class MainController {
                 });
 
 
-                /**
+                /*
                  * get last utterance to set player position in time
-                 **/
+                 */
                 Utterance currentUtterance = getUtteranceList().last();
                 // default seek init
                 onReadySeekDuration = Duration.ZERO;
@@ -1479,7 +1510,7 @@ public class MainController {
                 }
 
 
-                /**
+                /*
                  * adjust player position
                  */
                 mediaPlayer.seek(onReadySeekDuration);
@@ -1490,7 +1521,7 @@ public class MainController {
                 updateUtteranceDisplays();
 
 
-                /**
+                /*
                     initialize new timeline
                     assumes mediaplayer time position is already set
                  */
@@ -1521,6 +1552,60 @@ public class MainController {
 
 
             case GLOBAL_CODING:
+
+                // always reset for globals
+                resetUserControlsContainer();
+
+                /* Listener: currentTime
+                   responsible for updating gui components with current playback position
+                   because MediaPlayer’s currentTime property is updated on a different thread than the main JavaFX application thread. Therefore we cannot bind to it directly
+                   NOTE: this version does not update a timeline */
+                mediaPlayer.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                    // update display of current time
+                    lblTimePos.setText(Utils.formatDuration(newValue));
+                    // update the mediaplayer slider
+                    sldSeek.setValue(newValue.toMillis() / totalDuration.toMillis());
+                });
+
+                // reset playback controls to zero
+                onReadySeekDuration = Duration.ZERO;
+                mediaPlayer.seek(onReadySeekDuration);
+                lblTimePos.setText(Utils.formatDuration(onReadySeekDuration));
+                sldSeek.setValue(onReadySeekDuration.toMillis()/totalDuration.toMillis());
+
+                // hide controls needed for coding
+                setPlayerButtonState();
+
+                // enable GLOBAL coding controls
+                loader = new FXMLLoader(getClass().getResource("GLOBAL_CODING.fxml"), resourceStrings);
+                loader.setController(this);
+
+                try {
+                    vbApp.getChildren().add(loader.load());
+                } catch (IOException ex) {
+                    showError("Error", ex.toString());
+                }
+
+
+                // update control state
+                // load coding buttons from userConfiguration.xml appropriate for GuiState
+                parseUserControls();
+
+                // resize app window
+                windW = appPrefs.getDouble("main.wind.w", 800.0);
+                ourTown.setWidth(windW);
+                // enforce 600 min height for coding window
+                windH = appPrefs.getDouble("main.wind.h", 600.0);
+                if( windH < 600.0) {
+                    ourTown.setHeight(600.0);
+                } else {
+                    ourTown.setHeight(windH);
+                }
+
+                break;
+
+
+            case REPORT:
 
                 // always reset for globals
                 resetUserControlsContainer();
@@ -1775,7 +1860,7 @@ public class MainController {
 
 
     /**
-     * @param utr
+     * @param utr Utterance instance to be removed
      */
     private synchronized void removeUtterance(Utterance utr){
         try {
@@ -2361,7 +2446,7 @@ public class MainController {
             alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
 
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonTypeOne){
+            if (result.isPresent() && (result.get() == buttonTypeOne)){
                 // create new using default path
                 selectConfigFile(UserConfig.getPath());
                 try {
@@ -2369,7 +2454,7 @@ public class MainController {
                 } catch (IOException e) {
                     showError("File Write Error", "Could not write user config file");
                 }
-            } else if (result.get() == buttonTypeTwo) {
+            } else if (result.isPresent() && (result.get() == buttonTypeTwo)) {
                 // select existing by sending no path
                 selectConfigFile("");
             } else {

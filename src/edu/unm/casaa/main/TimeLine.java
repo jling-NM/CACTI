@@ -36,7 +36,6 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.sql.SQLException;
@@ -55,15 +54,24 @@ public class TimeLine extends Group {
     private double thickness              = 2.0;    // thickness of line that represents time :)
 
 
+    /*
+        Add change property support to TimeLine
+        This allows TimeLine to broadcast a request for utterance annotation.
+        The controller will listen for these requests and handle the annotation
+        editor.
+        There are probably better ways to do this but i chose to avoid the pub/sub model
+        as that will be deprecated in Java 9
 
-    // TODO keep?
-    private String annotateMarkerId       = null;   // test
+        annotateMarkerId is the property with change support.
+        When these changes it is a request for annotation.
+     */
+    private String annotateMarkerId = null;
+
+    /* add property change support to timeline */
     final PropertyChangeSupport mPcs = new PropertyChangeSupport(this);
-
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         mPcs.addPropertyChangeListener(listener);
     }
-
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         mPcs.removePropertyChangeListener(listener);
     }
@@ -72,26 +80,39 @@ public class TimeLine extends Group {
         return annotateMarkerId;
     }
 
+
+    /**
+     * TimeLine member called by TimeLineMarker to when a marker context menu
+     * selection indicates an annotation event.
+     * @param annotateMarkerId
+     */
     public void setAnnotateMarkerId(String annotateMarkerId) {
 
+        /* update property being listened to */
         this.annotateMarkerId = annotateMarkerId;
 
-        //mPcs.firePropertyChange("annotateMarkerId", prevAnnotateMarkerId, annotateMarkerId);
-        /* We want to fire the event and have it seen as change even if user selects the
-           same utterance again. Set the old value to 0 and the listener will always hear
-           the new utterance id.
+        /*
+           We want to fire the event and have it seen as change even if user selects the
+           same utterance again. Therefore, instead of sending the previous annotateMarkerId
+           always set the old value to 0 and the listener will always hear
+           this as a new change event.
          */
         mPcs.firePropertyChange("annotateMarkerId", 0, annotateMarkerId);
     }
-    // TODO end keep?
 
 
+    /**
+     * @param audioDuration Time span of timeline
+     * @param pixelsPerSecond Temporal resolution of timeline
+     * @param center Horizontal center is beginning of timeline
+     * @param utteranceList A reference to the utterance list that will be rendered on the timeline as TimeLineMarkers
+     */
     public TimeLine(Duration audioDuration, int pixelsPerSecond, double center, SessionData.UtteranceList utteranceList) {
 
         this.pixelsPerSecond = pixelsPerSecond;
         this.utteranceList = utteranceList;
 
-        /**
+        /*
             horizontal center is beginning of timeline
             We position both cursor and start of timeline in center of screen
             Manual layout is ok as i don't want cursor to move when window is resized
@@ -100,7 +121,7 @@ public class TimeLine extends Group {
         // where does timeline begin; center
         this.setTranslateX(center);
 
-        /**
+        /*
             the center line of the timeline
          */
         double end = audioDuration.toSeconds() * pixelsPerSecond;
@@ -112,7 +133,7 @@ public class TimeLine extends Group {
         renderUtterances();
 
 
-        /**
+        /*
          * initialize the animation of timeline
          * add 2 seconds to duration of timeline. We want to timeline to outlast
          * the media playback until we figure out how to recover timeline after
@@ -122,14 +143,14 @@ public class TimeLine extends Group {
         // interpolator needs to be linear like the audio playback
         animation.setInterpolator(Interpolator.LINEAR);
 
-        /**
+        /*
          * translation is negative of the entire timeline width
          * Here, subtract 2 seconds worth of line to compensate for duration extension above
          */
         double byX = -audioDuration.toSeconds() * pixelsPerSecond - (2 * pixelsPerSecond);
         animation.setByX(byX);
 
-        /**
+        /*
          * Define listeners for change to utterance list
          * This links timeline markers to changes in utterance list
         */
@@ -154,7 +175,7 @@ public class TimeLine extends Group {
     /**
      * Add or update utterance on timeline and model
      *
-     * @param newUtterance
+     * @param newUtterance Utterance to add
      */
     public void addMarker(Utterance newUtterance) {
         // insert updated marker
@@ -198,13 +219,13 @@ public class TimeLine extends Group {
             }
 
         } else {
-            /**
+            /*
              * check if exact utterance is already in list.
              * This to prevent timeline from adding duplicates.
              */
             Node r = this.lookup("#"+newUtterance.getID());
             if( r == null) {
-                /**
+                /*
                  * sync timeline with player time to marker appears lined up.
                  * Do this only for new markers not edited above here
                   */
@@ -258,7 +279,7 @@ public class TimeLine extends Group {
 
     /**
      * set user selected timeline marker
-     * @param selectedMarker
+     * @param selectedMarker TimeLineMarker to set as selected
      */
     public void setSelectedMarker(TimeLineMarker selectedMarker) {
         this.selectedMarker = selectedMarker;
@@ -289,6 +310,13 @@ public class TimeLine extends Group {
         private int indicatorWidth = 12;    // size of arrow
 
 
+        /**
+         * An indicator rendered on the timeline
+         * @param markerID Node id
+         * @param code The code to label the marker
+         * @param posSeconds Position on timeline
+         * @param speaker Which speaker is being marked
+         */
         public TimeLineMarker(String markerID, String code, double posSeconds, MiscCode.Speaker speaker) {
 
             // Set spacing between nodes inside marker. specify spacing as CSS doesn't appear to work for this
@@ -330,7 +358,7 @@ public class TimeLine extends Group {
             this.setAlignment(Pos.CENTER);
 
 
-            /**
+            /*
              * Filter the TimeLineMarker MouseEvent.MOUSE_CLICKED to control event order.
              * If i simply assign setOnContextMenuRequested() this gets handled before the
              * MouseEvent.MOUSE_CLICKED. This interferes with setting the selected marker
@@ -350,7 +378,7 @@ public class TimeLine extends Group {
                 if( timeLineMarker != null) {
 
                     if( timeLineMarker.equals(getSelectedMarker()) ) {
-                        /**
+                        /*
                          * selected marker clicked again. If left-click, delect this marker, if right-click, don't.
                          */
                         if( e.getButton().equals(MouseButton.PRIMARY)) {
@@ -358,7 +386,7 @@ public class TimeLine extends Group {
                             setSelectedMarker(null);
                         }
                     } else {
-                        /**
+                        /*
                          * different marker selected, deselect any previous and select this one regardles of mouse button
                          */
                         if( getSelectedMarker() != null ) {
@@ -372,7 +400,7 @@ public class TimeLine extends Group {
                     }
                 }
 
-                /**
+                /*
                  * finished with accounting. Now, provide a popup menu on right-click that will use selectedMarker
                  * "|| e.isControlDown()" is for OSX Ctrl+Click provided in addition to two finger click
                  */

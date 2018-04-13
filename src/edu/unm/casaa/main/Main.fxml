@@ -37,12 +37,13 @@
           <items>
             <MenuItem fx:id="mniSessionStart" accelerator="Shortcut+S" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.session.start" />
             <MenuItem fx:id="mniSessionResume" accelerator="Shortcut+R" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.session.resume" />
+              <MenuItem fx:id="mniReportView" accelerator="Shortcut+P" mnemonicParsing="false" onAction="#mniReportView" text="%menu.title.session.report" />
           </items>
         </Menu>
         <Menu fx:id="mnuCoding" disable="true" text="%menu.title.codingview">
           <items>
             <MenuItem fx:id="mniCoding" accelerator="Shortcut+U" mnemonicParsing="false" onAction="#mniCodingView" text="%menu.title.codingview.utterances" />
-                  <MenuItem fx:id="mniGlobalScore1" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoringView" text="%menu.title.codingview.ratings" />
+                  <MenuItem fx:id="mniGlobalScore" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoringView" text="%menu.title.codingview.ratings" />
           </items>
         </Menu>
             <Menu text="%menu.title.settings">
