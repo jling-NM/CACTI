@@ -1188,13 +1188,17 @@ public class MainController {
     public void openUtteranceEditor(PropertyChangeEvent evt) {
         if( evt.getNewValue() != null ) {
 
-
             /* get data */
-            int utterance_id = Integer.parseInt(evt.getNewValue().toString());
+            String utterance_id = evt.getNewValue().toString();
             String existingAnnotation = "";
+
+            //ObservableList<GlobalCode> ratingCode = null;
+            /* globals list */
+            ArrayList<GlobalCode> ratingCode = null;
 
             try {
                 existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
+                ratingCode = sessionData.getRatingsList(utterance_id);
             } catch ( SQLException e) {
                 showError("Error Annotation", e.getMessage());
             }
@@ -1209,19 +1213,26 @@ public class MainController {
                 e.printStackTrace();
             }
 
-            // icons?
-            //dialog.setGraphic(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+            /* */
+            dialog.setTitle("Annotate Utterance");
+            Stage dlgStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+            dialog.initStyle(StageStyle.UTILITY);
 
-            // reference for later
-            ObservableList<GlobalCode> ratingCode = FXCollections.observableArrayList(new GlobalCode(10, "ick", "ICK"), new GlobalCode(20, "nuts", "NUTS"));
-            ListView<GlobalCode> dlgListView = new ListView<>(ratingCode);
-            dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            //dlgListView.getItems().add(new GlobalCode(10, "ick", "ICK"));
-            //dlgListView.getItems().add(new GlobalCode(20, "nuts", "NUTS"));
+            /* populate listview of global items */
+            ListView<GlobalCode> dlgListView = new ListView<>();
             dlgListView.setPrefHeight(120);
-            //
+            dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            for(GlobalCode gc : ratingCode){
+                dlgListView.getItems().add(gc);
+                if((gc.label != null) && (gc.label.equals(utterance_id))) {
+                    dlgListView.getSelectionModel().select(gc);
+                }
+            }
+
+            /* local reference for annotation text */
             TextArea extTa = null;
-            //
+            // get annotation reference and populate with existing text
             for(Node nodeOut:dialog.getDialogPane().getChildren()){
                 if(nodeOut instanceof VBox) {
                     VBox vb = (VBox) nodeOut;
@@ -1231,6 +1242,7 @@ public class MainController {
                             extTa.setText(existingAnnotation);
                         }
                     }
+                    /* secondarily, add list view to VBox container */
                     vb.getChildren().add(dlgListView);
                 }
             }
@@ -1238,24 +1250,21 @@ public class MainController {
             // Use traditional way to get results as lambda expects 'final' variables
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.isPresent() & (result.get() == ButtonType.APPLY)){
-                ObservableList selectedIndices = dlgListView.getSelectionModel().getSelectedIndices();
-                System.out.println(ratingCode.get(0).id);
+                ObservableList<Integer> selectedIndices = dlgListView.getSelectionModel().getSelectedIndices();
+
+                ArrayList<GlobalCode> globalCodeList = new ArrayList<>();
+                for(int i : selectedIndices){
+                    globalCodeList.add(ratingCode.get(i));
+                }
 
                 /* save utterance annotation */
                 try {
-                    sessionData.annotateUtterance(utterance_id, extTa.getText(), selectedIndices);
+                    sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
                 } catch (SQLException e) {
                     showError("Error Annotating Utterance", e.getMessage());
                 }
             }
 
-
-            /* link/unlink ratings to utterance */
-
-            /* anything else/ */
-
-
-            return;
         }
     }
 

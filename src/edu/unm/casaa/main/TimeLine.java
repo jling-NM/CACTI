@@ -74,9 +74,8 @@ public class TimeLine extends Group {
 
     public void setAnnotateMarkerId(String annotateMarkerId) {
 
-        //String prevAnnotateMarkerId = this.annotateMarkerId;
         this.annotateMarkerId = annotateMarkerId;
-        System.out.println("setAnnotateMarkerId fired");
+
         //mPcs.firePropertyChange("annotateMarkerId", prevAnnotateMarkerId, annotateMarkerId);
         /* We want to fire the event and have it seen as change even if user selects the
            same utterance again. Set the old value to 0 and the listener will always hear
@@ -412,7 +411,6 @@ public class TimeLine extends Group {
             MenuItem mniAnnotateUtterance = new MenuItem("Annotate");
             mniAnnotateUtterance.setOnAction( e -> {
                 if( getSelectedMarker() != null) {
-                    System.out.println("call a time line method to display annoation popup");
                     setAnnotateMarkerId(getMarkerID());
                 }
             });

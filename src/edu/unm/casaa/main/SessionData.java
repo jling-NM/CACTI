@@ -144,7 +144,7 @@ public class SessionData
      * @return HashMap of ratings
      * @throws SQLException
      */
-    private HashMap< Integer, Integer > getRatings() throws SQLException {
+    private HashMap< Integer, Integer > getRatingsMap() throws SQLException {
 
         HashMap< Integer, Integer > ratings = new HashMap<>();
 
@@ -160,6 +160,36 @@ public class SessionData
             }
 
             return ratings;
+        }
+    }
+
+
+    /**
+     * @return ObservableList of global ratings
+     * @throws SQLException
+     */
+    public ArrayList<GlobalCode> getRatingsList(String utterance_id) throws SQLException {
+
+        //ObservableList<GlobalCode> ratingCode = FXCollections.observableArrayList();
+        ArrayList<GlobalCode> ratingCode = new ArrayList<>();
+
+        try (Connection connection = ds.getConnection();
+             PreparedStatement ps = connection.prepareStatement("select ratings.*, utterances_ratings.utterance_id from ratings left outer join utterances_ratings on utterances_ratings.rating_id = ratings.rating_id where utterances_ratings.utterance_id = ? or utterances_ratings.utterance_id is NULL")
+            ) {
+
+
+            //ResultSet rs = statement.executeQuery("select rating_id, rating_name from ratings");
+            ps.setString(1, utterance_id);
+            ResultSet rs = ps.executeQuery();
+            // TODO: kluge, use label member to indicate if this global code is associated with this utterance
+            while (rs.next()) {
+                int ratingId = rs.getInt("rating_id");
+                String ratingName = rs.getString("rating_name");
+                String linked_utterance_id = rs.getString("utterance_id");
+                ratingCode.add(new GlobalCode(ratingId, ratingName, linked_utterance_id));
+            }
+
+            return ratingCode;
         }
     }
 
@@ -361,12 +391,12 @@ public class SessionData
     }
 
 
-    public String getUtteranceAnnotationText(int utterance_id) throws SQLException {
+    public String getUtteranceAnnotationText(String utterance_id) throws SQLException {
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps = connection.prepareStatement("select annotation from utterances where utterance_id = ?") ) {
 
             // annotation text
-            ps.setInt(1, utterance_id);
+            ps.setString(1, utterance_id);
             ResultSet rs = ps.executeQuery();
             if( rs.next() ) {
                 return rs.getString("annotation");
@@ -379,20 +409,35 @@ public class SessionData
 
 
 
-    public void annotateUtterance(int utterance_id, String annotationText, ObservableList globalsList) throws SQLException
+    public void annotateUtterance(String utterance_id, String annotationText, ArrayList<GlobalCode> globalsList) throws SQLException
     {
         try ( Connection connection = ds.getConnection();
-              PreparedStatement ps = connection.prepareStatement("update utterances set annotation = ? where utterance_id = ?") ) {
+              PreparedStatement psU = connection.prepareStatement("update utterances set annotation = ? where utterance_id = ?");
+              PreparedStatement psI = connection.prepareStatement("INSERT INTO utterances_ratings (utterance_id, rating_id) VALUES (?, ?)");
+              Statement statement = connection.createStatement()
+            ) {
 
-            //
-//            connection.setAutoCommit(false);
-            // annotation text
-            ps.setString(1, annotationText);
-            ps.setInt(2, utterance_id);
-            ps.executeUpdate();
+            /* disable autocommit */
+            connection.setAutoCommit(false);
+
+            /* handle annotation text */
+            psU.setString(1, annotationText);
+            psU.setString(2, utterance_id);
+            psU.executeUpdate();
+
+            /* clear all utterance to rating links */
+            statement.execute("delete from utterances_ratings where utterance_id = '"+ utterance_id + "'");
+
+            /* add selected utterance to rating links */
+            for (GlobalCode gc : globalsList ) {
+                psI.setString(1, utterance_id);
+                psI.setInt(2, gc.id);
+                psI.addBatch();
+            }
+            psI.executeBatch();
 
             // apply changes
-//            connection.commit();
+            connection.commit();
         }
     }
 
@@ -555,7 +600,7 @@ public class SessionData
                     "response_value integer not null" +
                     ")");
             statement.executeUpdate("create table if not exists utterances_ratings ( " +
-                    "utterance_id integer," +
+                    "utterance_id TEXT," +
                     "rating_id integer, " +
                     "  foreign key (utterance_id) references utterances (utterance_id)," +
                     "  foreign key (rating_id) references ratings (rating_id)" +
@@ -759,7 +804,7 @@ public class SessionData
          * @throws SQLException
          */
         private Ratings() throws SQLException {
-            ratings = getRatings();
+            ratings = getRatingsMap();
             notes = getAttribute(SessionAttributes.GLOBAL_NOTES);
         }
 
