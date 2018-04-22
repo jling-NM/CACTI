@@ -239,6 +239,32 @@ public class SessionData
     }
 
 
+    
+    /**
+     * Provide a count of codes used in all utterances
+     * @return map<code_name, count>
+     * @throws SQLException
+     */
+    private HashMap< String, Integer > getCodeCounts() throws SQLException {
+        HashMap< String, Integer > mapCodeCount = new HashMap<>();
+
+        try ( Connection connection = ds.getConnection();
+              Statement statement = connection.createStatement() ) {
+
+            ResultSet rs = statement.executeQuery("select codes.code_name, count(codes.code_id) as code_count from codes join utterances on codes.code_id = utterances.code_id group by codes.code_name;");
+
+            while (rs.next()) {
+
+                String code_name = rs.getString("code_name");
+                int code_count = rs.getInt("code_count");
+                mapCodeCount.put( code_name, code_count);
+            }
+
+            return mapCodeCount;
+        }
+    }
+
+
 
     /**
      * Reset utterance list to contents of list
