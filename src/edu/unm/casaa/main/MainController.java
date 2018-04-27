@@ -731,10 +731,29 @@ public class MainController {
         if(sessionData != null) {
             setGuiState(GuiState.REPORT);
 
+            if( vbApp.getChildren().size() > 2 ) {
+                // remove usercontrols content node. At some point i determined that remove add worked better than setContent()
+                vbApp.getChildren().remove(1,3);
+            }
+
+            //resetUserControlsContainer();
             // take care of media player
-            initializeMediaPlayer(currentAudioFile, playerReady);
+            //initializeMediaPlayer(currentAudioFile, playerReady);
+
+
+            HashMap<String, Integer> mapCodeSummary = null;
+            try {
+                // get counts
+                mapCodeSummary = sessionData.getCodeSummaryMap();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+            System.out.println(mapCodeSummary);
+
         }
     }
+
+
 
     /**********************************************************************
      * sldSeek mouse event:
