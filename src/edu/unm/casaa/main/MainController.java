@@ -33,6 +33,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -42,6 +43,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -56,6 +58,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -80,6 +83,39 @@ import static java.lang.String.format;
 
 
 public class MainController {
+
+    //TODO: move this if still needed
+    // Report
+    @FXML
+    public ScrollPane pnReport;
+    public Label rptScore_mico;
+    public Label rptScore_miin;
+    public Label rptScore_pmic;
+    public Label rptScore_r2q;
+    public Label rptScore_poq;
+    public Label rptScore_pcr;
+    public Label rptScore_ther2cli;
+    public Label rptScore_pct;
+    public Label rptScore_adp;
+    public Label rptScore_adw;
+    public Label rptScore_af;
+    public Label rptScore_co;
+    public Label rptScore_di;
+    public Label rptScore_ec;
+    public Label rptScore_gi;
+    public Label rptScore_open;
+    public Label rptScore_closed;
+    public Label rptScore_rcp;
+    public Label rptScore_rcw;
+    public Label rptScore_simple;
+    public Label rptScore_complex;
+    public Label rptScore_refct;
+    public Label rptScore_refst;
+    public Label rptScore_st;
+    public Label rptScore_rf;
+    public Label rptScore_su;
+    public Label rptScore_wa;
+
 
 
     // PLAYBACK
@@ -731,14 +767,29 @@ public class MainController {
         if(sessionData != null) {
             setGuiState(GuiState.REPORT);
 
-            if( vbApp.getChildren().size() > 2 ) {
-                // remove usercontrols content node. At some point i determined that remove add worked better than setContent()
-                vbApp.getChildren().remove(1,3);
-            }
+            Locale locale = new Locale("en", "US");
+            ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
 
-            //resetUserControlsContainer();
-            // take care of media player
-            //initializeMediaPlayer(currentAudioFile, playerReady);
+            Stage report = new Stage();
+            Parent root = null;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Report.fxml"), resourceStrings);
+            try {
+                root = fxmlLoader.load();
+
+            } catch (Exception e){
+                showError("About: fxml Error in About ", format("%s\n", e.toString()));
+            }
+            assert root != null;
+            report.setScene(new Scene(root));
+            //report.setTitle(resourceStrings.getString("txt.about.title"));
+            report.setTitle("Therapist Feedback");
+            report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+            report.initModality(Modality.APPLICATION_MODAL);
+            report.initStyle(StageStyle.DECORATED);
+            report.sizeToScene();
+            report.showAndWait();
+            report.sizeToScene();
+
 
 
             HashMap<String, Integer> mapCodeSummary = null;
@@ -921,6 +972,21 @@ public class MainController {
             System.exit(0);
         }
 
+    }
+
+
+    public void printReport(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
+//        Printer printer = Printer.getDefaultPrinter();
+//        PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+//        double scaleX = pageLayout.getPrintableWidth() / pnReport.getBoundsInParent().getWidth();
+//        double scaleY = pageLayout.getPrintableHeight() / pnReport.getBoundsInParent().getHeight();
+//        pnReport.getTransforms().add(new Scale(scaleX, scaleY));
+
+        PrinterJob job = PrinterJob.createPrinterJob();
+        if (job != null) {
+            boolean success = job.printPage(pnReport);
+            if (success) job.endJob();
+        }
     }
 
 

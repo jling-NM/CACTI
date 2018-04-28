@@ -19,7 +19,6 @@
 
 
 
-
 .menuBar {
     -fx-font-size: 12;
 }
@@ -193,3 +192,20 @@
      -fx-border-radius: 3px;
  }
 
+/**********************************************
+ * report
+ **********************************************/
+.lbl-report-section {
+    -fx-font-size: 14px;
+    /*-fx-font-family: "Arial Narrow", "Arial"; */
+    -fx-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-smoothing-type: lcd;
+}
+.lbl-report-row {
+    -fx-font-size: 12px;
+    /*-fx-font-family: "Arial Narrow", "Arial"; */
+    -fx-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-smoothing-type: lcd;
+}
