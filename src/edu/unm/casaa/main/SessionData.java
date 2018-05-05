@@ -266,21 +266,21 @@ public class SessionData
 
 
 
-    public HashMap< String, Integer > getCodeSummaryMap() throws SQLException {
+    public HashMap< String, Double > getCodeSummaryMap() throws SQLException {
 
         HashMap<String, Integer> mapCodeCount = null;
         // get counts
         mapCodeCount = getCodeCounts();
 
 
-        HashMap< String, Integer > mapCodeSummary = new HashMap<>();
+        HashMap< String, Double > mapCodeSummary = new HashMap<>();
 
         // sum(C+,R+,D+,A+,N+,TS+,O+)
         mapCodeSummary.put("SUM_CHANGE_ETOH",
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("C+") || e.getKey().equals("R+") || e.getKey().equals("D+") || e.getKey().equals("A+") || e.getKey().equals("N+") || e.getKey().equals("TS+") || e.getKey().equals("O+") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(C-,R-,D-,A-,N-,TS-,O-)
@@ -288,7 +288,7 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("C-") || e.getKey().equals("R-") || e.getKey().equals("D-") || e.getKey().equals("A-") || e.getKey().equals("N-") || e.getKey().equals("TS-") || e.getKey().equals("O-") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(C+_m, R+_m, D+_m, A+_m, N+_m, TS+_m, O+_m)
@@ -296,7 +296,7 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("C+_m") || e.getKey().equals("R+_m") || e.getKey().equals("D+_m") || e.getKey().equals("A+_m") || e.getKey().equals("N+_m") || e.getKey().equals("TS+_m") || e.getKey().equals("O+_m") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(C-_m, R-_m, D-_m, A-_m, N-_m, TS-_m, O-_m)
@@ -304,7 +304,7 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("C-_m") || e.getKey().equals("R-_m") || e.getKey().equals("D-_m") || e.getKey().equals("A-_m") || e.getKey().equals("N-_m") || e.getKey().equals("TS-_m") || e.getKey().equals("O-_m") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(ADP,AF,EC,RCP,SU)
@@ -312,7 +312,7 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("ADP") || e.getKey().equals("AF") || e.getKey().equals("EC") || e.getKey().equals("RCP") || e.getKey().equals("SU") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(ADW,CO,DI,RCW,WA)
@@ -320,7 +320,7 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("ADW") || e.getKey().equals("CO") || e.getKey().equals("DI") || e.getKey().equals("RCW") || e.getKey().equals("WA") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(OQ-,OQ0,OQ+)
@@ -328,15 +328,15 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("OQ-") || e.getKey().equals("OQ0") || e.getKey().equals("OQ+") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
-        // sum(CR+,CR-,CR0,CR+-)
+        // sum(CR+,CR-,CR0,CR+/-)
         mapCodeSummary.put("SUM_CR",
                 mapCodeCount.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().equals("CR+") || e.getKey().equals("CR-") || e.getKey().equals("CR0") || e.getKey().equals("CR+-") )
-                        .mapToInt(e -> e.getValue())
+                        .filter(e -> e.getKey().equals("CR+") || e.getKey().equals("CR-") || e.getKey().equals("CR0") || e.getKey().equals("CR+/-") )
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+)
@@ -344,39 +344,39 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("CQ-") || e.getKey().equals("CQ0") || e.getKey().equals("CQ+") || e.getKey().equals("OQ-") || e.getKey().equals("OQ0") || e.getKey().equals("OQ+") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
-        // sum(SR+,SR-,SR0,SR+-)
+        // sum(SR+,SR-,SR0,SR+/-)
         mapCodeSummary.put("SUM_SIMPLE",
                 mapCodeCount.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().equals("SR+") || e.getKey().equals("SR-") || e.getKey().equals("SR0") || e.getKey().equals("SR+-") )
-                        .mapToInt(e -> e.getValue())
+                        .filter(e -> e.getKey().equals("SR+") || e.getKey().equals("SR-") || e.getKey().equals("SR0") || e.getKey().equals("SR+/-") )
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
-        // sum(SR+,SR-,SR0,SR+-,CR+,CR-,CR0,CR+-)
+        // sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)
         mapCodeSummary.put("SUM_REFLECTION",
                 mapCodeCount.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().equals("SR+") || e.getKey().equals("SR-") || e.getKey().equals("SR0") || e.getKey().equals("SR+-") || e.getKey().equals("CR+") || e.getKey().equals("CR-") || e.getKey().equals("CR0") || e.getKey().equals("CR+-") )
-                        .mapToInt(e -> e.getValue())
+                        .filter(e -> e.getKey().equals("SR+") || e.getKey().equals("SR-") || e.getKey().equals("SR0") || e.getKey().equals("SR+/-") || e.getKey().equals("CR+") || e.getKey().equals("CR-") || e.getKey().equals("CR0") || e.getKey().equals("CR+/-") )
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(Rem+, rem+_m)
         mapCodeSummary.put("SUM_REM_POS",
                 mapCodeCount.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().equals("Rem+") || e.getKey().equals("Rem+_n") )
-                        .mapToInt(e -> e.getValue())
+                        .filter(e -> e.getKey().equals("Rem+") || e.getKey().equals("Rem+_m") )
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(Rem-, rem-_m)
         mapCodeSummary.put("SUM_REM_NEG",
                 mapCodeCount.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().equals("Rem-") || e.getKey().equals("Rem-_n") )
-                        .mapToInt(e -> e.getValue())
+                        .filter(e -> e.getKey().equals("Rem-") || e.getKey().equals("Rem-_m") )
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(FN, rem+, rem-, rem+_m, rem-_m)
@@ -384,7 +384,7 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("FN") || e.getKey().equals("Rem+") || e.getKey().equals("Rem-") || e.getKey().equals("Rem+_m") || e.getKey().equals("Rem-_m") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(SR+, CR+)
@@ -392,7 +392,7 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("SR+") || e.getKey().equals("CR+") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
         // sum(SR-, CR-)
@@ -400,60 +400,56 @@ public class SessionData
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("SR-") || e.getKey().equals("CR-") )
-                        .mapToInt(e -> e.getValue())
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
-        // sum( C+ TO FN, Rem+, Rem-, Rem+_m, Rem-_m)
+        // client_utt = sum( C+	R+	D+	A+	N+	TS+	O+	C-	R-	D-	A-	N-	TS-	O-	C+_m	R+_m	D+_m	A+_m	N+_m	TS+_m	O+_m	C-_m	R-_m	D-_m	A-_m	N-_m	TS-_m	O-_m	FN, Rem+, Rem-, Rem+_m, Rem-_m).
         mapCodeSummary.put("SUM_CLIENT_UTT",
                 mapCodeCount.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().equals("C+") || e.getKey().equals("TO") || e.getKey().equals("FN") || e.getKey().equals("Rem+") || e.getKey().equals("Rem-") || e.getKey().equals("Rem+_m") || e.getKey().equals("Rem-_m") )
-                        .mapToInt(e -> e.getValue())
+                        .filter(e -> e.getKey().equals("C+") || e.getKey().equals("R+") || e.getKey().equals("D+") || e.getKey().equals("A+") || e.getKey().equals("N+") || e.getKey().equals("TS+") || e.getKey().equals("O+") || e.getKey().equals("C-") || e.getKey().equals("R-") || e.getKey().equals("D-") || e.getKey().equals("A-") || e.getKey().equals("N-") || e.getKey().equals("TS-") || e.getKey().equals("O-") || e.getKey().equals("C+_m") || e.getKey().equals("R+_m") || e.getKey().equals("D+_m") || e.getKey().equals("A+_m") || e.getKey().equals("N+_m") || e.getKey().equals("TS+_m") || e.getKey().equals("O+_m") || e.getKey().equals("C-_m") || e.getKey().equals("R-_m") || e.getKey().equals("D-_m") || e.getKey().equals("A-_m") || e.getKey().equals("N-_m") || e.getKey().equals("TS-_m") || e.getKey().equals("O-_m") || e.getKey().equals("") || e.getKey().equals("FN") || e.getKey().equals("Rem+") || e.getKey().equals("Rem-") || e.getKey().equals("Rem+_m") || e.getKey().equals("Rem-_m") )
+                        .mapToDouble(e -> e.getValue())
                         .sum());
 
-        // ther_utt = sum(adp TO wa, p)
+        // ther_utt = sum(ADP	ADW	AF	CO	DI	EC	FA	FI	GI	CQ-	CQ0	CQ+	OQ-	OQ0	OQ+	RCP	RCW	SR+	SR-	SR0	SR+/-	CR+	CR-	CR0	CR+/-	RF	ST	SU	WA, p)
         mapCodeSummary.put("SUM_THER_UTT",
                 mapCodeCount.entrySet()
                         .stream()
-                        .filter(e -> e.getKey().equals("ADP") || e.getKey().equals("TO") || e.getKey().equals("WA") || e.getKey().equals("P") )
-                        .mapToInt(e -> e.getValue())
+                        .filter(e -> e.getKey().equals("ADP") || e.getKey().equals("ADW") || e.getKey().equals("AF") || e.getKey().equals("CO") || e.getKey().equals("DI") || e.getKey().equals("EC") || e.getKey().equals("FA") || e.getKey().equals("FI") || e.getKey().equals("GI") || e.getKey().equals("CQ-") || e.getKey().equals("CQ0") || e.getKey().equals("CQ+") || e.getKey().equals("OQ-") || e.getKey().equals("OQ0") || e.getKey().equals("OQ+") || e.getKey().equals("RCP") || e.getKey().equals("RCW") || e.getKey().equals("SR+") || e.getKey().equals("SR-") || e.getKey().equals("SR0") || e.getKey().equals("SR+/-") || e.getKey().equals("CR+") || e.getKey().equals("CR-") || e.getKey().equals("CR0") || e.getKey().equals("CR+/-") || e.getKey().equals("RF") || e.getKey().equals("ST") || e.getKey().equals("SU") || e.getKey().equals("WA") || e.getKey().equals("P") )
+                        .mapToDouble(e -> e.getValue())
                         .sum());
+
 
         // sum(adp to FN, Rem+, Rem-, Rem+_m, Rem-_m, p)
-        mapCodeSummary.put("SUM_TOTAL_UTT",
-                mapCodeCount.entrySet()
-                        .stream()
-                        .filter(e -> e.getKey().equals("ADP") || e.getKey().equals("TO") || e.getKey().equals("FN") || e.getKey().equals("Rem+") || e.getKey().equals("Rem-") || e.getKey().equals("Rem+_m") || e.getKey().equals("Rem-_m") || e.getKey().equals("P") )
-                        .mapToInt(e -> e.getValue())
-                        .sum());
+        mapCodeSummary.put("SUM_TOTAL_UTT", (mapCodeSummary.get("SUM_THER_UTT") + mapCodeSummary.get("SUM_CLIENT_UTT")) );
+        // Change = sum(change_etoh, change_drug)
+        mapCodeSummary.put("SUM_CHANGE", (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_CHANGE_DRUG")) );
+        // Sustain = sum(sustain_etoh, sustain_drug).
+        mapCodeSummary.put("SUM_SUSTAIN", (mapCodeSummary.get("SUM_SUSTAIN_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_DRUG")) );
+        // change_rem = sum(change, Rem+, rem+_m).
+        mapCodeSummary.put("SUM_CHANGE_REM", (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_REM_POS")) );
+        // sustain_rem = sum(sustain, Rem-, rem-_m).
+        mapCodeSummary.put("SUM_SUSTAIN_REM", (mapCodeSummary.get("SUM_SUSTAIN") + mapCodeSummary.get("SUM_REM_NEG")) );
 
+        // pmic = mico/sum(mico, miin).
+        mapCodeSummary.put("PCT_MIC", (mapCodeSummary.get("SUM_MICO") / (mapCodeSummary.get("SUM_MICO") + mapCodeSummary.get("SUM_MIIN"))) );
+        // pct_etoh = change_etoh/sum(change_etoh,sustain_etoh).
+        mapCodeSummary.put("PCT_ETOH", (mapCodeSummary.get("SUM_CHANGE_ETOH") / (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_ETOH"))) );
+        // pct_drug = change_drug/sRATIO_THER2CLIum(change_drug, sustain_drug).
+        mapCodeSummary.put("PCT_DRUG", (mapCodeSummary.get("SUM_CHANGE_DRUG") / (mapCodeSummary.get("SUM_CHANGE_DRUG") + mapCodeSummary.get("SUM_SUSTAIN_DRUG"))) );
+        // pct = change/sum(change, sustain).
+        mapCodeSummary.put("PCT", (mapCodeSummary.get("SUM_CHANGE") / (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_SUSTAIN"))) );
 
-//        // ther2cli = ther_utt/client_utt.
-//        mapCodeSummary.put("THER2CLI", (mapCodeSummary.get("SUM_THER_UTT") / mapCodeSummary.get("SUM_CLIENT_UTT")) );
-//        // Change = sum(change_etoh, change_drug)
-//        mapCodeSummary.put("SUM_CHANGE", (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_CHANGE_DRUG")) );
-//        // Sustain = sum(sustain_etoh, sustain_drug).
-//        mapCodeSummary.put("SUM_SUSTAIN", (mapCodeSummary.get("SUM_SUSTAIN_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_DRUG")) );
-//        // change_rem = sum(change, Rem+, rem+_m).
-//        mapCodeSummary.put("SUM_CHANGE_REM", (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_REM_POS")) );
-//        // sustain_rem = sum(sustain, Rem-, rem-_m).
-//        mapCodeSummary.put("SUM_SUSTAIN_REM", (mapCodeSummary.get("SUM_SUSTAIN") + mapCodeSummary.get("SUM_REM_NEG")) );
-//
-//        // pmic = mico/sum(mico, miin).
-//        mapCodeSummary.put("PCT_MIC", (mapCodeSummary.get("SUM_MICO") / (mapCodeSummary.get("SUM_MICO") + mapCodeSummary.get("SUM_MIIN"))) );
-//        // pct_etoh = change_etoh/sum(change_etoh,sustain_etoh).
-//        mapCodeSummary.put("PCT_ETOH", (mapCodeSummary.get("SUM_CHANGE_ETOH") / (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_ETOH"))) );
-//        // pct_drug = change_drug/sum(change_drug, sustain_drug).
-//        mapCodeSummary.put("PC    T_DRUG", (mapCodeSummary.get("SUM_CHANGE_DRUG") / (mapCodeSummary.get("SUM_CHANGE_DRUG") + mapCodeSummary.get("SUM_SUSTAIN_DRUG"))) );
-//        // pct = change/sum(change, sustain).
-//        mapCodeSummary.put("PCT", (mapCodeSummary.get("SUM_CHANGE") / (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_SUSTAIN"))) );
-//
-//        // r2q=sum(SR+,SR-,SR0,SR+-,CR+,CR-,CR0,CR+-)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
-//        mapCodeSummary.put("RATIO_R2Q", (mapCodeSummary.get("SUM_REFLECTION") / mapCodeSummary.get("SUM_QUESTION")) );
-//        // poq = sum(OQ-,OQ0,OQ+)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
-//        mapCodeSummary.put("RATIO_POQ", (mapCodeSummary.get("SUM_P") / mapCodeSummary.get("SUM_QUESTION")) );
-//        // sr2cr = sum(SR+,SR-,SR0,SR+-)/sum(CR+,CR-,CR0,CR+-).
-//        mapCodeSummary.put("RATIO_SR2CR", (mapCodeSummary.get("SUM_SIMPLE") / mapCodeSummary.get("SUM_CR")) );
+        // pcr=sum(CR+,CR_,CR0,CR+/-)/sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)
+        mapCodeSummary.put("RATIO_PCR", (mapCodeSummary.get("SUM_CR") / mapCodeSummary.get("SUM_REFLECTION")) );
+        // r2q=sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
+        mapCodeSummary.put("RATIO_R2Q", (mapCodeSummary.get("SUM_REFLECTION") / mapCodeSummary.get("SUM_QUESTION")) );
+        // poq = sum(OQ-,OQ0,OQ+)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
+        mapCodeSummary.put("RATIO_POQ", (mapCodeSummary.get("SUM_P") / mapCodeSummary.get("SUM_QUESTION")) );
+        // sr2cr = sum(SR+,SR-,SR0,SR+/-)/sum(CR+,CR-,CR0,CR+/-).
+        mapCodeSummary.put("RATIO_SR2CR", (mapCodeSummary.get("SUM_SIMPLE") / mapCodeSummary.get("SUM_CR")) );
+        // ther2cli = ther_utt/client_utt.
+        mapCodeSummary.put("RATIO_THER2CLI", (mapCodeSummary.get("SUM_THER_UTT") / mapCodeSummary.get("SUM_CLIENT_UTT")) );
 
         return mapCodeSummary;
     }

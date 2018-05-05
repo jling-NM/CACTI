@@ -792,7 +792,7 @@ public class MainController {
 
 
 
-            HashMap<String, Integer> mapCodeSummary = null;
+            HashMap<String, Double> mapCodeSummary = null;
             try {
                 // get counts
                 mapCodeSummary = sessionData.getCodeSummaryMap();
