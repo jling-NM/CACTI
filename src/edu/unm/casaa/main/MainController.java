@@ -85,37 +85,68 @@ import static java.lang.String.format;
 public class MainController {
 
     //TODO: move this if still needed
-    // Report
-    @FXML
-    public ScrollPane pnReport;
-    public Label rptScore_mico;
-    public Label rptScore_miin;
-    public Label rptScore_pmic;
-    public Label rptScore_r2q;
-    public Label rptScore_poq;
-    public Label rptScore_pcr;
-    public Label rptScore_ther2cli;
-    public Label rptScore_pct;
-    public Label rptScore_adp;
-    public Label rptScore_adw;
-    public Label rptScore_af;
-    public Label rptScore_co;
-    public Label rptScore_di;
-    public Label rptScore_ec;
-    public Label rptScore_gi;
-    public Label rptScore_open;
-    public Label rptScore_closed;
-    public Label rptScore_rcp;
-    public Label rptScore_rcw;
-    public Label rptScore_simple;
-    public Label rptScore_complex;
-    public Label rptScore_refct;
-    public Label rptScore_refst;
-    public Label rptScore_st;
-    public Label rptScore_rf;
-    public Label rptScore_su;
-    public Label rptScore_wa;
 
+    // SESSION REPORT
+    @FXML
+    private ScrollPane pnReport;
+    @FXML
+    private Label rptScore_mico;
+    @FXML
+    private Label rptScore_miin;
+    @FXML
+    private Label rptScore_pmic;
+    @FXML
+    private Label rptScore_r2q;
+    @FXML
+    private Label rptScore_poq;
+    @FXML
+    private Label rptScore_pcr;
+    @FXML
+    private Label rptScore_ther2cli;
+    @FXML
+    private Label rptScore_pct;
+    @FXML
+    private Label rptScore_adp;
+    @FXML
+    private Label rptScore_adw;
+    @FXML
+    private Label rptScore_af;
+    @FXML
+    private Label rptScore_co;
+    @FXML
+    private Label rptScore_di;
+    @FXML
+    private Label rptScore_ec;
+    @FXML
+    private Label rptScore_gi;
+    @FXML
+    private Label rptScore_open;
+    @FXML
+    private Label rptScore_closed;
+    @FXML
+    private Label rptScore_rcp;
+    @FXML
+    private Label rptScore_rcw;
+    @FXML
+    private Label rptScore_simple;
+    @FXML
+    private Label rptScore_complex;
+    @FXML
+    private Label rptScore_refct;
+    @FXML
+    private Label rptScore_refst;
+    @FXML
+    private Label rptScore_st;
+    @FXML
+    private Label rptScore_rf;
+    @FXML
+    private Label rptScore_su;
+    @FXML
+    private Label rptScore_wa;
+    @FXML
+    private Label rptScore_change;
+    @FXML
+    private Label rptScore_sustain;
 
 
     // PLAYBACK
@@ -193,7 +224,6 @@ public class MainController {
     private GridPane gpGlobalControls;                  // control containing globals controls
 
 
-
     // SETTINGS KB
     @FXML
     private TextField codingActionKeyReplay;
@@ -204,6 +234,7 @@ public class MainController {
     private TextArea dlgAnnotation;
     @FXML
     private ListView dlgListView;
+
 
 
 
@@ -755,7 +786,7 @@ public class MainController {
 
 
     /**
-     * TODO
+     * Display summary report of session
      */
     public void mniReportView() {
 
@@ -765,7 +796,6 @@ public class MainController {
         }
 
         if(sessionData != null) {
-            setGuiState(GuiState.REPORT);
 
             Locale locale = new Locale("en", "US");
             ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
@@ -773,9 +803,10 @@ public class MainController {
             Stage report = new Stage();
             Parent root = null;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Report.fxml"), resourceStrings);
+            // set loader so i have access to instance variables
+            fxmlLoader.setController(this);
             try {
                 root = fxmlLoader.load();
-
             } catch (Exception e){
                 showError("About: fxml Error in About ", format("%s\n", e.toString()));
             }
@@ -786,12 +817,9 @@ public class MainController {
             report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
-            report.sizeToScene();
-            report.showAndWait();
-            report.sizeToScene();
 
 
-
+            /* get the session summary scores */
             HashMap<String, Double> mapCodeSummary = null;
             try {
                 // get counts
@@ -799,8 +827,42 @@ public class MainController {
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
-            System.out.println(mapCodeSummary);
 
+            /* attach/format summary scores to report */
+            // integers: "%.0f"
+            // doubles: "%.2f"
+            rptScore_mico.setText(String.format("%.0f",mapCodeSummary.get("SUM_MICO")));
+            rptScore_miin.setText(String.format("%.0f",mapCodeSummary.get("SUM_MIIN")));
+            rptScore_pmic.setText(String.format("%.1f%%",mapCodeSummary.get("PCT_MIC")));
+            rptScore_r2q.setText(String.format("%.2f",mapCodeSummary.get("RATIO_R2Q")));
+            rptScore_poq.setText(String.format("%.1f%%",mapCodeSummary.get("PCT_POQ")));
+            rptScore_pcr.setText(String.format("%.1f%%",mapCodeSummary.get("PCT_PCR")));
+            rptScore_ther2cli.setText(String.format("%.2f",mapCodeSummary.get("RATIO_THER2CLI")));
+            rptScore_pct.setText(String.format("%.1f%%",mapCodeSummary.get("PCT")));
+            rptScore_adp.setText(String.format("%.0f",mapCodeSummary.get("SUM_ADP")));
+            rptScore_adw.setText(String.format("%.0f",mapCodeSummary.get("SUM_ADW")));
+            rptScore_af.setText(String.format("%.0f",mapCodeSummary.get("SUM_AF")));
+            rptScore_co.setText(String.format("%.0f",mapCodeSummary.get("SUM_CO")));
+            rptScore_di.setText(String.format("%.0f",mapCodeSummary.get("SUM_DI")));
+            rptScore_ec.setText(String.format("%.0f",mapCodeSummary.get("SUM_EC")));
+            rptScore_gi.setText(String.format("%.0f",mapCodeSummary.get("SUM_GI")));
+            // TODO: don't know how these are defined. not in SPS syntax
+            //rptScore_open.setText(String.format("%.0f",mapCodeSummary.get("")));
+            //rptScore_closed.setText(String.format("%.0f",mapCodeSummary.get("")));
+            rptScore_rcp.setText(String.format("%.0f",mapCodeSummary.get("SUM_RCP")));
+            rptScore_rcw.setText(String.format("%.0f",mapCodeSummary.get("SUM_RCW")));
+            rptScore_simple.setText(String.format("%.0f",mapCodeSummary.get("SUM_SIMPLE")));
+            rptScore_complex.setText(String.format("%.0f",mapCodeSummary.get("SUM_CR")));
+            rptScore_refct.setText(String.format("%.0f",mapCodeSummary.get("SUM_REF_CT")));
+            rptScore_refst.setText(String.format("%.0f",mapCodeSummary.get("SUM_REF_ST")));
+            rptScore_st.setText(String.format("%.0f",mapCodeSummary.get("SUM_ST")));
+            rptScore_rf.setText(String.format("%.0f",mapCodeSummary.get("SUM_RF")));
+            rptScore_su.setText(String.format("%.0f",mapCodeSummary.get("SUM_SU")));
+            rptScore_wa.setText(String.format("%.0f",mapCodeSummary.get("SUM_WA")));
+            rptScore_change.setText(String.format("%.0f",mapCodeSummary.get("SUM_CHANGE")));
+            rptScore_sustain.setText(String.format("%.0f",mapCodeSummary.get("SUM_SUSTAIN")));
+
+            report.showAndWait();
         }
     }
 

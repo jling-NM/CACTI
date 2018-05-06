@@ -245,7 +245,7 @@ public class SessionData
      * @return map<code_name, count>
      * @throws SQLException
      */
-    public HashMap< String, Integer > getCodeCounts() throws SQLException {
+    private HashMap< String, Integer > getCodeCounts() throws SQLException {
         HashMap< String, Integer > mapCodeCount = new HashMap<>();
 
         try ( Connection connection = ds.getConnection();
@@ -273,7 +273,24 @@ public class SessionData
         mapCodeCount = getCodeCounts();
 
 
+        /* create map to store summary scores*/
         HashMap< String, Double > mapCodeSummary = new HashMap<>();
+        /* Simply get counts */
+        mapCodeSummary.put("SUM_ADP", mapCodeCount.getOrDefault("ADP", 0).doubleValue());
+        mapCodeSummary.put("SUM_ADW", mapCodeCount.getOrDefault("ADW", 0).doubleValue());
+        mapCodeSummary.put("SUM_AF", mapCodeCount.getOrDefault("AF", 0).doubleValue());
+        mapCodeSummary.put("SUM_CO", mapCodeCount.getOrDefault("CO", 0).doubleValue());
+        mapCodeSummary.put("SUM_DI", mapCodeCount.getOrDefault("DI", 0).doubleValue());
+        mapCodeSummary.put("SUM_EC", mapCodeCount.getOrDefault("EC", 0).doubleValue());
+        mapCodeSummary.put("SUM_GI", mapCodeCount.getOrDefault("GI", 0).doubleValue());
+        mapCodeSummary.put("SUM_RCP", mapCodeCount.getOrDefault("RCP", 0).doubleValue());
+        mapCodeSummary.put("SUM_RCW", mapCodeCount.getOrDefault("RCW", 0).doubleValue());
+        mapCodeSummary.put("SUM_ST", mapCodeCount.getOrDefault("ST", 0).doubleValue());
+        mapCodeSummary.put("SUM_RF", mapCodeCount.getOrDefault("RF", 0).doubleValue());
+        mapCodeSummary.put("SUM_SU", mapCodeCount.getOrDefault("SU", 0).doubleValue());
+        mapCodeSummary.put("SUM_WA", mapCodeCount.getOrDefault("WA", 0).doubleValue());
+
+        /* Calculate sums of different code combinations */
 
         // sum(C+,R+,D+,A+,N+,TS+,O+)
         mapCodeSummary.put("SUM_CHANGE_ETOH",
@@ -420,6 +437,8 @@ public class SessionData
                         .sum());
 
 
+        /* calculate sums by group */
+
         // sum(adp to FN, Rem+, Rem-, Rem+_m, Rem-_m, p)
         mapCodeSummary.put("SUM_TOTAL_UTT", (mapCodeSummary.get("SUM_THER_UTT") + mapCodeSummary.get("SUM_CLIENT_UTT")) );
         // Change = sum(change_etoh, change_drug)
@@ -431,23 +450,25 @@ public class SessionData
         // sustain_rem = sum(sustain, Rem-, rem-_m).
         mapCodeSummary.put("SUM_SUSTAIN_REM", (mapCodeSummary.get("SUM_SUSTAIN") + mapCodeSummary.get("SUM_REM_NEG")) );
 
-        // pmic = mico/sum(mico, miin).
-        mapCodeSummary.put("PCT_MIC", (mapCodeSummary.get("SUM_MICO") / (mapCodeSummary.get("SUM_MICO") + mapCodeSummary.get("SUM_MIIN"))) );
-        // pct_etoh = change_etoh/sum(change_etoh,sustain_etoh).
-        mapCodeSummary.put("PCT_ETOH", (mapCodeSummary.get("SUM_CHANGE_ETOH") / (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_ETOH"))) );
-        // pct_drug = change_drug/sRATIO_THER2CLIum(change_drug, sustain_drug).
-        mapCodeSummary.put("PCT_DRUG", (mapCodeSummary.get("SUM_CHANGE_DRUG") / (mapCodeSummary.get("SUM_CHANGE_DRUG") + mapCodeSummary.get("SUM_SUSTAIN_DRUG"))) );
-        // pct = change/sum(change, sustain).
-        mapCodeSummary.put("PCT", (mapCodeSummary.get("SUM_CHANGE") / (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_SUSTAIN"))) );
+        /* calculate percentage scores */
 
+        // pmic = mico/sum(mico, miin).
+        mapCodeSummary.put("PCT_MIC", ((mapCodeSummary.get("SUM_MICO") / (mapCodeSummary.get("SUM_MICO") + mapCodeSummary.get("SUM_MIIN")))*100) );
+        // pct_etoh = change_etoh/sum(change_etoh,sustain_etoh).
+        mapCodeSummary.put("PCT_ETOH", ((mapCodeSummary.get("SUM_CHANGE_ETOH") / (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_ETOH")))*100) );
+        // pct_drug = change_drug/sRATIO_THER2CLIum(change_drug, sustain_drug).
+        mapCodeSummary.put("PCT_DRUG", ((mapCodeSummary.get("SUM_CHANGE_DRUG") / (mapCodeSummary.get("SUM_CHANGE_DRUG") + mapCodeSummary.get("SUM_SUSTAIN_DRUG")))*100) );
+        // pct = change/sum(change, sustain).
+        mapCodeSummary.put("PCT", ((mapCodeSummary.get("SUM_CHANGE") / (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_SUSTAIN")))*100) );
         // pcr=sum(CR+,CR_,CR0,CR+/-)/sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)
-        mapCodeSummary.put("RATIO_PCR", (mapCodeSummary.get("SUM_CR") / mapCodeSummary.get("SUM_REFLECTION")) );
-        // r2q=sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
-        mapCodeSummary.put("RATIO_R2Q", (mapCodeSummary.get("SUM_REFLECTION") / mapCodeSummary.get("SUM_QUESTION")) );
+        mapCodeSummary.put("PCT_PCR", ((mapCodeSummary.get("SUM_CR") / mapCodeSummary.get("SUM_REFLECTION")))*100 );
         // poq = sum(OQ-,OQ0,OQ+)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
-        mapCodeSummary.put("RATIO_POQ", (mapCodeSummary.get("SUM_P") / mapCodeSummary.get("SUM_QUESTION")) );
+        mapCodeSummary.put("PCT_POQ", ((mapCodeSummary.get("SUM_P") / mapCodeSummary.get("SUM_QUESTION")))*100 );
+
         // sr2cr = sum(SR+,SR-,SR0,SR+/-)/sum(CR+,CR-,CR0,CR+/-).
         mapCodeSummary.put("RATIO_SR2CR", (mapCodeSummary.get("SUM_SIMPLE") / mapCodeSummary.get("SUM_CR")) );
+        // r2q=sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
+        mapCodeSummary.put("RATIO_R2Q", (mapCodeSummary.get("SUM_REFLECTION") / mapCodeSummary.get("SUM_QUESTION")) );
         // ther2cli = ther_utt/client_utt.
         mapCodeSummary.put("RATIO_THER2CLI", (mapCodeSummary.get("SUM_THER_UTT") / mapCodeSummary.get("SUM_CLIENT_UTT")) );
 
