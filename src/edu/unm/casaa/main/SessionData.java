@@ -42,7 +42,7 @@ public class SessionData
     /**
      * Available session attributes
      */
-    private enum SessionAttributes {
+    public enum SessionAttributes {
         AUDIO_FILE_PATH,
         GLOBAL_NOTES
     }
@@ -198,11 +198,42 @@ public class SessionData
     // join all globals with their linked utterances
     // or just get the utterances linked to a single global
     // TBD
-    private ResultSet getGlobalUtterances() throws SQLException
+    public ArrayList< TreeMap< String, String> > getGlobalUtterances() throws SQLException
     {
+        String sql = "SELECT ratings.rating_id, ratings.rating_name, ratings.response_value, utterances.utterance_id, utterances.time_marker, utterances.annotation, codes.code_name " +
+                "FROM ratings " +
+                "JOIN utterances_ratings ON ratings.rating_id = utterances_ratings.rating_id " +
+                "JOIN utterances ON utterances.utterance_id = utterances_ratings.utterance_id " +
+                "JOIN codes ON utterances.code_id = codes.code_id " +
+                "ORDER BY ratings.rating_name, utterances.time_marker";
+
+        TreeMap< String, String> row;
+        ArrayList< TreeMap< String, String> > records = new ArrayList<>();
+
+
         try ( Connection connection = ds.getConnection();
               Statement statement = connection.createStatement()  ) {
-            return statement.executeQuery("select utterances.*, codes.code_name from utterances inner join codes on utterances.code_id = codes.code_id");
+
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                String rating_id = rs.getString("rating_id");
+                String rating_name = rs.getString("rating_name");
+                String rating_value = rs.getString("response_value");
+                String time_marker = rs.getString("time_marker");
+                String code_name = rs.getString("code_name");
+                String annotation = rs.getString("annotation");
+
+                row = new TreeMap<>();
+                row.put("rating_id", rating_id);
+                row.put("rating_name", rating_name);
+                row.put("rating_value", rating_value);
+                row.put("time_marker", time_marker);
+                row.put("code_name", code_name);
+                row.put("annotation", annotation);
+                records.add(row);
+            }
+
+            return records;
         }
     }
 
@@ -570,7 +601,7 @@ public class SessionData
      * @return current value for session attribute
      * @throws SQLException
      */
-    private String getAttribute(SessionAttributes sessionAttribute) throws SQLException
+    public String getAttribute(SessionAttributes sessionAttribute) throws SQLException
     {
         String sql = "select value from attributes where name = ?";
 

@@ -814,30 +814,52 @@ public class MainController {
                 showError("About: fxml Error in About ", format("%s\n", e.toString()));
             }
             assert root != null;
-            report.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            scene.setFill(Color.TRANSPARENT);
+            report.setScene(scene);
+
             //report.setTitle(resourceStrings.getString("txt.about.title"));
             report.setTitle("Therapist Feedback");
             report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
+            //report.initStyle(StageStyle.TRANSPARENT);
 
 
             // global ratings section
-            Text txtSample = new Text("Advocacy: 5\n");
-            Text txtSample2 = new Text("Hell Advocacy: 3");
-            rptScore_global_ratings_tf.getChildren().addAll(txtSample, txtSample2);
+            ArrayList< TreeMap< String, String> > records = null;
+            String notes = null;
 
-
-
-            /* get the session summary scores */
-
+            /* get the session summary scores and global ratings */
             HashMap<String, Double> mapCodeSummary = null;
             try {
                 // get counts
                 mapCodeSummary = sessionData.getCodeSummaryMap();
+                records = sessionData.getGlobalUtterances();
+                notes = sessionData.getAttribute(SessionData.SessionAttributes.GLOBAL_NOTES);
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
+
+
+            // global rating insert
+            String current_rating_id = "";
+            for(TreeMap< String, String>  row : records) {
+
+                if(!row.get("rating_id").equals(current_rating_id)) {
+                    current_rating_id = row.get("rating_id");
+                    Text txtRating = new Text(String.format("\n%s [Score:%s]\n", row.get("rating_name"), row.get("rating_value")));
+                    txtRating.setUnderline(true);
+                    rptScore_global_ratings_tf.getChildren().add(txtRating);
+                }
+
+                Text txtUtterance = new Text(String.format("- %s : %s : %s\n", row.get("time_marker"), row.get("code_name"), row.get("annotation").replace("\n", "; ")));
+                rptScore_global_ratings_tf.getChildren().add(txtUtterance);
+            }
+
+            Text txtNotes = new Text( String.format("\n\nNotes:\n%s\n\n", notes) );
+            rptScore_global_ratings_tf.getChildren().add(txtNotes);
+
 
             /* attach/format summary scores to report */
             // integers: "%.0f"
@@ -1049,16 +1071,25 @@ public class MainController {
 
 
     public void printReport(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
-//        Printer printer = Printer.getDefaultPrinter();
-//        PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
-//        double scaleX = pageLayout.getPrintableWidth() / pnReport.getBoundsInParent().getWidth();
-//        double scaleY = pageLayout.getPrintableHeight() / pnReport.getBoundsInParent().getHeight();
-//        pnReport.getTransforms().add(new Scale(scaleX, scaleY));
+
+        double origScaleX = pnReport.getBoundsInParent().getWidth();
+        double origScaleY = pnReport.getBoundsInParent().getHeight();
 
         PrinterJob job = PrinterJob.createPrinterJob();
-        if (job != null) {
+        if (job != null && job.showPrintDialog(null)){
+
+            PageLayout pageLayout = job.getJobSettings().getPageLayout();
+            double scaleX = pageLayout.getPrintableWidth() / pnReport.getBoundsInParent().getWidth();
+            double scaleY = pageLayout.getPrintableHeight() / pnReport.getBoundsInParent().getHeight();
+            pnReport.getTransforms().add(new Scale(scaleX, scaleX));
+            pnReport.setBackground(Background.EMPTY);
+
             boolean success = job.printPage(pnReport);
-            if (success) job.endJob();
+            //pnReport.getTransforms().remove(new Scale(scaleX, scaleY));
+            if (success) {
+                job.endJob();
+            }
+
         }
     }
 
