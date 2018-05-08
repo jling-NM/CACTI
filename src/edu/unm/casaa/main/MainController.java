@@ -58,6 +58,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -87,6 +88,8 @@ public class MainController {
     //TODO: move this if still needed
 
     // SESSION REPORT
+    @FXML
+    private TextFlow rptScore_global_ratings_tf;
     @FXML
     private ScrollPane pnReport;
     @FXML
@@ -817,6 +820,13 @@ public class MainController {
             report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
+
+
+            // global ratings section
+            Text txtSample = new Text("Advocacy: 5\n");
+            Text txtSample2 = new Text("Hell Advocacy: 3");
+            rptScore_global_ratings_tf.getChildren().addAll(txtSample, txtSample2);
+
 
 
             /* get the session summary scores */
