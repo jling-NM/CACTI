@@ -820,6 +820,7 @@ public class MainController {
 
 
             /* get the session summary scores */
+
             HashMap<String, Double> mapCodeSummary = null;
             try {
                 // get counts
