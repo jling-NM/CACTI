@@ -82,7 +82,7 @@ public class TimeLine extends Group {
 
 
     /**
-     * TimeLine member called by TimeLineMarker to when a marker context menu
+     * TimeLine member called by TimeLineMarker when a marker context menu
      * selection indicates an annotation event.
      * @param annotateMarkerId
      */
@@ -224,7 +224,7 @@ public class TimeLine extends Group {
              * This to prevent timeline from adding duplicates.
              */
             Node r = this.lookup("#"+newUtterance.getID());
-            if( r == null) {
+            if( r == null ) {
                 /*
                  * sync timeline with player time to marker appears lined up.
                  * Do this only for new markers not edited above here

@@ -51,6 +51,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -60,10 +61,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Scale;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 import javafx.util.Duration;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -389,11 +387,22 @@ public class MainController {
      *  button event:
      *  Apply utterance code
      **********************************************************************/
-    private void btnActCode(ActionEvent actionEvent) {
+    private void btnActCode(MouseEvent actionEvent) {
         Button src = (Button) actionEvent.getSource();
         MiscCode mc = MiscCode.codeWithName(src.getText());
         assert mc != null;
-        insertUtterance(mc);
+
+        if (actionEvent.isControlDown() ) {
+            // stop timeline
+            if(mediaPlayer != null) {
+                mediaPlayer.pause();
+            }
+            // insert and annotate
+            insertUtterance(mc, true);
+        } else {
+            // insert and keep the timeline running
+            insertUtterance(mc);
+        }
     }
 
 
@@ -825,6 +834,9 @@ public class MainController {
             report.initStyle(StageStyle.DECORATED);
             //report.initStyle(StageStyle.TRANSPARENT);
 
+            // don't let dialog get too big on smaller screens
+            report.setY(0.0);
+            report.setMaxHeight(Screen.getPrimary().getVisualBounds().getHeight());
 
             // global ratings section
             ArrayList< TreeMap< String, String> > records = null;
@@ -1108,11 +1120,12 @@ public class MainController {
             /* get data */
             String utterance_id = pcEvt.getNewValue().toString();
             String existingAnnotation = "";
-            /* globals list */
-            ArrayList<GlobalCode> ratingCode = null;
+
+            /* linked globals list */
+            ArrayList<Integer> selectedRatingIDs = null;
             try {
                 existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
-                ratingCode = sessionData.getRatingsList(utterance_id);
+                selectedRatingIDs = sessionData.getUtteranceRatingIDs(utterance_id);
             } catch ( SQLException e) {
                 showError("Error Annotation", e.getMessage());
             }
@@ -1142,16 +1155,22 @@ public class MainController {
 
             /* populate listview of global items.
             * Since we want to reselect previous items i loop through items
-            * instead of just populating with an observablelist */
+            * instead of just populating with an observablelist
+            */
             ListView<GlobalCode> dlgListView = new ListView<>();
             dlgListView.setPrefHeight(120);
             dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            for(GlobalCode gc : ratingCode){
-                dlgListView.getItems().add(gc);
-                if((gc.label != null) && (gc.label.equals(utterance_id))) {
-                    dlgListView.getSelectionModel().select(gc);
+
+            ListIterator<GlobalCode> globalCodeListIterator = GlobalCode.getIterator();
+            while(globalCodeListIterator.hasNext()) {
+                GlobalCode rating = globalCodeListIterator.next();
+                dlgListView.getItems().add(rating);
+                if( selectedRatingIDs.contains(rating.id) ) {
+                    dlgListView.getSelectionModel().select(rating);
                 }
+
             }
+
 
             /* local reference for annotation text */
             TextArea extTa = null;
@@ -1163,6 +1182,8 @@ public class MainController {
                         if (nodeIn instanceof TextArea) {
                             extTa = (TextArea) nodeIn;
                             extTa.setText(existingAnnotation);
+                            extTa.requestFocus();
+                            extTa.positionCaret(existingAnnotation.length());
                         }
                     }
                     /* secondarily, add list view to VBox container */
@@ -1177,7 +1198,7 @@ public class MainController {
 
                 ArrayList<GlobalCode> globalCodeList = new ArrayList<>();
                 for(int i : selectedIndices){
-                    globalCodeList.add(ratingCode.get(i));
+                    globalCodeList.add(GlobalCode.codeAtIndex(i));
                 }
 
                 /* save utterance annotation */
@@ -1188,6 +1209,12 @@ public class MainController {
                 }
             }
 
+            /*
+                whether edited or not, remove active marker now
+                this is a bit broken since we aren't communicating through the timeline while annotating the utterance
+                but the timeline only has a map which only has add/remove events.
+             */
+            timeLine.setSelectedMarker(null);
         }
     }
 
@@ -1961,13 +1988,16 @@ public class MainController {
     }
 
 
+    private synchronized void insertUtterance(MiscCode miscCode) {
+        insertUtterance(miscCode, false);
+    }
 
 
     /**
      * New utterance
      * @param miscCode code linked to utterance
      */
-    private synchronized void insertUtterance(MiscCode miscCode) {
+    private synchronized void insertUtterance(MiscCode miscCode, boolean annotate) {
 
         // get current time
         Duration position = mediaPlayer.getCurrentTime();
@@ -1983,6 +2013,9 @@ public class MainController {
             updateUtteranceDisplays();
             // button state different if 0 ver > 0 utterances
             setPlayerButtonState();
+            // annotate right after adding?
+            if( annotate ) timeLine.setAnnotateMarkerId(id);
+
         } catch (SQLException e) {
             showError("Error writing casaa file", e.getMessage());
         }
@@ -2484,7 +2517,8 @@ public class MainController {
                         Button button = new Button(codeName);
                         // show underscores in codes; do not trigger Mnemonic parsings
                         button.setMnemonicParsing(false);
-                        button.setOnAction(this::btnActCode);
+                        //button.setOnAction(this::btnActCode);
+                        button.setOnMouseClicked(this::btnActCode);
                         button.getStyleClass().add("btn-dark-blue");
                         // width and height of button expands with grid resizing
                         button.prefWidthProperty().bind(panel.widthProperty());

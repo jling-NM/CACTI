@@ -165,39 +165,35 @@ public class SessionData
 
 
     /**
-     * @return ObservableList of global ratings
+     * @param utterance_id
+     * @return array of global rating ids already linked to this utterance
      * @throws SQLException
      */
-    public ArrayList<GlobalCode> getRatingsList(String utterance_id) throws SQLException {
+    public ArrayList<Integer> getUtteranceRatingIDs(String utterance_id) throws SQLException {
 
-        //ObservableList<GlobalCode> ratingCode = FXCollections.observableArrayList();
-        ArrayList<GlobalCode> ratingCode = new ArrayList<>();
+        ArrayList<Integer> selectedRatingIDs = new ArrayList<>();
 
         try (Connection connection = ds.getConnection();
-             PreparedStatement ps = connection.prepareStatement("select ratings.*, utterances_ratings.utterance_id from ratings left outer join utterances_ratings on utterances_ratings.rating_id = ratings.rating_id where utterances_ratings.utterance_id = ? or utterances_ratings.utterance_id is NULL")
-            ) {
+             PreparedStatement ps = connection.prepareStatement("select ratings.rating_id from ratings left outer join utterances_ratings on utterances_ratings.rating_id = ratings.rating_id where utterances_ratings.utterance_id = ?;")
+        ) {
 
-
-            //ResultSet rs = statement.executeQuery("select rating_id, rating_name from ratings");
             ps.setString(1, utterance_id);
             ResultSet rs = ps.executeQuery();
-            // TODO: kluge, use label member to indicate if this global code is associated with this utterance
+
             while (rs.next()) {
-                int ratingId = rs.getInt("rating_id");
-                String ratingName = rs.getString("rating_name");
-                String linked_utterance_id = rs.getString("utterance_id");
-                ratingCode.add(new GlobalCode(ratingId, ratingName, linked_utterance_id));
+                selectedRatingIDs.add(rs.getInt("rating_id"));
             }
 
-            return ratingCode;
+            return selectedRatingIDs;
         }
     }
 
 
-    // TODO: not sure what this needs to do yet
-    // join all globals with their linked utterances
-    // or just get the utterances linked to a single global
-    // TBD
+
+    /**
+     * @return
+     * @throws SQLException
+     */
     public ArrayList< TreeMap< String, String> > getGlobalUtterances() throws SQLException
     {
         String sql = "SELECT ratings.rating_id, ratings.rating_name, ratings.response_value, utterances.utterance_id, utterances.time_marker, utterances.annotation, codes.code_name " +
@@ -620,43 +616,6 @@ public class SessionData
     }
 
 
-    private void unlinkUtteranceFromGlobal(int utterance_id, int global_id) throws SQLException
-    {
-        Connection connection = null;
-
-        try
-        {
-            connection = ds.getConnection();
-            PreparedStatement ps = connection.prepareStatement("delete from utterances_globals where utterance_id = ? and global_id = ?");
-            ps.setInt(1, utterance_id);
-            ps.setInt(2, global_id);
-            ps.executeUpdate();
-        } finally
-        {
-            if(connection != null)
-                connection.close();
-        }
-    }
-
-
-    private void linkUtteranceToGlobal(int utterance_id, int global_id) throws SQLException
-    {
-        Connection connection = null;
-
-        try
-        {
-            connection = ds.getConnection();
-            PreparedStatement ps = connection.prepareStatement("insert into utterances_globals (utterance_id, global_id) values (?,?)");
-            ps.setInt(1, utterance_id);
-            ps.setInt(2, global_id);
-            ps.executeUpdate();
-
-        } finally
-        {
-            if(connection != null)
-                connection.close();
-        }
-    }
 
 
     public String getUtteranceAnnotationText(String utterance_id) throws SQLException {
@@ -710,24 +669,6 @@ public class SessionData
     }
 
 
-    private void recodeUtterance(int utterance_id, int code_id) throws SQLException
-    {
-        Connection connection = null;
-
-        try
-        {
-            connection = ds.getConnection();
-            PreparedStatement ps = connection.prepareStatement("update utterances set code_id = ? where utterance_id = ?");
-            ps.setInt(1, code_id);
-            ps.setInt(2, utterance_id);
-            ps.executeUpdate();
-        } finally
-        {
-            if(connection != null)
-                connection.close();
-        }
-    }
-
 
     /**
      * Remove utterance from datasource
@@ -736,13 +677,24 @@ public class SessionData
      */
     private void removeUtterance(String utterance_id) throws SQLException
     {
-        String sql = "delete from utterances where utterance_id = ?";
-
         try ( Connection connection = ds.getConnection();
-              PreparedStatement ps = connection.prepareStatement(sql) )
-        {
-            ps.setString(1, utterance_id);
-            ps.executeUpdate();
+              PreparedStatement ps1 = connection.prepareStatement("delete from utterances_ratings where utterance_id = ?");
+              PreparedStatement ps2 = connection.prepareStatement("delete from utterances where utterance_id = ?")
+            ) {
+
+            /* disable autocommit */
+            connection.setAutoCommit(false);
+
+            /* clear all utterance to rating links */
+            ps1.setString(1, utterance_id);
+            ps1.executeUpdate();
+
+            /* delete utterance */
+            ps2.setString(1, utterance_id);
+            ps2.executeUpdate();
+
+            // apply changes
+            connection.commit();
         }
     }
 
