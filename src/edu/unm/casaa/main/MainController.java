@@ -48,8 +48,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -1088,7 +1086,10 @@ public class MainController {
         double origScaleY = pnReport.getBoundsInParent().getHeight();
 
         PrinterJob job = PrinterJob.createPrinterJob();
-        if (job != null && job.showPrintDialog(null)){
+        if( job == null ){
+            this.showError("Printing", "No printer configured.");
+        }
+        else if (job != null && job.showPrintDialog(null)){
 
             PageLayout pageLayout = job.getJobSettings().getPageLayout();
             double scaleX = pageLayout.getPrintableWidth() / pnReport.getBoundsInParent().getWidth();

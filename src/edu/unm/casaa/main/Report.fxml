@@ -39,7 +39,7 @@
                                  </children>
                               </AnchorPane>
                               <Label layoutX="20.0" layoutY="20.0" styleClass="lbl-report-section" text="Global Ratings" />
-                              <TextFlow fx:id="rptScore_global_ratings_tf">
+                              <TextFlow fx:id="rptScore_global_ratings_tf" layoutX="1.0" maxWidth="900.0">
                                  <padding>
                                     <Insets bottom="20.0" />
                                  </padding>
@@ -108,6 +108,7 @@
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" />
