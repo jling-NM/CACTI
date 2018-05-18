@@ -31,8 +31,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.*;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -43,6 +43,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -55,6 +56,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -65,7 +67,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
@@ -88,6 +89,8 @@ public class MainController {
     private TextFlow rptScore_global_ratings_tf;
     @FXML
     private ScrollPane pnReport;
+    @FXML
+    private Label lblSessionID;
     @FXML
     private Label rptScore_mico;
     @FXML
@@ -179,6 +182,8 @@ public class MainController {
     private MenuBar menuBar;
     @FXML
     private Menu mnuCoding;
+    @FXML
+    private MenuItem mniReportView;
     @FXML
     private MediaPlayer mediaPlayer;
     @FXML
@@ -798,7 +803,7 @@ public class MainController {
     /**
      * Display summary report of session
      */
-    public void mniReportView() {
+    public void reportView() {
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -811,6 +816,7 @@ public class MainController {
             ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
 
             Stage report = new Stage();
+
             Parent root = null;
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Report.fxml"), resourceStrings);
             // set loader so i have access to instance variables
@@ -830,7 +836,7 @@ public class MainController {
             report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
-            //report.initStyle(StageStyle.TRANSPARENT);
+            report.initStyle(StageStyle.TRANSPARENT);
 
             // don't let dialog get too big on smaller screens
             report.setY(0.0);
@@ -851,6 +857,8 @@ public class MainController {
                 System.out.println(e.getMessage());
             }
 
+            // report label is session label
+            lblSessionID.setText(sessionData.getSessionLabel());
 
             // global rating insert
             String current_rating_id = "";
@@ -870,7 +878,6 @@ public class MainController {
             Text txtNotes = new Text( String.format("\n\nNotes:\n%s\n\n", notes) );
             rptScore_global_ratings_tf.getChildren().add(txtNotes);
 
-
             /* attach/format summary scores to report */
             // integers: "%.0f"
             // doubles: "%.2f"
@@ -889,9 +896,8 @@ public class MainController {
             rptScore_di.setText(String.format("%.0f",mapCodeSummary.get("SUM_DI")));
             rptScore_ec.setText(String.format("%.0f",mapCodeSummary.get("SUM_EC")));
             rptScore_gi.setText(String.format("%.0f",mapCodeSummary.get("SUM_GI")));
-            // TODO: don't know how these are defined. not in SPS syntax
-            //rptScore_open.setText(String.format("%.0f",mapCodeSummary.get("")));
-            //rptScore_closed.setText(String.format("%.0f",mapCodeSummary.get("")));
+            rptScore_open.setText(String.format("%.0f",mapCodeSummary.get("SUM_OQ")));
+            rptScore_closed.setText(String.format("%.0f",mapCodeSummary.get("SUM_CQ")));
             rptScore_rcp.setText(String.format("%.0f",mapCodeSummary.get("SUM_RCP")));
             rptScore_rcw.setText(String.format("%.0f",mapCodeSummary.get("SUM_RCW")));
             rptScore_simple.setText(String.format("%.0f",mapCodeSummary.get("SUM_SIMPLE")));
@@ -1115,9 +1121,6 @@ public class MainController {
     private void openUtteranceEditor(PropertyChangeEvent pcEvt) {
         if( pcEvt.getNewValue() != null ) {
 
-            /* grab mouse location to position editor window. not ideal but worth a test */
-            Point mousePtrLoc = MouseInfo.getPointerInfo().getLocation();
-
             /* get data */
             String utterance_id = pcEvt.getNewValue().toString();
             String existingAnnotation = "";
@@ -1146,12 +1149,28 @@ public class MainController {
             Stage dlgStage = (Stage) dlgUtteranceEditor.getDialogPane().getScene().getWindow();
             dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
             dlgUtteranceEditor.initStyle(StageStyle.TRANSPARENT);
+            dlgUtteranceEditor.initModality(Modality.APPLICATION_MODAL);
             Scene scene = dlgStage.getScene();
             scene.setFill(Color.TRANSPARENT);
 
+
+            // TODO: position popup?
             /* position window */
-            dlgUtteranceEditor.setX(mousePtrLoc.x-20.0);
-            dlgUtteranceEditor.setY(mousePtrLoc.y-60.0);
+            /* grab mouse location to position editor window. not ideal but worth a test */
+            Point mousePtrLoc = MouseInfo.getPointerInfo().getLocation();
+            Point2D convertPoint = vbApp.localToScreen( new Point2D(mousePtrLoc.getX(), timeLine.getLayoutY() ) );
+            Double resolutionScaler = ( Toolkit.getDefaultToolkit().getScreenSize().getWidth() / Screen.getPrimary().getVisualBounds().getWidth() );
+            Point2D scaledPoint = new Point2D( (convertPoint.getX()/resolutionScaler), (convertPoint.getY()/resolutionScaler) );
+            Double thirdWidth = (2*Screen.getPrimary().getVisualBounds().getWidth())/3;
+            //if( Screen.getPrimary().getVisualBounds().contains( scaledPoint.getX(), scaledPoint.getY()) ) {
+            if( scaledPoint.getX() < thirdWidth ) {
+                dlgUtteranceEditor.setX( scaledPoint.getX() );
+                dlgUtteranceEditor.setY( scaledPoint.getY() );
+            } else {
+                System.out.println("out of bounds");
+                dlgUtteranceEditor.setX( (scaledPoint.getX() - 200) );
+                dlgUtteranceEditor.setY( scaledPoint.getY() );
+            }
 
 
             /* populate listview of global items.
@@ -1690,6 +1709,7 @@ public class MainController {
 
                 // TODO: verify best place for this
                 mnuCoding.setDisable(false);
+                mniReportView.setDisable(false);
 
                 // display controls needed for coding
                 setPlayerButtonState();
@@ -1808,6 +1828,7 @@ public class MainController {
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
 
+                /*
                 // resize app window
                 windW = appPrefs.getDouble("main.wind.w", 800.0);
                 ourTown.setWidth(windW);
@@ -1818,6 +1839,7 @@ public class MainController {
                 } else {
                     ourTown.setHeight(windH);
                 }
+                */
 
                 break;
 
@@ -2468,7 +2490,7 @@ public class MainController {
                          */
                         tfGlobalsNotes.focusedProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean lostFocus, Boolean hasFocus) -> {
                             if(lostFocus) {
-                                try {
+                                    try {
                                     sessionData.ratingsList.setNotes(tfGlobalsNotes.getText());
                                 } catch ( SQLException e ) {
                                     showError("Error Writing Casaa File", e.getMessage());

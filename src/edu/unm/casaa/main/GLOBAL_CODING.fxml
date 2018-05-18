@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
     This source code file is part of the CASAA Treatment Coding System Utility
     Copyright (C) 2009  UNM CASAA
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
@@ -23,36 +25,39 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="GLOBAL_CODING" styleClass="controlsWin" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="GLOBAL_CODING" styleClass="controlsWin" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TitledPane animated="false" collapsible="false" prefHeight="400.0" prefWidth="600.0" text="Global Ratings" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TitledPane animated="false" collapsible="false" text="Global Ratings" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+            <VBox>
                <children>
-                  <GridPane fx:id="gpGlobalControls" gridLinesVisible="false" hgap="4.0" prefWidth="600.0" vgap="8.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="-Infinity" prefHeight="40.0" vgrow="NEVER" />
-                      <RowConstraints minHeight="-Infinity" prefHeight="40.0" vgrow="NEVER" />
-                      <RowConstraints minHeight="-Infinity" prefHeight="40.0" vgrow="NEVER" />
-                    </rowConstraints>
+                <AnchorPane minHeight="0.0" minWidth="0.0" VBox.vgrow="ALWAYS">
                      <children>
+                        <GridPane fx:id="gpGlobalControls" gridLinesVisible="false" hgap="4.0" vgap="8.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="-Infinity" prefHeight="40.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="-Infinity" prefHeight="40.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="-Infinity" prefHeight="40.0" vgrow="NEVER" />
+                          </rowConstraints>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </GridPane>
                      </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </GridPane>
-                  <AnchorPane prefHeight="120.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  </AnchorPane>
+                  <AnchorPane VBox.vgrow="ALWAYS">
                      <children>
-                        <TextArea fx:id="tfGlobalsNotes" promptText="Enter scoring notes" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <TextArea fx:id="tfGlobalsNotes" promptText="Enter scoring notes" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0" />
                      </children>
                   </AnchorPane>
                </children>
-            </AnchorPane>
+            </VBox>
         </content>
       </TitledPane>
    </children>

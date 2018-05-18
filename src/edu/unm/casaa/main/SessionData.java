@@ -368,12 +368,21 @@ public class SessionData
                         .sum());
 
         // sum(OQ-,OQ0,OQ+)
-        mapCodeSummary.put("SUM_P",
+        mapCodeSummary.put("SUM_OQ",
                 mapCodeCount.entrySet()
                         .stream()
                         .filter(e -> e.getKey().equals("OQ-") || e.getKey().equals("OQ0") || e.getKey().equals("OQ+") )
                         .mapToDouble(e -> e.getValue())
                         .sum());
+
+        // sum(CQ-,CQ0,CQ+)
+        mapCodeSummary.put("SUM_CQ",
+                mapCodeCount.entrySet()
+                        .stream()
+                        .filter(e -> e.getKey().equals("CQ-") || e.getKey().equals("CQ0") || e.getKey().equals("CQ+") )
+                        .mapToDouble(e -> e.getValue())
+                        .sum());
+
 
         // sum(CR+,CR-,CR0,CR+/-)
         mapCodeSummary.put("SUM_CR",
@@ -478,26 +487,36 @@ public class SessionData
         mapCodeSummary.put("SUM_SUSTAIN_REM", (mapCodeSummary.get("SUM_SUSTAIN") + mapCodeSummary.get("SUM_REM_NEG")) );
 
         /* calculate percentage scores */
+        Double setVal = 0.0;
 
         // pmic = mico/sum(mico, miin).
-        mapCodeSummary.put("PCT_MIC", ((mapCodeSummary.get("SUM_MICO") / (mapCodeSummary.get("SUM_MICO") + mapCodeSummary.get("SUM_MIIN")))*100) );
+        setVal = ((mapCodeSummary.get("SUM_MICO") / (mapCodeSummary.get("SUM_MICO") + mapCodeSummary.get("SUM_MIIN")))*100);
+        mapCodeSummary.put("PCT_MIC", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
         // pct_etoh = change_etoh/sum(change_etoh,sustain_etoh).
-        mapCodeSummary.put("PCT_ETOH", ((mapCodeSummary.get("SUM_CHANGE_ETOH") / (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_ETOH")))*100) );
+        setVal = ((mapCodeSummary.get("SUM_CHANGE_ETOH") / (mapCodeSummary.get("SUM_CHANGE_ETOH") + mapCodeSummary.get("SUM_SUSTAIN_ETOH")))*100);
+        mapCodeSummary.put("PCT_ETOH", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
         // pct_drug = change_drug/sRATIO_THER2CLIum(change_drug, sustain_drug).
-        mapCodeSummary.put("PCT_DRUG", ((mapCodeSummary.get("SUM_CHANGE_DRUG") / (mapCodeSummary.get("SUM_CHANGE_DRUG") + mapCodeSummary.get("SUM_SUSTAIN_DRUG")))*100) );
+        setVal = ((mapCodeSummary.get("SUM_CHANGE_DRUG") / (mapCodeSummary.get("SUM_CHANGE_DRUG") + mapCodeSummary.get("SUM_SUSTAIN_DRUG")))*100);
+        mapCodeSummary.put("PCT_DRUG", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
         // pct = change/sum(change, sustain).
-        mapCodeSummary.put("PCT", ((mapCodeSummary.get("SUM_CHANGE") / (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_SUSTAIN")))*100) );
+        setVal = ((mapCodeSummary.get("SUM_CHANGE") / (mapCodeSummary.get("SUM_CHANGE") + mapCodeSummary.get("SUM_SUSTAIN")))*100);
+        mapCodeSummary.put("PCT", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
         // pcr=sum(CR+,CR_,CR0,CR+/-)/sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)
-        mapCodeSummary.put("PCT_PCR", ((mapCodeSummary.get("SUM_CR") / mapCodeSummary.get("SUM_REFLECTION")))*100 );
+        setVal = ((mapCodeSummary.get("SUM_CR") / mapCodeSummary.get("SUM_REFLECTION")))*100;
+        mapCodeSummary.put("PCT_PCR", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
         // poq = sum(OQ-,OQ0,OQ+)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
-        mapCodeSummary.put("PCT_POQ", ((mapCodeSummary.get("SUM_P") / mapCodeSummary.get("SUM_QUESTION")))*100 );
+        setVal = ((mapCodeSummary.get("SUM_OQ") / mapCodeSummary.get("SUM_QUESTION")))*100;
+        mapCodeSummary.put("PCT_POQ", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
 
         // sr2cr = sum(SR+,SR-,SR0,SR+/-)/sum(CR+,CR-,CR0,CR+/-).
-        mapCodeSummary.put("RATIO_SR2CR", (mapCodeSummary.get("SUM_SIMPLE") / mapCodeSummary.get("SUM_CR")) );
-        // r2q=sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+).
-        mapCodeSummary.put("RATIO_R2Q", (mapCodeSummary.get("SUM_REFLECTION") / mapCodeSummary.get("SUM_QUESTION")) );
+        setVal = (mapCodeSummary.get("SUM_SIMPLE") / mapCodeSummary.get("SUM_CR"));
+        mapCodeSummary.put("RATIO_SR2CR", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
+        // r2q=sum(SR+,SR-,SR0,SR+/-,CR+,CR-,CR0,CR+/-)/sum(CQ-,CQ0,CQ+,OQ-,OQ0,OQ+)
+        setVal = (mapCodeSummary.get("SUM_REFLECTION") / mapCodeSummary.get("SUM_QUESTION"));
+        mapCodeSummary.put("RATIO_R2Q", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
         // ther2cli = ther_utt/client_utt.
-        mapCodeSummary.put("RATIO_THER2CLI", (mapCodeSummary.get("SUM_THER_UTT") / mapCodeSummary.get("SUM_CLIENT_UTT")) );
+        setVal = (mapCodeSummary.get("SUM_THER_UTT") / mapCodeSummary.get("SUM_CLIENT_UTT"));
+        mapCodeSummary.put("RATIO_THER2CLI", setVal.isNaN() || setVal.isInfinite() ? 0.0 : setVal);
 
         return mapCodeSummary;
     }
@@ -592,6 +611,10 @@ public class SessionData
     }
 
 
+    public String getSessionLabel() {
+        return sessionFile.getName().substring(0, sessionFile.getName().lastIndexOf("."));
+    }
+
     /**
      * @param sessionAttribute SessionAttribute to get
      * @return current value for session attribute
@@ -677,9 +700,13 @@ public class SessionData
      */
     private void removeUtterance(String utterance_id) throws SQLException
     {
+
+        System.out.println("--- Remove utterance:" + utterance_id);
+
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps1 = connection.prepareStatement("delete from utterances_ratings where utterance_id = ?");
-              PreparedStatement ps2 = connection.prepareStatement("delete from utterances where utterance_id = ?")
+              PreparedStatement ps2 = connection.prepareStatement("delete from utterances where utterance_id = ?");
+              Statement statement = connection.createStatement()
             ) {
 
             /* disable autocommit */
@@ -695,6 +722,18 @@ public class SessionData
 
             // apply changes
             connection.commit();
+
+            // TODO: temp
+            System.out.println("--- Remaining Utterances:");
+            ResultSet rs = statement.executeQuery("select utterances.*, codes.code_name, codes.speaker_id from utterances inner join codes on utterances.code_id = codes.code_id order by utterances.time_marker");
+
+            while (rs.next()) {
+                String utt_id = rs.getString("utterance_id");
+                String startTime = rs.getString("time_marker");
+                String codeName = rs.getString("code_name");
+                System.out.println(String.format("%s - %s - %s", utt_id, startTime, codeName));
+            }
+
         }
     }
 
@@ -709,6 +748,11 @@ public class SessionData
      */
     private void addUtterance(String utterance_id, int code_id, String time_marker, String annotation) throws SQLException
     {
+
+        // TODO: temp
+        System.out.println( String.format("--- Add utterance: %s - %s - %s", utterance_id, time_marker, annotation) );
+        // TODO: temp
+
         String sql = "insert into utterances (utterance_id, code_id, time_marker, annotation) values (?,?,?,?)";
 
         try ( Connection connection = ds.getConnection();
