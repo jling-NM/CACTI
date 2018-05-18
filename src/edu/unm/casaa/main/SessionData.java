@@ -198,9 +198,9 @@ public class SessionData
     {
         String sql = "SELECT ratings.rating_id, ratings.rating_name, ratings.response_value, utterances.utterance_id, utterances.time_marker, utterances.annotation, codes.code_name " +
                 "FROM ratings " +
-                "JOIN utterances_ratings ON ratings.rating_id = utterances_ratings.rating_id " +
-                "JOIN utterances ON utterances.utterance_id = utterances_ratings.utterance_id " +
-                "JOIN codes ON utterances.code_id = codes.code_id " +
+                "LEFT JOIN utterances_ratings ON ratings.rating_id = utterances_ratings.rating_id " +
+                "LEFT JOIN utterances ON utterances.utterance_id = utterances_ratings.utterance_id " +
+                "LEFT JOIN codes ON utterances.code_id = codes.code_id " +
                 "ORDER BY ratings.rating_name, utterances.time_marker";
 
         TreeMap< String, String> row;
@@ -670,12 +670,14 @@ public class SessionData
             /* disable autocommit */
             connection.setAutoCommit(false);
 
+            System.out.println("--- annotateUtterance: Update annotation string:"+utterance_id);
             /* handle annotation text */
             psU.setString(1, annotationText);
             psU.setString(2, utterance_id);
             psU.executeUpdate();
 
             /* clear all utterance to rating links */
+            System.out.println("--- annotateUtterance: Clear rating links:"+utterance_id);
             statement.execute("delete from utterances_ratings where utterance_id = '"+ utterance_id + "'");
 
             /* add selected utterance to rating links */
@@ -684,8 +686,10 @@ public class SessionData
                 psI.setInt(2, gc.id);
                 psI.addBatch();
             }
+            System.out.println("--- annotateUtterance: Insert rating links:"+utterance_id);
             psI.executeBatch();
 
+            System.out.println("--- annotateUtterance: commit:"+utterance_id);
             // apply changes
             connection.commit();
         }

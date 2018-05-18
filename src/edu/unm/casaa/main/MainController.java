@@ -37,6 +37,7 @@ import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
@@ -49,6 +50,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -60,7 +62,9 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
 import javafx.stage.*;
 import javafx.util.Duration;
 import org.w3c.dom.Document;
@@ -831,12 +835,14 @@ public class MainController {
             scene.setFill(Color.TRANSPARENT);
             report.setScene(scene);
 
+
             //report.setTitle(resourceStrings.getString("txt.about.title"));
             report.setTitle("Therapist Feedback");
             report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
-            report.initStyle(StageStyle.TRANSPARENT);
+            //report.initStyle(StageStyle.TRANSPARENT);
+
 
             // don't let dialog get too big on smaller screens
             report.setY(0.0);
@@ -871,8 +877,11 @@ public class MainController {
                     rptScore_global_ratings_tf.getChildren().add(txtRating);
                 }
 
-                Text txtUtterance = new Text(String.format("- %s : %s : %s\n", row.get("time_marker"), row.get("code_name"), row.get("annotation").replace("\n", "; ")));
-                rptScore_global_ratings_tf.getChildren().add(txtUtterance);
+                // check if there are utterances to list
+                if( row.get("time_marker") != null ) {
+                    Text txtUtterance = new Text(String.format("- %s : %s : %s\n", row.get("time_marker"), row.get("code_name"), row.get("annotation").replace("\n", "; ")));
+                    rptScore_global_ratings_tf.getChildren().add(txtUtterance);
+                }
             }
 
             Text txtNotes = new Text( String.format("\n\nNotes:\n%s\n\n", notes) );
@@ -1109,6 +1118,19 @@ public class MainController {
                 job.endJob();
             }
 
+            pnReport.getTransforms().remove(0);
+
+            try {
+                Transform rev = pnReport.getTransforms().get(0).createInverse();
+            } catch (NonInvertibleTransformException e){
+                System.out.println(e.getMessage());
+            }
+
+
+            // image method
+            //WritableImage reportImage = pnReport.snapshot(new SnapshotParameters(), null);
+            //reportImage.
+
         }
     }
 
@@ -1131,7 +1153,9 @@ public class MainController {
                 existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
                 selectedRatingIDs = sessionData.getUtteranceRatingIDs(utterance_id);
             } catch ( SQLException e) {
-                showError("Error Annotation", e.getMessage());
+                //showError("Error Annotation", e.getMessage());
+                //TODO
+                System.out.println(e.getMessage());
             }
 
 
@@ -1181,6 +1205,7 @@ public class MainController {
             dlgListView.setPrefHeight(120);
             dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+            // note that globalcode is in user defined rather than alphabetical order
             ListIterator<GlobalCode> globalCodeListIterator = GlobalCode.getIterator();
             while(globalCodeListIterator.hasNext()) {
                 GlobalCode rating = globalCodeListIterator.next();
@@ -1225,7 +1250,10 @@ public class MainController {
                 try {
                     sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
                 } catch (SQLException e) {
-                    showError("Error Annotating Utterance", e.getMessage());
+                    //showError("Error Annotating Utterance", e.getMessage());
+                    System.out.println("line 1236");
+                    System.out.println(e.getMessage());
+                    System.out.println(e.getSQLState());
                 }
             }
 
@@ -2022,6 +2050,8 @@ public class MainController {
      */
     private synchronized void insertUtterance(MiscCode miscCode, boolean annotate) {
 
+        System.out.println("--- Controller add utterance:" + miscCode.toDisplayString());
+
         // get current time
         Duration position = mediaPlayer.getCurrentTime();
 
@@ -2031,16 +2061,19 @@ public class MainController {
         data.setMiscCode(miscCode);
 
         try {
-            timeLine.add(data);
+            String addedUtteranceId = timeLine.add(data);
             // update display
             updateUtteranceDisplays();
             // button state different if 0 ver > 0 utterances
             setPlayerButtonState();
             // annotate right after adding?
-            if( annotate ) timeLine.setAnnotateMarkerId(id);
+            if( annotate ) timeLine.setAnnotateMarkerId(addedUtteranceId);
 
         } catch (SQLException e) {
-            showError("Error writing casaa file", e.getMessage());
+            //showError("Error writing casaa file", e.getMessage());
+            System.out.println("line 2055");
+            System.out.println(e.getMessage());
+            System.out.println(e.getSQLState());
         }
     }
 
@@ -2108,10 +2141,16 @@ public class MainController {
      * @param utr Utterance instance to be removed
      */
     private synchronized void removeUtterance(Utterance utr){
+        System.out.println("--- Controller removeUtterance:" + utr.displayCoded());
+
         try {
             sessionData.utteranceList.remove(utr);
         } catch (SQLException e) {
-            showError("Error writing casaa file", e.getMessage());
+            //showError("Error writing casaa file", e.getMessage());
+            System.out.println("line: 2131");
+            System.out.println(e.getMessage());
+            System.out.println(e.getErrorCode());
+            System.out.println(e.getSQLState());
         }
         // refresh last utterance display
         updateUtteranceDisplays();

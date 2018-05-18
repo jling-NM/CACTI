@@ -188,7 +188,7 @@ public class TimeLine extends Group {
      *
      * @param newUtterance
      */
-    public void add(Utterance newUtterance) throws SQLException {
+    public String add(Utterance newUtterance) throws SQLException {
         /* check for selected timeline marker */
         TimeLineMarker activeMarker = getSelectedMarker();
 
@@ -236,6 +236,8 @@ public class TimeLine extends Group {
             }
 
         }
+
+        return newUtterance.getID();
 
     }
 

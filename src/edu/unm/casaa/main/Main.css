@@ -14,7 +14,9 @@
   -fx-background-radius: 4;
 }
 
-
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
 
 .menuBar {
     -fx-font-size: 12;
