@@ -1,18 +1,27 @@
-.modal-dialog-glass {
-  -fx-effect: dropshadow(three-pass-box, derive(gray, -50%), 3, 0, 4, 4);
+/**********************************************
+ * Annotation editor
+ **********************************************/
+ .modal-dialog-glass {
+  -fx-effect: dropshadow(three-pass-box, derive(gray, -50%), 1, 1, 0, 0);
   -fx-background-insets: 3;
-  -fx-background-radius: 3;
+  -fx-background-radius: 12;
 }
 
-.modal-dialog-content {
-  -fx-padding: 20;
-  -fx-spacing: 10;
-  -fx-border-width: 5;
-  -fx-background-insets: 12;
-  -fx-border-insets: 10;
-  -fx-border-radius: 4;
-  -fx-background-radius: 4;
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: linear-gradient(#ed2d2d 0%, #c92e2e 25%, #bf1515 75%, #bf0a0a 100%);
+    -fx-text-fill: white;
 }
+
+.list-view:focused, .text-area:focused {
+    -fx-focus-color: red;
+    -fx-faint-focus-color: transparent;
+    -fx-inner-border: transparent;
+    -fx-body-color: red;
+    -fx-background-color: -fx-faint-focus-color, -fx-focus-color, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: -0.1, -0.1, 0, 0;
+    -fx-background-radius: 0.5, 0.5, 0, 0;
+}
+
 
 .scroll-pane > .viewport {
    -fx-background-color: transparent;

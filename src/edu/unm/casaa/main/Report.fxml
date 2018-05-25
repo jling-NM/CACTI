@@ -27,11 +27,11 @@
     </MenuBar>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
          <children>
-            <ScrollPane fx:id="pnReport" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ScrollPane fx:id="pnReportScrollPane" fitToWidth="true" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: transparent;">
                      <children>
-                        <VBox style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <VBox fx:id="pnReportContent" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <AnchorPane>
                                  <children>
@@ -43,7 +43,10 @@
                                     </HBox>
                                  </children>
                               </AnchorPane>
-                              <Label layoutX="20.0" layoutY="20.0" styleClass="lbl-report-section" text="Global Ratings" />
+                              <Label layoutX="20.0" layoutY="20.0" styleClass="lbl-report-section" text="Global Ratings">
+                                 <padding>
+                                    <Insets top="12.0" />
+                                 </padding></Label>
                               <TextFlow fx:id="rptScore_global_ratings_tf" layoutX="1.0" maxWidth="900.0">
                                  <padding>
                                     <Insets bottom="20.0" />
@@ -450,9 +453,6 @@
                                  </children>
                               </GridPane>
                            </children>
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
                         </VBox>
                      </children>
                      <padding>

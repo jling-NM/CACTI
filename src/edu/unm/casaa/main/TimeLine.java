@@ -86,7 +86,7 @@ public class TimeLine extends Group {
      * selection indicates an annotation event.
      * @param annotateMarkerId
      */
-    public void setAnnotateMarkerId(String annotateMarkerId) {
+    public void setAnnotateMarker(String annotateMarkerId) {
 
         /* update property being listened to */
         this.annotateMarkerId = annotateMarkerId;
@@ -228,7 +228,8 @@ public class TimeLine extends Group {
                 /*
                  * sync timeline with player time to marker appears lined up.
                  * Do this only for new markers not edited above here
-                  */
+                 */
+                // TODO: check if this is still the best thing to do even after threading timeline
                 this.getAnimation().jumpTo(newUtterance.getStartTime());
 
                 // new utterance in storage
@@ -389,7 +390,7 @@ public class TimeLine extends Group {
                         }
                     } else {
                         /*
-                         * different marker selected, deselect any previous and select this one regardles of mouse button
+                         * different marker selected, deselect any previous and select this one regardless of mouse button
                          */
                         if( getSelectedMarker() != null ) {
                             getSelectedMarker().getIndicatorShape().setFill(Color.TRANSPARENT);
@@ -441,7 +442,7 @@ public class TimeLine extends Group {
             MenuItem mniAnnotateUtterance = new MenuItem("Annotate");
             mniAnnotateUtterance.setOnAction( e -> {
                 if( getSelectedMarker() != null) {
-                    setAnnotateMarkerId(getMarkerID());
+                    setAnnotateMarker(getMarkerID());
                 }
             });
 

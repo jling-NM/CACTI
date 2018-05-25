@@ -37,7 +37,6 @@ import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
@@ -50,7 +49,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -58,13 +56,10 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
 import javafx.stage.*;
 import javafx.util.Duration;
 import org.w3c.dom.Document;
@@ -86,13 +81,13 @@ import static java.lang.String.format;
 
 public class MainController {
 
-    //TODO: move this if still needed
-
     // SESSION REPORT
     @FXML
     private TextFlow rptScore_global_ratings_tf;
     @FXML
-    private ScrollPane pnReport;
+    private ScrollPane pnReportScrollPane;
+    @FXML
+    private VBox pnReportContent;
     @FXML
     private Label lblSessionID;
     @FXML
@@ -841,8 +836,6 @@ public class MainController {
             report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
-            //report.initStyle(StageStyle.TRANSPARENT);
-
 
             // don't let dialog get too big on smaller screens
             report.setY(0.0);
@@ -919,6 +912,10 @@ public class MainController {
             rptScore_wa.setText(String.format("%.0f",mapCodeSummary.get("SUM_WA")));
             rptScore_change.setText(String.format("%.0f",mapCodeSummary.get("SUM_CHANGE")));
             rptScore_sustain.setText(String.format("%.0f",mapCodeSummary.get("SUM_SUSTAIN")));
+
+            //root.applyCss();
+            //root.layout();
+            //root.autosize();
 
             report.showAndWait();
         }
@@ -1095,11 +1092,16 @@ public class MainController {
     }
 
 
+    /**
+     * Print session report
+     * @param actionEvent
+     */
     public void printReport(@SuppressWarnings("UnusedParameters") ActionEvent actionEvent) {
 
-        double origScaleX = pnReport.getBoundsInParent().getWidth();
-        double origScaleY = pnReport.getBoundsInParent().getHeight();
-
+        /*
+            The content node is wrapped in a scrollpane in case the user's screen is small so they can scroll
+            to view report. Use the scrollpane to to determine scaling for content pane being printed.
+         */
         PrinterJob job = PrinterJob.createPrinterJob();
         if( job == null ){
             this.showError("Printing", "No printer configured.");
@@ -1107,30 +1109,17 @@ public class MainController {
         else if (job != null && job.showPrintDialog(null)){
 
             PageLayout pageLayout = job.getJobSettings().getPageLayout();
-            double scaleX = pageLayout.getPrintableWidth() / pnReport.getBoundsInParent().getWidth();
-            double scaleY = pageLayout.getPrintableHeight() / pnReport.getBoundsInParent().getHeight();
-            pnReport.getTransforms().add(new Scale(scaleX, scaleX));
-            pnReport.setBackground(Background.EMPTY);
-
-            boolean success = job.printPage(pnReport);
-            //pnReport.getTransforms().remove(new Scale(scaleX, scaleY));
+            double scaleX = pageLayout.getPrintableWidth() / (pnReportScrollPane.viewportBoundsProperty().get().getWidth() + 20.0);
+            //double scaleX = pageLayout.getPrintableWidth() / (pnReportContent.getWidth() + 10.0);
+            // transform uses same transform on Y as X to maintain ratio
+            pnReportContent.getTransforms().add(new Scale(scaleX, scaleX));
+            pnReportContent.setBackground(Background.EMPTY);
+            boolean success = job.printPage(pnReportContent);
             if (success) {
                 job.endJob();
             }
-
-            pnReport.getTransforms().remove(0);
-
-            try {
-                Transform rev = pnReport.getTransforms().get(0).createInverse();
-            } catch (NonInvertibleTransformException e){
-                System.out.println(e.getMessage());
-            }
-
-
-            // image method
-            //WritableImage reportImage = pnReport.snapshot(new SnapshotParameters(), null);
-            //reportImage.
-
+            // undo the transform by removing it. This returns the node to the original size on screen
+            pnReportContent.getTransforms().remove(0);
         }
     }
 
@@ -1153,11 +1142,8 @@ public class MainController {
                 existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
                 selectedRatingIDs = sessionData.getUtteranceRatingIDs(utterance_id);
             } catch ( SQLException e) {
-                //showError("Error Annotation", e.getMessage());
-                //TODO
-                System.out.println(e.getMessage());
+                showError("Error Annotation", e.getMessage());
             }
-
 
             /* open editor */
             Dialog<ButtonType> dlgUtteranceEditor = new Dialog<>();
@@ -1177,33 +1163,32 @@ public class MainController {
             Scene scene = dlgStage.getScene();
             scene.setFill(Color.TRANSPARENT);
 
+            /* position popup window using marker location */
+            Node markerNode = timeLine.lookup("#"+utterance_id);
+            Point2D markerNodePoint = markerNode.localToScreen(new Point2D(markerNode.getLayoutBounds().getMaxX(), markerNode.getLayoutBounds().getMinY()));
 
-            // TODO: position popup?
-            /* position window */
-            /* grab mouse location to position editor window. not ideal but worth a test */
-            Point mousePtrLoc = MouseInfo.getPointerInfo().getLocation();
-            Point2D convertPoint = vbApp.localToScreen( new Point2D(mousePtrLoc.getX(), timeLine.getLayoutY() ) );
-            Double resolutionScaler = ( Toolkit.getDefaultToolkit().getScreenSize().getWidth() / Screen.getPrimary().getVisualBounds().getWidth() );
-            Point2D scaledPoint = new Point2D( (convertPoint.getX()/resolutionScaler), (convertPoint.getY()/resolutionScaler) );
-            Double thirdWidth = (2*Screen.getPrimary().getVisualBounds().getWidth())/3;
-            //if( Screen.getPrimary().getVisualBounds().contains( scaledPoint.getX(), scaledPoint.getY()) ) {
-            if( scaledPoint.getX() < thirdWidth ) {
-                dlgUtteranceEditor.setX( scaledPoint.getX() );
-                dlgUtteranceEditor.setY( scaledPoint.getY() );
+            /* check that pop-up doesn't go offscreen */
+            if( (markerNodePoint.getX() + dlgUtteranceEditor.getDialogPane().getWidth()) > Screen.getPrimary().getVisualBounds().getWidth() ) {
+                dlgUtteranceEditor.setX( Screen.getPrimary().getVisualBounds().getWidth() - dlgUtteranceEditor.getDialogPane().getWidth() );
             } else {
-                System.out.println("out of bounds");
-                dlgUtteranceEditor.setX( (scaledPoint.getX() - 200) );
-                dlgUtteranceEditor.setY( scaledPoint.getY() );
+                dlgUtteranceEditor.setX( markerNodePoint.getX() );
             }
+            dlgUtteranceEditor.setY( markerNodePoint.getY() );
 
+
+//            System.out.println(convertPoint.getX());
+//            System.out.println(dlgUtteranceEditor.getDialogPane().getWidth());
+//            System.out.println(convertPoint.getX() + dlgUtteranceEditor.getDialogPane().getWidth());
+//            System.out.println(Screen.getPrimary().getVisualBounds().getWidth());
 
             /* populate listview of global items.
             * Since we want to reselect previous items i loop through items
             * instead of just populating with an observablelist
             */
             ListView<GlobalCode> dlgListView = new ListView<>();
-            dlgListView.setPrefHeight(120);
+            dlgListView.setPrefHeight(60);
             dlgListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
 
             // note that globalcode is in user defined rather than alphabetical order
             ListIterator<GlobalCode> globalCodeListIterator = GlobalCode.getIterator();
@@ -1250,12 +1235,15 @@ public class MainController {
                 try {
                     sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
                 } catch (SQLException e) {
-                    //showError("Error Annotating Utterance", e.getMessage());
-                    System.out.println("line 1236");
-                    System.out.println(e.getMessage());
-                    System.out.println(e.getSQLState());
+                    showError("Error Annotating Utterance", e.getMessage());
                 }
             }
+
+
+//            TimeLine.TimeLineMarker timeLineMarker = (TimeLine.TimeLineMarker) timeLine.lookup("#"+utterance_id);
+//            timeLineMarker.getIndicatorShape().setStyle("-fx-background-color:blue;");
+//            TimeLine.TimeLineMarker ick = (TimeLine.TimeLineMarker) timeLine.getChildren().get(timeLine.getChildren().indexOf(timeLineMarker));
+//            ick.getIndicatorShape().setFill(Color.AQUA);
 
             /*
                 whether edited or not, remove active marker now
@@ -2067,7 +2055,7 @@ public class MainController {
             // button state different if 0 ver > 0 utterances
             setPlayerButtonState();
             // annotate right after adding?
-            if( annotate ) timeLine.setAnnotateMarkerId(addedUtteranceId);
+            if( annotate ) timeLine.setAnnotateMarker(addedUtteranceId);
 
         } catch (SQLException e) {
             //showError("Error writing casaa file", e.getMessage());
