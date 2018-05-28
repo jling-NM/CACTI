@@ -68,14 +68,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.prefs.Preferences;
-
 import static java.lang.String.format;
 
 
@@ -795,6 +793,43 @@ public class MainController {
 
             // take care of media player
             initializeMediaPlayer(currentAudioFile, playerReady);
+        }
+    }
+
+
+
+    /**
+     *
+     */
+    public void mniExport() {
+
+        // this something be playing, stop it
+        if(mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+
+        Locale locale = new Locale("en", "US");
+        ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);
+
+        /* open editor */
+        Dialog<ButtonType> dlgExport = new Dialog<>();
+        FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource("Export.fxml"));
+        // set loader so i have access to instance variables
+        //dialogLoader.setController("ExportController");
+        try {
+            dlgExport.setDialogPane(dialogLoader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        dlgExport.setTitle("Export");
+        Stage dlgStage = (Stage) dlgExport.getDialogPane().getScene().getWindow();
+        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        dlgExport.initModality(Modality.APPLICATION_MODAL);
+
+        Optional<ButtonType> result = dlgExport.showAndWait();
+        if (result.isPresent() & (result.get() == ButtonType.APPLY)) {
+
         }
     }
 

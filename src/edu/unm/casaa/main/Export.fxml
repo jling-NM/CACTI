@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+
+<DialogPane prefHeight="264.0" prefWidth="517.0" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.ExportController">
+   <content>
+      <VBox>
+         <children>
+            <Label prefHeight="122.0" prefWidth="397.0" text="Drag CASAA files or folders containing CASAA files to export their contents to the destination directory." wrapText="true" />
+            <Label text="Successfully converted:">
+               <padding>
+                  <Insets bottom="2.0" top="2.0" />
+               </padding></Label>
+            <ListView fx:id="dstListView" onDragDropped="#srcDragDropped" onDragExited="#srcDragExited" onDragOver="#srcDragOver" prefHeight="180.0" prefWidth="417.0" />
+         </children>
+      </VBox>
+   </content>
+   <buttonTypes>
+      <ButtonType fx:constant="CLOSE" />
+   </buttonTypes>
+   <header>
+      <Label fx:id="dstFilePathName" onDragDropped="#dstDragDropped" onDragExited="#dstDragExited" onDragOver="#dstDragOver" prefHeight="40.0" text="[Drag Destination Directory Here]" textFill="#d50b0b">
+         <padding>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </padding>
+         <graphic>
+            <Label>
+               <graphic>
+                  <Button fx:id="btnDstDir" mnemonicParsing="false" onAction="#selectDstDirectory" text="Output Directory:" />
+               </graphic></Label>
+         </graphic>
+      </Label>
+   </header>
+</DialogPane>

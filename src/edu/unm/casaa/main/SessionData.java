@@ -1,3 +1,21 @@
+/*
+This source code file is part of the CASAA Treatment Coding System Utility
+    Copyright (C) 2009  UNM CASAA
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package edu.unm.casaa.main;
 
 
@@ -11,13 +29,14 @@ import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 import org.sqlite.SQLiteDataSource;
 import org.sqlite.SQLiteConfig;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 
 /**
@@ -1126,6 +1145,73 @@ public class SessionData
         }
 
     }
+
+
+    /**
+     * Handle Session Export
+     */
+    public class Export {
+
+        // destination directory for exported files
+        File destinationPath;
+        // single filename for summary codes export
+        File summaryFilePath;
+
+
+        /**
+         * @param destPath
+         */
+        Export(File destPath, File summaryFilePath) {
+            // set dest path to user specified
+            this.destinationPath = destPath;
+            this.summaryFilePath = summaryFilePath;
+        }
+
+
+        /**
+         * Export code list very similar to old CASAA file format
+         * @throws IOException
+         */
+        public void writeCodeList() throws IOException {
+
+            String outFilePath = this.destinationPath + File.separator + "exported_codelist_" + sessionFile.getName().replace(".casaa", ".txt");
+
+            try(FileWriter fileWriter = new FileWriter(new File( outFilePath ), false);
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                PrintWriter printWriter = new PrintWriter(bufferedWriter)) {
+                utteranceList.values().forEach(utterance -> printWriter.println(utterance.displayCoded()));
+            }
+        }
+
+
+        /**
+         * Export summary scores for session
+         * @throws SQLException
+         * @throws IOException
+         */
+        public void appendSummary() throws SQLException, IOException {
+            try(FileWriter fileWriter = new FileWriter(this.summaryFilePath, true);
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                PrintWriter printWriter = new PrintWriter(bufferedWriter))
+            {
+
+                // include header on null length files only
+                if( summaryFilePath.length() == 0 ){
+                    getCodeSummaryMap().keySet().forEach(key -> printWriter.print(key + ","));
+                    printWriter.println("");
+                }
+
+                // write out summary values
+                getCodeSummaryMap().entrySet().forEach(entry -> printWriter.print(entry.getValue() + ","));
+                printWriter.println("");
+            }
+
+
+        }
+
+    }
+
+
 
 
     /**

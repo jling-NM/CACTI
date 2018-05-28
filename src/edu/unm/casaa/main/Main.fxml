@@ -11,6 +11,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -30,6 +31,12 @@
               <MenuItem fx:id="mniLoadCasaa" accelerator="Shortcut+C" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.file.load.casaa" />
                   <MenuItem fx:id="mniLoadConfig" mnemonicParsing="false" onAction="#mniLoadConfig" text="%menu.title.file.load.config" />
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="mniExport" mnemonicParsing="false" onAction="#mniExport" text="Export">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem fx:id="mniExit" accelerator="Shortcut+Q" onAction="#mniActExit" text="%menu.title.file.exit" />
           </items>
         </Menu>
@@ -37,7 +44,7 @@
           <items>
             <MenuItem fx:id="mniSessionStart" accelerator="Shortcut+S" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.session.start" />
             <MenuItem fx:id="mniSessionResume" accelerator="Shortcut+R" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.session.resume" />
-              <MenuItem fx:id="mniReportView" disable="true" accelerator="Shortcut+P" mnemonicParsing="false" onAction="#reportView" text="%menu.title.session.report" />
+              <MenuItem fx:id="mniReportView" accelerator="Shortcut+P" disable="true" mnemonicParsing="false" onAction="#reportView" text="%menu.title.session.report" />
           </items>
         </Menu>
         <Menu fx:id="mnuCoding" disable="true" text="%menu.title.codingview">

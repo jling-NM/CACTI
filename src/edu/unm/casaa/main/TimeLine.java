@@ -46,7 +46,7 @@ import java.sql.SQLException;
  */
 public class TimeLine extends Group {
 
-    private int pixelsPerSecond	          = 50;     // sort of a framerate for the animation
+    private int pixelsPerSecond	           = 50;     // sort of a framerate for the animation
     private TranslateTransition animation = null;   // animation for moving timeline
     private TimeLineMarker selectedMarker = null;   // store currently selected marker, if any
     private SessionData.UtteranceList utteranceList   = null;   //
@@ -237,7 +237,6 @@ public class TimeLine extends Group {
             }
 
         }
-
         return newUtterance.getID();
 
     }
