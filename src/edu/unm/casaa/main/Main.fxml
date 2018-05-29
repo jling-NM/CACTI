@@ -31,11 +31,7 @@
               <MenuItem fx:id="mniLoadCasaa" accelerator="Shortcut+C" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.file.load.casaa" />
                   <MenuItem fx:id="mniLoadConfig" mnemonicParsing="false" onAction="#mniLoadConfig" text="%menu.title.file.load.config" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="mniExport" mnemonicParsing="false" onAction="#mniExport" text="Export">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator>
-                  </MenuItem>
+                  <MenuItem fx:id="mniExport" accelerator="Shortcut+E" mnemonicParsing="false" onAction="#mniExport" text="Export" />
                   <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem fx:id="mniExit" accelerator="Shortcut+Q" onAction="#mniActExit" text="%menu.title.file.exit" />
           </items>
