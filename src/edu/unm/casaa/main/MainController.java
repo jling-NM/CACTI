@@ -300,7 +300,9 @@ public class MainController {
     private void initialize() {
         // Use OS X standard menus no Java window menus
         if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
-            menuBar.setUseSystemMenuBar(true);
+            if( menuBar != null ) {
+                menuBar.setUseSystemMenuBar(true);
+            }
         }
     }
 
@@ -1834,6 +1836,10 @@ public class MainController {
                 } else {
                     ourTown.setHeight(windH);
                 }
+
+                // push out to expand window otherwise window may only stay in playback sizes
+                // TODO: this doesn't reclaim user-saved window size. FIX.
+                ourTown.sizeToScene();
 
                 break;
 
