@@ -33,7 +33,7 @@ public class Main extends Application {
 
 
     @Override
-    public void init() throws Exception {
+    public void init() {
 
         // get requirements
         String javaVersionStr = System.getProperty("java.specification.version","UNKNOWN");
@@ -107,7 +107,7 @@ public class Main extends Application {
 
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
 
         // save user appPrefs for position and size of main window
         appPrefs.putDouble("main.wind.x",mainStage.getX());

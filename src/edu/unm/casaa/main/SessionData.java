@@ -24,7 +24,6 @@ import edu.unm.casaa.misc.MiscCode;
 import edu.unm.casaa.misc.MiscDataItem;
 import edu.unm.casaa.utterance.Utterance;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 import org.sqlite.SQLiteDataSource;
@@ -33,10 +32,7 @@ import org.sqlite.SQLiteConfig;
 import java.io.*;
 import java.nio.file.Files;
 import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Date;
 
 
 /**
@@ -124,7 +120,6 @@ public class SessionData
             if( isSQLiteDataFile() ) {
                 // try loading file
                 try {
-                    // TODO: this take a long time. WHY?
                     audioFilePath = getAttribute(SessionAttributes.AUDIO_FILE_PATH);
                     utteranceList = new SessionData.UtteranceList();
                     ratingsList = new SessionData.Ratings();
@@ -746,7 +741,10 @@ public class SessionData
             // apply changes
             connection.commit();
 
-            // TODO: temp
+
+            /*
+            Provides an accounting of utterances for debugging
+
             System.out.println("--- Remaining Utterances:");
             ResultSet rs = statement.executeQuery("select utterances.*, codes.code_name, codes.speaker_id from utterances inner join codes on utterances.code_id = codes.code_id order by utterances.time_marker");
 
@@ -756,6 +754,7 @@ public class SessionData
                 String codeName = rs.getString("code_name");
                 System.out.println(String.format("%s - %s - %s", utt_id, startTime, codeName));
             }
+             */
 
         }
     }
@@ -772,9 +771,11 @@ public class SessionData
     private void addUtterance(String utterance_id, int code_id, String time_marker, String annotation) throws SQLException
     {
 
-        // TODO: temp
+        /*
+        utterance accounting
+
         System.out.println( String.format("--- Add utterance: %s - %s - %s", utterance_id, time_marker, annotation) );
-        // TODO: temp
+         */
 
         String sql = "insert into utterances (utterance_id, code_id, time_marker, annotation) values (?,?,?,?)";
 
@@ -838,7 +839,7 @@ public class SessionData
         String sql = "update ratings set response_value = ? where rating_id = ?";
 
         try ( Connection connection = ds.getConnection();
-              PreparedStatement ps = connection.prepareStatement(sql);
+              PreparedStatement ps = connection.prepareStatement(sql)
         )
         {
             ps.setInt(1, response_value);
@@ -1228,11 +1229,7 @@ public class SessionData
         public static String getAudioFilename( File casaaFileTextFormat ) throws IOException {
 
             Scanner in;
-            try {
-                in = new Scanner(casaaFileTextFormat);
-            } catch (FileNotFoundException e) {
-                throw e;
-            }
+            in = new Scanner(casaaFileTextFormat);
 
             if( !in.hasNext() ){
                 throw new IOException("No Audio File Listed in casaa file");

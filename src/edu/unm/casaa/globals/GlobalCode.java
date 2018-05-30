@@ -27,7 +27,7 @@ public class GlobalCode {
 
 
     // List of available codes. Built when we parse XML file.
-    private static Vector< GlobalCode > list             = new Vector< GlobalCode >();
+    private static Vector< GlobalCode > list             = new Vector<>();
 
     public int                          id               = 0;
     public String                       name;                                         // Name for use in file. Ex: "ACCEPTANCE".
@@ -80,10 +80,8 @@ public class GlobalCode {
     // PRE: code exists with given id.
     public static GlobalCode codeWithId( int value ) {
         // Check user codes.
-        for( int i = 0; i < list.size(); i++ ) {
-            GlobalCode code = list.get( i );
-
-            if( code.id == value ) {
+        for (GlobalCode code : list) {
+            if (code.id == value) {
                 return code;
             }
         }
@@ -129,4 +127,4 @@ public class GlobalCode {
     public String toString() {
         return this.name;
     }
-};
+}

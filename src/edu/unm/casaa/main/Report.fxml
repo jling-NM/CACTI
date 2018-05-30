@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
 
-<VBox style="-fx-background-color: transparent;" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox style="-fx-background-color: transparent;" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>

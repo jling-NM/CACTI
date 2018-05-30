@@ -7,7 +7,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
 
-<DialogPane fx:id="dlgEditor" expanded="true" prefWidth="240.0" styleClass="modal-dialog-glass" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<DialogPane fx:id="dlgEditor" expanded="true" prefWidth="240.0" styleClass="modal-dialog-glass" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.unm.casaa.main.MainController">
    <content>
       <VBox fx:id="dlgVbox" styleClass="modal-dialog-content">
          <children>

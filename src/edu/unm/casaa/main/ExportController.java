@@ -89,7 +89,7 @@ public class ExportController {
 
     /**
      * Handle Dnd for destination directory
-     * @param e
+     * @param e DragEvent
      */
     @FXML
     private void dstDragDropped(final DragEvent e) {
@@ -120,6 +120,7 @@ public class ExportController {
     private void dstDragExited(final DragEvent e) {
         dstFilePathName.setStyle("-fx-border-color: #C6C6C6;");
     }
+
 
     /**
      * GUI feedback for DnD

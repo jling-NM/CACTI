@@ -56,8 +56,6 @@ public class UserConfig {
             writer.println("<globalControls panel=\"right\"><slider global=\"COLLABORATION\"/></globalControls>");
             writer.println("</userConfiguration>");
 
-        } catch (IOException e) {
-            throw e;
         }
     }
 

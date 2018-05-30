@@ -32,21 +32,11 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.*;
-import javafx.geometry.Insets;
 import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -321,6 +311,9 @@ public class MainController {
             mediaPlayer.pause();
         } else if (mediaPlayer.getStatus() != MediaPlayer.Status.UNKNOWN && mediaPlayer.getStatus() != MediaPlayer.Status.DISPOSED) {
             mediaPlayer.play();
+//            Platform.runLater(() -> {
+//                mediaPlayer.play();
+//            });
         }
     }
 
@@ -801,7 +794,7 @@ public class MainController {
 
 
     /**
-     *
+     * Display Export controller
      */
     public void mniExport() {
 
@@ -815,9 +808,7 @@ public class MainController {
 
         /* open editor */
         Dialog<ButtonType> dlgExport = new Dialog<>();
-        FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource("Export.fxml"));
-        // set loader so i have access to instance variables
-        //dialogLoader.setController("ExportController");
+        FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource("Export.fxml"), resourceStrings);
         try {
             dlgExport.setDialogPane(dialogLoader.load());
         } catch (IOException e) {
@@ -826,7 +817,7 @@ public class MainController {
 
         dlgExport.setTitle("Export");
         Stage dlgStage = (Stage) dlgExport.getDialogPane().getScene().getWindow();
-        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_32x32.png")));
         dlgExport.initModality(Modality.APPLICATION_MODAL);
 
         Optional<ButtonType> result = dlgExport.showAndWait();
@@ -834,6 +825,7 @@ public class MainController {
 
         }
     }
+
 
 
     /**
@@ -870,7 +862,7 @@ public class MainController {
 
             //report.setTitle(resourceStrings.getString("txt.about.title"));
             report.setTitle("Therapist Feedback");
-            report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+            report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_32x32.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
 
@@ -1141,7 +1133,7 @@ public class MainController {
          */
         PrinterJob job = PrinterJob.createPrinterJob();
         if( job == null ){
-            this.showError("Printing", "No printer configured.");
+            showError("Printing", "No printer configured.");
         }
         else if (job != null && job.showPrintDialog(null)){
 
@@ -1738,10 +1730,9 @@ public class MainController {
                 // display controls needed for coding
                 setPlayerButtonState();
 
-                // resize window
+                // resize window. Since playback is smaller we first size window to controls, then set width to user prefs or a minimum
                 ourTown.sizeToScene();
-                double windW = appPrefs.getDouble("main.wind.w", 800.0);
-                ourTown.setWidth(windW);
+                ourTown.setWidth(appPrefs.getDouble("main.wind.w", 800.0));
 
                 break;
 
@@ -1760,7 +1751,7 @@ public class MainController {
                     showError("Error", ex.toString());
                 }
 
-                // TODO: verify best place for this
+                // The coding menu and report menuitem are disabled by default. Make them active in the coding state.
                 mnuCoding.setDisable(false);
                 mniReportView.setDisable(false);
 
@@ -1810,7 +1801,6 @@ public class MainController {
                 // update the utterance data(previous/current) displayed in the gui
                 updateUtteranceDisplays();
 
-
                 /*
                     initialize new timeline
                     assumes mediaplayer time position is already set
@@ -1826,20 +1816,9 @@ public class MainController {
                 // force last marker
                 gotoLastMarker();
 
-                // resize app window
-                windW = appPrefs.getDouble("main.wind.w", 800.0);
-                ourTown.setWidth(windW);
-                // enforce 600 min height for coding window
-                double windH = appPrefs.getDouble("main.wind.h", 600.0);
-                if( windH < 600.0) {
-                    ourTown.setHeight(600.0);
-                } else {
-                    ourTown.setHeight(windH);
-                }
-
-                // push out to expand window otherwise window may only stay in playback sizes
-                // TODO: this doesn't reclaim user-saved window size. FIX.
-                ourTown.sizeToScene();
+                // resize app window to user preferences or a minimum if no preferences available
+                ourTown.setWidth(appPrefs.getDouble("main.wind.w", 800.0));
+                ourTown.setHeight(appPrefs.getDouble("main.wind.h", 600.0));
 
                 break;
 
@@ -1885,18 +1864,9 @@ public class MainController {
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
 
-                /*
-                // resize app window
-                windW = appPrefs.getDouble("main.wind.w", 800.0);
-                ourTown.setWidth(windW);
-                // enforce 600 min height for coding window
-                windH = appPrefs.getDouble("main.wind.h", 600.0);
-                if( windH < 600.0) {
-                    ourTown.setHeight(600.0);
-                } else {
-                    ourTown.setHeight(windH);
-                }
-                */
+                // resize app window to user preferences or a minimum if no preferences available
+                ourTown.setWidth(appPrefs.getDouble("main.wind.w", 800.0));
+                ourTown.setHeight(appPrefs.getDouble("main.wind.h", 600.0));
 
                 break;
 
@@ -1940,17 +1910,6 @@ public class MainController {
                 // update control state
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
-
-                // resize app window
-                windW = appPrefs.getDouble("main.wind.w", 800.0);
-                ourTown.setWidth(windW);
-                // enforce 600 min height for coding window
-                windH = appPrefs.getDouble("main.wind.h", 600.0);
-                if( windH < 600.0) {
-                    ourTown.setHeight(600.0);
-                } else {
-                    ourTown.setHeight(windH);
-                }
 
                 break;
 
@@ -2022,7 +1981,6 @@ public class MainController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
-        //alert.initStyle(StageStyle.UTILITY); // what was this for? With this, the ESC and ENTER keys don't work. //TODO: check on other OS
         alert.showAndWait();
     }
 

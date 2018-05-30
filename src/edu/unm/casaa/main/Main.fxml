@@ -21,7 +21,7 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.unm.casaa.main.MainController">
+<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.unm.casaa.main.MainController">
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>
