@@ -326,6 +326,7 @@ public class TimeLine extends Group {
             return annotationToolTip.getText();
         }
 
+        // TODO: move this if we still want it
         public void setAnnotationToolTipText(String annotationToolTipText) {
             this.annotationToolTip.setText(annotationToolTipText);
         }
@@ -341,7 +342,6 @@ public class TimeLine extends Group {
             this.markerID = utterance.toString();
             this.posSeconds = utterance.getStartTime().toSeconds();
             this.speaker = utterance.getMiscCode().getSpeaker();
-            // TODO: see above
             this.annotationToolTip = new Tooltip(utterance.getAnnotation());
 
             // where does marker point on timeline
@@ -367,14 +367,12 @@ public class TimeLine extends Group {
             codeBubble.getChildren().addAll(codeBubbleOutline, markerCode);
             codeBubble.autosize();
 
-            // add tooltip to codeBubble
-            if( !utterance.getAnnotation().isEmpty() ) {
-                //this.annotationToolTip = new Tooltip(utterance.getAnnotation());
-                annotationToolTip.setWrapText(true);
-                annotationToolTip.setTextOverrun(OverrunStyle.ELLIPSIS);
-                annotationToolTip.setMaxWidth(300.0);
-                Tooltip.install(codeBubble, annotationToolTip);
-            }
+            // add tooltip to codeBubble. Consequence of adding here is that empty string pop-up. Maybe that is ok.
+            annotationToolTip.setWrapText(true);
+            annotationToolTip.setTextOverrun(OverrunStyle.ELLIPSIS);
+            annotationToolTip.setMaxWidth(300.0);
+            Tooltip.install(codeBubble, annotationToolTip);
+
 
             // formatting of marker varies on speaker (above/below timeline)
             if( speaker.equals(MiscCode.Speaker.Therapist) ) {
