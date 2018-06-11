@@ -1161,14 +1161,19 @@ public class MainController {
     private void openUtteranceEditor(PropertyChangeEvent pcEvt) {
         if( pcEvt.getNewValue() != null ) {
 
+            // TODO: clean up and comment Main.css !
+
+            // TODO: rating ids are bypassing data model for utterance MiscDataItem.
             /* get data */
             String utterance_id = pcEvt.getNewValue().toString();
-            String existingAnnotation = "";
+
+            // get utterance from utterance map
+            Utterance utterance = sessionData.utteranceList.get(utterance_id);
 
             /* linked globals list */
             ArrayList<Integer> selectedRatingIDs = null;
             try {
-                existingAnnotation = sessionData.getUtteranceAnnotationText(utterance_id);
+                // get the rating ids separately for this utterance
                 selectedRatingIDs = sessionData.getUtteranceRatingIDs(utterance_id);
             } catch ( SQLException e) {
                 showError("Error Annotation", e.getMessage());
@@ -1193,7 +1198,7 @@ public class MainController {
             scene.setFill(Color.TRANSPARENT);
 
             /* position popup window using marker location */
-            Node markerNode = timeLine.lookup("#"+utterance_id);
+            TimeLine.TimeLineMarker markerNode = timeLine.getTimeLineMarker(utterance_id);
             Point2D markerNodePoint = markerNode.localToScreen(new Point2D(markerNode.getLayoutBounds().getMaxX(), markerNode.getLayoutBounds().getMinY()));
 
             /* check that pop-up doesn't go offscreen */
@@ -1240,9 +1245,9 @@ public class MainController {
                     for (Node nodeIn : vb.getChildren()) {
                         if (nodeIn instanceof TextArea) {
                             extTa = (TextArea) nodeIn;
-                            extTa.setText(existingAnnotation);
+                            extTa.setText(utterance.getAnnotation());
                             extTa.requestFocus();
-                            extTa.positionCaret(existingAnnotation.length());
+                            extTa.positionCaret(utterance.getAnnotation().length());
                         }
                     }
                     /* secondarily, add list view to VBox container */
@@ -1262,17 +1267,16 @@ public class MainController {
 
                 /* save utterance annotation */
                 try {
+                    // update utterance
                     sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
+                    // update tooltip for immediate gratification
+                    // TODO: get this immediate popup to work somehow in case where user ctrl-clicks. Other cases work.
+                    markerNode.setAnnotationToolTipText(extTa.getText());
+                    //timeLine.getSelectedMarker().setAnnotationToolTipText(extTa.getText());
                 } catch (SQLException e) {
                     showError("Error Annotating Utterance", e.getMessage());
                 }
             }
-
-
-//            TimeLine.TimeLineMarker timeLineMarker = (TimeLine.TimeLineMarker) timeLine.lookup("#"+utterance_id);
-//            timeLineMarker.getIndicatorShape().setStyle("-fx-background-color:blue;");
-//            TimeLine.TimeLineMarker ick = (TimeLine.TimeLineMarker) timeLine.getChildren().get(timeLine.getChildren().indexOf(timeLineMarker));
-//            ick.getIndicatorShape().setFill(Color.AQUA);
 
             /*
                 whether edited or not, remove active marker now
@@ -1280,6 +1284,8 @@ public class MainController {
                 but the timeline only has a map which only has add/remove events.
              */
             timeLine.setSelectedMarker(null);
+            // make sure the marker is no longer selected on timeline
+            markerNode.selected(false);
         }
     }
 
@@ -1484,7 +1490,16 @@ public class MainController {
         if (mediaFile != null) {
             try {
                 final Media media = new Media(mediaFile.toURI().toString());
+                // TODO: is this starting multiple threads that never get cleaned up?
                 mediaPlayer = new MediaPlayer(media);
+                //System.gc();
+
+//                if( mediaPlayer == null ) {
+//                    mediaPlayer = new MediaPlayer(media);
+//                } else {
+//                    mediaPlayer = null;
+//                    mediaPlayer = new MediaPlayer(media);
+//                }
 
                 /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(onReadyMethod);
@@ -1594,7 +1609,8 @@ public class MainController {
          */
         double center = vbApp.getScene().getWidth()/2;
         // time position line
-        Line l = new Line(0,0,0,28.0);
+        Line l = new Line(0,0,0,65.0);
+        l.setStroke(Color.rgb(255,0,0,1.0));
         l.setStrokeWidth(0.5);
         l.setTranslateX(center + l.getStrokeWidth());
 

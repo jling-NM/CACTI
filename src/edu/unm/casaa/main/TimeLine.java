@@ -27,12 +27,14 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
+import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
@@ -46,12 +48,12 @@ import java.sql.SQLException;
  */
 public class TimeLine extends Group {
 
-    private int pixelsPerSecond	           = 50;     // sort of a framerate for the animation
-    private TranslateTransition animation = null;   // animation for moving timeline
-    private TimeLineMarker selectedMarker = null;   // store currently selected marker, if any
-    private SessionData.UtteranceList utteranceList   = null;   //
-    private double height                 = 55.0;   // projected height of timeline. forces Group dimensions early
-    private double thickness              = 2.0;    // thickness of line that represents time :)
+    private int pixelsPerSecond	                     = 50;     // sort of a framerate for the animation
+    private TranslateTransition animation           = null;   // animation for moving timeline
+    private TimeLineMarker selectedMarker           = null;   // store currently selected marker, if any
+    private SessionData.UtteranceList utteranceList = null;   //
+    private double height                           = 55.0;   // projected height of timeline. forces Group dimensions early
+    private double thickness                        = 2.0;    // thickness of line that represents time :)
 
 
     /*
@@ -126,6 +128,7 @@ public class TimeLine extends Group {
          */
         double end = audioDuration.toSeconds() * pixelsPerSecond;
         Line h = new Line(0,0,end,0);
+        h.setStroke(Color.rgb(255,0,0,1.0));
         h.setStrokeWidth(thickness);
         h.setTranslateY( (height/2.0) + (thickness/2.0) );
         this.getChildren().add(h);
@@ -179,7 +182,8 @@ public class TimeLine extends Group {
      */
     public void addMarker(Utterance newUtterance) {
         // insert updated marker
-        TimeLineMarker newMarker = new TimeLineMarker(newUtterance.toString(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker());
+        //TimeLineMarker newMarker = new TimeLineMarker(newUtterance.toString(), newUtterance.getMiscCode().name, newUtterance.getStartTime().toSeconds(), newUtterance.getMiscCode().getSpeaker());
+        TimeLineMarker newMarker = new TimeLineMarker(newUtterance);
         this.getChildren().add(newMarker);
     }
 
@@ -229,13 +233,11 @@ public class TimeLine extends Group {
                  * sync timeline with player time to marker appears lined up.
                  * Do this only for new markers not edited above here
                  */
-                // TODO: check if this is still the best thing to do even after threading timeline
                 this.getAnimation().jumpTo(newUtterance.getStartTime());
 
                 // new utterance in storage
                 utteranceList.add(newUtterance);
             }
-
         }
         return newUtterance.getID();
 
@@ -296,6 +298,13 @@ public class TimeLine extends Group {
     }
 
 
+    /**
+     * @param utterance_id
+     * @return
+     */
+    public TimeLineMarker getTimeLineMarker(String utterance_id) {
+        return (TimeLine.TimeLineMarker) this.lookup("#"+utterance_id);
+    }
 
 
     /**
@@ -309,54 +318,81 @@ public class TimeLine extends Group {
         private MiscCode.Speaker speaker;   //
         private Text markerCode;            // displays utterance code for this marker
         private Polygon indicatorShape;     // displays arrow on timeline
-        private int indicatorWidth = 12;    // size of arrow
+        private int indicatorWidth = 4;     // size of arrow
+        // TODO: i need this only if i want to immediately update tooltip after editing annotation
+        private Tooltip annotationToolTip;
 
+        public String getAnnotationToolTipText() {
+            return annotationToolTip.getText();
+        }
+
+        public void setAnnotationToolTipText(String annotationToolTipText) {
+            this.annotationToolTip.setText(annotationToolTipText);
+        }
 
         /**
-         * An indicator rendered on the timeline
-         * @param markerID Node id
-         * @param code The code to label the marker
-         * @param posSeconds Position on timeline
-         * @param speaker Which speaker is being marked
+         * An indicator rendered on the timeline to represent an utterance
+         * @param utterance
          */
-        public TimeLineMarker(String markerID, String code, double posSeconds, MiscCode.Speaker speaker) {
+        public TimeLineMarker(Utterance utterance) {
 
             // Set spacing between nodes inside marker. specify spacing as CSS doesn't appear to work for this
-            this.setSpacing(1.0);
-            this.markerID = markerID;
-            this.posSeconds = posSeconds;
-            this.speaker = speaker;
+            this.setSpacing(0.0);
+            this.markerID = utterance.toString();
+            this.posSeconds = utterance.getStartTime().toSeconds();
+            this.speaker = utterance.getMiscCode().getSpeaker();
+            // TODO: see above
+            this.annotationToolTip = new Tooltip(utterance.getAnnotation());
 
             // where does marker point on timeline
             double tipPos = (posSeconds * pixelsPerSecond);
 
             // initialize utterance code
-            markerCode = new Text(code);
+            markerCode = new Text(utterance.getMiscCode().name);
             markerCode.setTextAlignment(TextAlignment.CENTER);
             double markerCodeWidth = markerCode.getBoundsInLocal().getWidth();
+            double markerCodeHeight = markerCode.getBoundsInLocal().getHeight();
+
+            // stack code and surrounding bubble
+            StackPane codeBubble = new StackPane();
+            // bubble outline
+            Rectangle codeBubbleOutline = new Rectangle( (markerCodeWidth + 4.0), (markerCodeHeight));
+            codeBubbleOutline.setArcHeight(5.0);
+            codeBubbleOutline.setArcWidth(5.0);
+            codeBubbleOutline.setFill(Color.WHITE);
+            codeBubbleOutline.setStroke(Color.GRAY);
+            codeBubbleOutline.setStrokeLineCap(StrokeLineCap.ROUND);
+            codeBubbleOutline.setStrokeLineJoin(StrokeLineJoin.ROUND);
+            codeBubbleOutline.setStrokeType(StrokeType.OUTSIDE);
+            codeBubble.getChildren().addAll(codeBubbleOutline, markerCode);
+            codeBubble.autosize();
+
+            // add tooltip to codeBubble
+            if( !utterance.getAnnotation().isEmpty() ) {
+                //this.annotationToolTip = new Tooltip(utterance.getAnnotation());
+                annotationToolTip.setWrapText(true);
+                annotationToolTip.setTextOverrun(OverrunStyle.ELLIPSIS);
+                annotationToolTip.setMaxWidth(300.0);
+                Tooltip.install(codeBubble, annotationToolTip);
+            }
 
             // formatting of marker varies on speaker (above/below timeline)
             if( speaker.equals(MiscCode.Speaker.Therapist) ) {
-                this.indicatorShape = new Polygon(0,-indicatorWidth, indicatorWidth,0, indicatorWidth*2,-indicatorWidth);
-                this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
-                markerCode.getStyleClass().add("unselectedMarkerTextSpeaker1");
-                this.getChildren().addAll(markerCode, indicatorShape);
-                this.setTranslateY(-1.0);
+                // tick mark between code bubble and timeline
+                this.indicatorShape = new Polygon(0,-indicatorWidth, indicatorWidth, 0, indicatorWidth*2,-indicatorWidth);
+                // add code bubble and indicator to create marker
+                this.getChildren().addAll(codeBubble,indicatorShape);
+                // vertical placement on timeline
+                this.setTranslateY(5.5);
             } else {
                 // speaker 2
                 this.indicatorShape = new Polygon(0,indicatorWidth, indicatorWidth,0, indicatorWidth*2,indicatorWidth);
-                this.indicatorShape.getStyleClass().add("unselectedMarkerShape");
-                markerCode.getStyleClass().add("unselectedMarkerTextSpeaker2");
-                this.getChildren().addAll(indicatorShape, markerCode);
+                this.getChildren().addAll(indicatorShape, codeBubble);
                 this.setTranslateY( (height/2.0)+thickness );
             }
 
-            // place on timeline
-            if( markerCodeWidth > this.indicatorShape.getBoundsInLocal().getWidth()) {
-                this.setTranslateX(tipPos - markerCode.getBoundsInParent().getWidth()/2.4);
-            } else {
-                this.setTranslateX(tipPos - indicatorWidth - 0.5);
-            }
+            // horizontal placement on timeline
+            this.setTranslateX(tipPos - codeBubbleOutline.getBoundsInParent().getWidth()/2.0);
             this.setAlignment(Pos.CENTER);
 
 
@@ -384,7 +420,8 @@ public class TimeLine extends Group {
                          * selected marker clicked again. If left-click, delect this marker, if right-click, don't.
                          */
                         if( e.getButton().equals(MouseButton.PRIMARY)) {
-                            timeLineMarker.getIndicatorShape().setFill(Color.TRANSPARENT);
+                            //timeLineMarker.getIndicatorShape().setFill(Color.BLACK);
+                            timeLineMarker.selected(false);
                             setSelectedMarker(null);
                         }
                     } else {
@@ -392,11 +429,13 @@ public class TimeLine extends Group {
                          * different marker selected, deselect any previous and select this one regardless of mouse button
                          */
                         if( getSelectedMarker() != null ) {
-                            getSelectedMarker().getIndicatorShape().setFill(Color.TRANSPARENT);
+                            //getSelectedMarker().getIndicatorShape().setFill(Color.BLACK);
+                            getSelectedMarker().selected(false);
                         }
 
                         // SELECT
-                        timeLineMarker.getIndicatorShape().setFill(Color.INDIANRED);
+                        //timeLineMarker.getIndicatorShape().setFill(Color.INDIANRED);
+                        timeLineMarker.selected(true);
                         // set active
                         setSelectedMarker(timeLineMarker);
                     }
@@ -481,6 +520,10 @@ public class TimeLine extends Group {
 
         public void setSpeaker(MiscCode.Speaker newSpeaker) { this.speaker = newSpeaker; }
 
+        public void selected(boolean b) {
+            this.getIndicatorShape().setFill(b ? Color.INDIANRED : Color.BLACK);
+        }
     }
+
 
 }

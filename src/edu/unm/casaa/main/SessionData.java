@@ -268,9 +268,12 @@ public class SessionData
                 int codeId = rs.getInt("code_id");
                 String codeName = rs.getString("code_name");
                 int speakerId = rs.getInt("speaker_id");
+                String annotationText = rs.getString("annotation");
+
                 MiscCode code = new MiscCode(codeId, codeName, MiscCode.Speaker.values()[speakerId]);
                 MiscDataItem item = new MiscDataItem(Utils.formatID(startTime, codeId), startTime);
                 item.setMiscCode(code);
+                item.setAnnotation(annotationText);
 
                 utteranceTreeMap.put(utterance_id, item);
             }
@@ -684,14 +687,18 @@ public class SessionData
             /* disable autocommit */
             connection.setAutoCommit(false);
 
-            System.out.println("--- annotateUtterance: Update annotation string:"+utterance_id);
+            // TODO: update the map instance here automatically?
+            // there is probably a better design pattern for doing this where when the instance gets updated the persistence is updated
+            this.utteranceList.get(utterance_id).setAnnotation(annotationText);
+
+            //System.out.println("--- annotateUtterance: Update annotation string:"+utterance_id);
             /* handle annotation text */
             psU.setString(1, annotationText);
             psU.setString(2, utterance_id);
             psU.executeUpdate();
 
             /* clear all utterance to rating links */
-            System.out.println("--- annotateUtterance: Clear rating links:"+utterance_id);
+            //System.out.println("--- annotateUtterance: Clear rating links:"+utterance_id);
             statement.execute("delete from utterances_ratings where utterance_id = '"+ utterance_id + "'");
 
             /* add selected utterance to rating links */
@@ -700,10 +707,10 @@ public class SessionData
                 psI.setInt(2, gc.id);
                 psI.addBatch();
             }
-            System.out.println("--- annotateUtterance: Insert rating links:"+utterance_id);
+            //System.out.println("--- annotateUtterance: Insert rating links:"+utterance_id);
             psI.executeBatch();
 
-            System.out.println("--- annotateUtterance: commit:"+utterance_id);
+            //System.out.println("--- annotateUtterance: commit:"+utterance_id);
             // apply changes
             connection.commit();
         }

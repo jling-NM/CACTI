@@ -12,7 +12,7 @@
       <VBox fx:id="dlgVbox" styleClass="modal-dialog-content">
          <children>
             <Label fx:id="dlgLblAnnotation" text="Annotation:" />
-            <TextArea fx:id="dlgAnnotation" prefHeight="70.0" prefWidth="304.0" />
+            <TextArea fx:id="dlgAnnotation" prefHeight="70.0" prefWidth="304.0" wrapText="true" />
             <Label fx:id="dlgLblRatings" text="Associated Global Ratings:">
                <padding>
                   <Insets top="8.0" />
