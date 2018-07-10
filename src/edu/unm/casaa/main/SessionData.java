@@ -725,9 +725,7 @@ public class SessionData
      */
     private void removeUtterance(String utterance_id) throws SQLException
     {
-
-        System.out.println("--- Remove utterance:" + utterance_id);
-
+        //System.out.println("--- Remove utterance:" + utterance_id);
         try ( Connection connection = ds.getConnection();
               PreparedStatement ps1 = connection.prepareStatement("delete from utterances_ratings where utterance_id = ?");
               PreparedStatement ps2 = connection.prepareStatement("delete from utterances where utterance_id = ?");

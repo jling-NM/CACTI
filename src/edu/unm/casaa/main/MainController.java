@@ -2144,16 +2144,11 @@ public class MainController {
      * @param utr Utterance instance to be removed
      */
     private synchronized void removeUtterance(Utterance utr){
-        System.out.println("--- Controller removeUtterance:" + utr.displayCoded());
-
+        //System.out.println("--- Controller removeUtterance:" + utr.displayCoded());
         try {
             sessionData.utteranceList.remove(utr);
         } catch (SQLException e) {
-            //showError("Error writing casaa file", e.getMessage());
-            System.out.println("line: 2131");
-            System.out.println(e.getMessage());
-            System.out.println(e.getErrorCode());
-            System.out.println(e.getSQLState());
+            showError("Error writing casaa file", e.getMessage());
         }
         // refresh last utterance display
         updateUtteranceDisplays();

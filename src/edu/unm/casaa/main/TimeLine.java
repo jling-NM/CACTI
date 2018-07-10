@@ -314,22 +314,38 @@ public class TimeLine extends Group {
     public class TimeLineMarker extends VBox {
 
         private String markerID;            // how to find record in data
-        private double posSeconds;          // start positon in bytes
+        private double posSeconds;          // start position in bytes
         private MiscCode.Speaker speaker;   //
         private Text markerCode;            // displays utterance code for this marker
         private Polygon indicatorShape;     // displays arrow on timeline
         private int indicatorWidth = 4;     // size of arrow
         // TODO: i need this only if i want to immediately update tooltip after editing annotation
         private Tooltip annotationToolTip;
+        private StackPane codeBubble;
+
+
 
         public String getAnnotationToolTipText() {
             return annotationToolTip.getText();
         }
 
-        // TODO: move this if we still want it
+        /**
+         * Provide access for tooltip text so that changes in annotation text are immediately reflected in the
+         * mouseover popup. Use this setter to avoid empty tooltip popups.
+         * @param annotationToolTipText
+         */
         public void setAnnotationToolTipText(String annotationToolTipText) {
+
+            // update the tooltip text
             this.annotationToolTip.setText(annotationToolTipText);
+            // remove any existing tooltip from marker
+            Tooltip.uninstall(codeBubble, annotationToolTip);
+            // if text is available, reinstall tooltip
+            if( !annotationToolTipText.isEmpty()) {
+                Tooltip.install(codeBubble, annotationToolTip);
+            }
         }
+
 
         /**
          * An indicator rendered on the timeline to represent an utterance
@@ -342,7 +358,6 @@ public class TimeLine extends Group {
             this.markerID = utterance.toString();
             this.posSeconds = utterance.getStartTime().toSeconds();
             this.speaker = utterance.getMiscCode().getSpeaker();
-            this.annotationToolTip = new Tooltip(utterance.getAnnotation());
 
             // where does marker point on timeline
             double tipPos = (posSeconds * pixelsPerSecond);
@@ -354,7 +369,7 @@ public class TimeLine extends Group {
             double markerCodeHeight = markerCode.getBoundsInLocal().getHeight();
 
             // stack code and surrounding bubble
-            StackPane codeBubble = new StackPane();
+            codeBubble = new StackPane();
             // bubble outline
             Rectangle codeBubbleOutline = new Rectangle( (markerCodeWidth + 4.0), (markerCodeHeight));
             codeBubbleOutline.setArcHeight(5.0);
@@ -367,12 +382,12 @@ public class TimeLine extends Group {
             codeBubble.getChildren().addAll(codeBubbleOutline, markerCode);
             codeBubble.autosize();
 
-            // add tooltip to codeBubble. Consequence of adding here is that empty string pop-up. Maybe that is ok.
+            // define tooltip for codeBubble. Assign text with setter member.
+            annotationToolTip = new Tooltip();
             annotationToolTip.setWrapText(true);
             annotationToolTip.setTextOverrun(OverrunStyle.ELLIPSIS);
             annotationToolTip.setMaxWidth(300.0);
-            Tooltip.install(codeBubble, annotationToolTip);
-
+            setAnnotationToolTipText(utterance.getAnnotation());
 
             // formatting of marker varies on speaker (above/below timeline)
             if( speaker.equals(MiscCode.Speaker.Therapist) ) {
