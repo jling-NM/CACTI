@@ -827,11 +827,31 @@ public class MainController {
     }
 
 
+    /**
+     * Display summary report of session
+     */
+    public void mniReportView() {
+
+        // this something be playing, stop it
+        if(mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+
+        if(sessionData != null) {
+            setGuiState(GuiState.REPORT);
+
+            // take care of media player
+            initializeMediaPlayer(currentAudioFile, playerReady);
+        }
+    }
+
 
     /**
      * Display summary report of session
      */
     public void reportView() {
+
+        // TODO: delete this function once all of what is needed has been added to initalizecontrols function
 
         // this something be playing, stop it
         if(mediaPlayer != null) {
@@ -1270,7 +1290,6 @@ public class MainController {
                     // update utterance
                     sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
                     // update tooltip for immediate gratification
-                    // TODO: get this immediate popup to work somehow in case where user ctrl-clicks. Other cases work.
                     markerNode.setAnnotationToolTipText(extTa.getText());
                     //timeLine.getSelectedMarker().setAnnotationToolTipText(extTa.getText());
                 } catch (SQLException e) {
@@ -1490,16 +1509,7 @@ public class MainController {
         if (mediaFile != null) {
             try {
                 final Media media = new Media(mediaFile.toURI().toString());
-                // TODO: is this starting multiple threads that never get cleaned up?
                 mediaPlayer = new MediaPlayer(media);
-                //System.gc();
-
-//                if( mediaPlayer == null ) {
-//                    mediaPlayer = new MediaPlayer(media);
-//                } else {
-//                    mediaPlayer = null;
-//                    mediaPlayer = new MediaPlayer(media);
-//                }
 
                 /* Status Handler: OnReady */
                 mediaPlayer.setOnReady(onReadyMethod);
@@ -1511,7 +1521,6 @@ public class MainController {
                 });
 
 
-                //mediaPlayer.setOnPaused(playerPaused);
                 /* Status Handler:  OnPaused */
                 mediaPlayer.setOnPaused(() -> {
                     lblTimePos.setText(Utils.formatDuration(mediaPlayer.getCurrentTime()));
@@ -1913,7 +1922,7 @@ public class MainController {
                 setPlayerButtonState();
 
                 // enable GLOBAL coding controls
-                loader = new FXMLLoader(getClass().getResource("GLOBAL_CODING.fxml"), resourceStrings);
+                loader = new FXMLLoader(getClass().getResource("Report.fxml"), resourceStrings);
                 loader.setController(this);
 
                 try {
@@ -1923,10 +1932,80 @@ public class MainController {
                 }
 
 
-                // update control state
-                // load coding buttons from userConfiguration.xml appropriate for GuiState
-                parseUserControls();
+                // global ratings section
+                ArrayList< TreeMap< String, String> > records = null;
+                String notes = null;
 
+                /* get the session summary scores and global ratings */
+                HashMap<String, Double> mapCodeSummary = null;
+                try {
+                    // get counts
+                    mapCodeSummary = sessionData.getCodeSummaryMap();
+                    records = sessionData.getGlobalUtterances();
+                    notes = sessionData.getAttribute(SessionData.SessionAttributes.GLOBAL_NOTES);
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+
+                // report label is session label
+                lblSessionID.setText(sessionData.getSessionLabel());
+
+                // global rating insert
+                String current_rating_id = "";
+                for(TreeMap< String, String>  row : records) {
+
+                    if(!row.get("rating_id").equals(current_rating_id)) {
+                        current_rating_id = row.get("rating_id");
+                        Text txtRating = new Text(String.format("\n%s [Score:%s]\n", row.get("rating_name"), row.get("rating_value")));
+                        txtRating.setUnderline(true);
+                        rptScore_global_ratings_tf.getChildren().add(txtRating);
+                    }
+
+                    // check if there are utterances to list
+                    if( row.get("time_marker") != null ) {
+                        Text txtUtterance = new Text(String.format("- %s : %s : %s\n", row.get("time_marker"), row.get("code_name"), row.get("annotation").replace("\n", "; ")));
+                        rptScore_global_ratings_tf.getChildren().add(txtUtterance);
+                    }
+                }
+
+                Text txtNotes = new Text( String.format("\n\nNotes:\n%s\n\n", notes) );
+                rptScore_global_ratings_tf.getChildren().add(txtNotes);
+
+                /* attach/format summary scores to report */
+                // integers: "%.0f"
+                // doubles: "%.2f"
+                rptScore_mico.setText(String.format("%.0f",mapCodeSummary.get("SUM_MICO")));
+                rptScore_miin.setText(String.format("%.0f",mapCodeSummary.get("SUM_MIIN")));
+                rptScore_pmic.setText(String.format("%.1f%%",mapCodeSummary.get("PCT_MIC")));
+                rptScore_r2q.setText(String.format("%.2f",mapCodeSummary.get("RATIO_R2Q")));
+                rptScore_poq.setText(String.format("%.1f%%",mapCodeSummary.get("PCT_POQ")));
+                rptScore_pcr.setText(String.format("%.1f%%",mapCodeSummary.get("PCT_PCR")));
+                rptScore_ther2cli.setText(String.format("%.2f",mapCodeSummary.get("RATIO_THER2CLI")));
+                rptScore_pct.setText(String.format("%.1f%%",mapCodeSummary.get("PCT")));
+                rptScore_adp.setText(String.format("%.0f",mapCodeSummary.get("SUM_ADP")));
+                rptScore_adw.setText(String.format("%.0f",mapCodeSummary.get("SUM_ADW")));
+                rptScore_af.setText(String.format("%.0f",mapCodeSummary.get("SUM_AF")));
+                rptScore_co.setText(String.format("%.0f",mapCodeSummary.get("SUM_CO")));
+                rptScore_di.setText(String.format("%.0f",mapCodeSummary.get("SUM_DI")));
+                rptScore_ec.setText(String.format("%.0f",mapCodeSummary.get("SUM_EC")));
+                rptScore_gi.setText(String.format("%.0f",mapCodeSummary.get("SUM_GI")));
+                rptScore_open.setText(String.format("%.0f",mapCodeSummary.get("SUM_OQ")));
+                rptScore_closed.setText(String.format("%.0f",mapCodeSummary.get("SUM_CQ")));
+                rptScore_rcp.setText(String.format("%.0f",mapCodeSummary.get("SUM_RCP")));
+                rptScore_rcw.setText(String.format("%.0f",mapCodeSummary.get("SUM_RCW")));
+                rptScore_simple.setText(String.format("%.0f",mapCodeSummary.get("SUM_SIMPLE")));
+                rptScore_complex.setText(String.format("%.0f",mapCodeSummary.get("SUM_CR")));
+                rptScore_refct.setText(String.format("%.0f",mapCodeSummary.get("SUM_REF_CT")));
+                rptScore_refst.setText(String.format("%.0f",mapCodeSummary.get("SUM_REF_ST")));
+                rptScore_st.setText(String.format("%.0f",mapCodeSummary.get("SUM_ST")));
+                rptScore_rf.setText(String.format("%.0f",mapCodeSummary.get("SUM_RF")));
+                rptScore_su.setText(String.format("%.0f",mapCodeSummary.get("SUM_SU")));
+                rptScore_wa.setText(String.format("%.0f",mapCodeSummary.get("SUM_WA")));
+                rptScore_change.setText(String.format("%.0f",mapCodeSummary.get("SUM_CHANGE")));
+                rptScore_sustain.setText(String.format("%.0f",mapCodeSummary.get("SUM_SUSTAIN")));
+
+
+                // done
                 break;
 
         }

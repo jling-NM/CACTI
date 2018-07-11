@@ -40,13 +40,13 @@
           <items>
             <MenuItem fx:id="mniSessionStart" accelerator="Shortcut+S" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.session.start" />
             <MenuItem fx:id="mniSessionResume" accelerator="Shortcut+R" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.session.resume" />
-              <MenuItem fx:id="mniReportView" accelerator="Shortcut+P" disable="true" mnemonicParsing="false" onAction="#reportView" text="%menu.title.session.report" />
+            <MenuItem fx:id="mniReportView" accelerator="Shortcut+P" disable="true" mnemonicParsing="false" onAction="#mniReportView" text="%menu.title.session.report" />
           </items>
         </Menu>
         <Menu fx:id="mnuCoding" disable="true" text="%menu.title.codingview">
           <items>
             <MenuItem fx:id="mniCoding" accelerator="Shortcut+U" mnemonicParsing="false" onAction="#mniCodingView" text="%menu.title.codingview.utterances" />
-                  <MenuItem fx:id="mniGlobalScore" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoringView" text="%menu.title.codingview.ratings" />
+            <MenuItem fx:id="mniGlobalScore" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoringView" text="%menu.title.codingview.ratings" />
           </items>
         </Menu>
             <Menu text="%menu.title.settings">
@@ -68,13 +68,13 @@
               <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="64.0" />
-                  <ColumnConstraints hgrow="ALWAYS" maxWidth="64.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="64.0" />
               </columnConstraints>
               <rowConstraints>
-                  <RowConstraints valignment="BOTTOM" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="BOTTOM" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="22.0" minHeight="22.0" prefHeight="22.0" valignment="CENTER" vgrow="NEVER" />
-                  <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="TOP" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="TOP" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" styleClass="slider" stylesheets="@Main.css" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2">
