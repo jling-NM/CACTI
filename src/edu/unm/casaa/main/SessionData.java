@@ -1185,6 +1185,9 @@ public class SessionData
             try(FileWriter fileWriter = new FileWriter(new File( outFilePath ), false);
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 PrintWriter printWriter = new PrintWriter(bufferedWriter)) {
+                // add the line that indicates the audio file
+                printWriter.println("Audio File:\t" + getAudioFilePath());
+                // finish with the code list
                 utteranceList.values().forEach(utterance -> printWriter.println(utterance.displayCoded()));
             }
         }
