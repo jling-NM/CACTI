@@ -191,3 +191,7 @@
     -fx-font-weight: bold;
     -fx-font-smoothing-type: lcd;
 }
+.report-border {
+    -fx-border-color:rgba(0,0,0,0.4);
+    -fx-border-width: 2.0;
+}

@@ -12,9 +12,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.TextFlow?>
 
-<VBox style="-fx-background-color: transparent;" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+<VBox style="-fx-background-color: transparent;" stylesheets="@Main.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -43,31 +42,24 @@
                                     </HBox>
                                  </children>
                               </AnchorPane>
-                              <Label layoutX="20.0" layoutY="20.0" styleClass="lbl-report-section" text="Global Ratings">
-                                 <padding>
-                                    <Insets top="12.0" />
-                                 </padding></Label>
-                              <TextFlow fx:id="rptScore_global_ratings_tf" layoutX="1.0" maxWidth="900.0">
-                                 <padding>
-                                    <Insets bottom="20.0" />
-                                 </padding>
-                              </TextFlow>
-                              <GridPane hgap="12.0" prefHeight="574.0" prefWidth="898.0" style="-fx-background-color: transparent;" vgap="12.0">
+                              <GridPane hgap="12.0" prefWidth="898.0" style="-fx-background-color: transparent;" vgap="12.0">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
                                 <rowConstraints>
+                                    <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" />
+                                    <RowConstraints minHeight="10.0" valignment="TOP" />
                                   <RowConstraints fillHeight="false" minHeight="10.0" />
                                   <RowConstraints minHeight="10.0" />
                                   <RowConstraints minHeight="10.0" />
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="100.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label styleClass="lbl-report-section" text="Therapist Behaviors" GridPane.halignment="LEFT" GridPane.valignment="TOP" />
-                                    <Label styleClass="lbl-report-section" text="Client Behaviors" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="TOP" />
-                                    <Label styleClass="lbl-report-section" text="Summary Scores" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <GridPane gridLinesVisible="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Label styleClass="lbl-report-section" text="Therapist Behaviors" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+                                    <Label styleClass="lbl-report-section" text="Client Behaviors" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+                                    <Label styleClass="lbl-report-section" text="Summary Scores" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <GridPane gridLinesVisible="true" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
@@ -107,7 +99,7 @@
                                           <Insets />
                                        </GridPane.margin>
                                     </GridPane>
-                                    <GridPane gridLinesVisible="true" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                    <GridPane gridLinesVisible="true" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" />
@@ -205,7 +197,7 @@
                                           </Label>
                                        </children>
                                     </GridPane>
-                                    <GridPane gridLinesVisible="true" prefHeight="510.0" prefWidth="388.0" GridPane.rowIndex="1" GridPane.rowSpan="3">
+                                    <GridPane gridLinesVisible="true" prefHeight="510.0" prefWidth="388.0" GridPane.rowIndex="3" GridPane.rowSpan="3">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -450,6 +442,34 @@
                                           </Label>
                                        </children>
                                     </GridPane>
+                                    <ScrollPane maxHeight="300.0" styleClass="report-border" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <content>
+                                          <VBox fx:id="vbxAllUtteranceList">
+                                             <padding>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </padding>
+                                          </VBox>
+                                       </content>
+                                    </ScrollPane>
+                                    <Label styleClass="lbl-report-section" text="Global Ratings" GridPane.valignment="BOTTOM">
+                                       <padding>
+                                          <Insets top="12.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label styleClass="lbl-report-section" text="All Utterances" GridPane.columnIndex="1">
+                                       <padding>
+                                          <Insets top="12.0" />
+                                       </padding>
+                                    </Label>
+                                    <ScrollPane maxHeight="300.0" styleClass="report-border" GridPane.rowIndex="1">
+                                       <content>
+                                          <VBox fx:id="vbxRptScore_global_ratings">
+                                             <padding>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </padding>
+                                          </VBox>
+                                       </content>
+                                    </ScrollPane>
                                  </children>
                               </GridPane>
                            </children>

@@ -33,6 +33,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.*;
 import javafx.print.*;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -71,7 +72,9 @@ public class MainController {
 
     // SESSION REPORT
     @FXML
-    private TextFlow rptScore_global_ratings_tf;
+    private VBox vbxRptScore_global_ratings;
+    @FXML
+    private VBox vbxAllUtteranceList;
     @FXML
     private ScrollPane pnReportScrollPane;
     @FXML
@@ -336,6 +339,16 @@ public class MainController {
     public void btnActReplay(ActionEvent actionEvent) {
         gotoLastMarker();
     }
+
+
+    // TODO: comments
+    private void actPlayAtUtterance(MouseEvent mouseEvent) {
+        Label label = (Label) mouseEvent.getSource();
+        Duration pos = (Duration) label.getUserData();
+        setMediaPlayerPosition( pos.subtract(Duration.ONE) );
+        mediaPlayer.play();
+    }
+
 
 
     /**
@@ -916,18 +929,18 @@ public class MainController {
                     current_rating_id = row.get("rating_id");
                     Text txtRating = new Text(String.format("\n%s [Score:%s]\n", row.get("rating_name"), row.get("rating_value")));
                     txtRating.setUnderline(true);
-                    rptScore_global_ratings_tf.getChildren().add(txtRating);
+                    vbxRptScore_global_ratings.getChildren().add(txtRating);
                 }
 
                 // check if there are utterances to list
                 if( row.get("time_marker") != null ) {
                     Text txtUtterance = new Text(String.format("- %s : %s : %s\n", row.get("time_marker"), row.get("code_name"), row.get("annotation").replace("\n", "; ")));
-                    rptScore_global_ratings_tf.getChildren().add(txtUtterance);
+                    vbxRptScore_global_ratings.getChildren().add(txtUtterance);
                 }
             }
 
             Text txtNotes = new Text( String.format("\n\nNotes:\n%s\n\n", notes) );
-            rptScore_global_ratings_tf.getChildren().add(txtNotes);
+            vbxRptScore_global_ratings.getChildren().add(txtNotes);
 
             /* attach/format summary scores to report */
             // integers: "%.0f"
@@ -1921,10 +1934,10 @@ public class MainController {
                 // hide controls needed for coding
                 setPlayerButtonState();
 
-                // enable GLOBAL coding controls
+                // load layout
                 loader = new FXMLLoader(getClass().getResource("Report.fxml"), resourceStrings);
                 loader.setController(this);
-
+                // add view to app
                 try {
                     vbApp.getChildren().add(loader.load());
                 } catch (IOException ex) {
@@ -1950,26 +1963,65 @@ public class MainController {
                 // report label is session label
                 lblSessionID.setText(sessionData.getSessionLabel());
 
+                // play icon image for multiple use in labels below
+                Image imagePlayIcon = new Image(Main.class.getResourceAsStream("/media/btn_play.png"));
+
+
                 // global rating insert
                 String current_rating_id = "";
                 for(TreeMap< String, String>  row : records) {
 
                     if(!row.get("rating_id").equals(current_rating_id)) {
                         current_rating_id = row.get("rating_id");
-                        Text txtRating = new Text(String.format("\n%s [Score:%s]\n", row.get("rating_name"), row.get("rating_value")));
+                        Text txtRating = new Text(String.format("%s [Score:%s]", row.get("rating_name"), row.get("rating_value")));
                         txtRating.setUnderline(true);
-                        rptScore_global_ratings_tf.getChildren().add(txtRating);
+                        vbxRptScore_global_ratings.getChildren().add(txtRating);
                     }
 
                     // check if there are utterances to list
                     if( row.get("time_marker") != null ) {
-                        Text txtUtterance = new Text(String.format("- %s : %s : %s\n", row.get("time_marker"), row.get("code_name"), row.get("annotation").replace("\n", "; ")));
-                        rptScore_global_ratings_tf.getChildren().add(txtUtterance);
+
+                        ImageView imageViewPlay = new ImageView(imagePlayIcon);
+                        imageViewPlay.setFitWidth(16);
+                        imageViewPlay.setPreserveRatio(true);
+                        imageViewPlay.setSmooth(true);
+                        imageViewPlay.setCache(true);
+
+                        Label txtUtterance = new Label(String.format("%s : %s : %s", row.get("time_marker"), row.get("code_name"), row.get("annotation").replace("\n", "; ")), imageViewPlay);
+                        txtUtterance.setUserData(Utils.parseDuration(row.get("time_marker")));
+                        txtUtterance.setCursor(Cursor.HAND);
+
+                        txtUtterance.setOnMouseClicked(this::actPlayAtUtterance);
+                        vbxRptScore_global_ratings.getChildren().add(txtUtterance);
                     }
+
                 }
 
+                // Add the global notes at the bottom
                 Text txtNotes = new Text( String.format("\n\nNotes:\n%s\n\n", notes) );
-                rptScore_global_ratings_tf.getChildren().add(txtNotes);
+                vbxRptScore_global_ratings.getChildren().add(txtNotes);
+
+
+
+
+
+                //
+                for (Utterance utr : sessionData.utteranceList.values()) {
+
+                    ImageView imageViewPlay = new ImageView(imagePlayIcon);
+                    imageViewPlay.setFitWidth(16);
+                    imageViewPlay.setPreserveRatio(true);
+                    imageViewPlay.setSmooth(true);
+                    imageViewPlay.setCache(true);
+
+                    Label txtUtteranceItem = new Label(String.format("%s : %s : %s", Utils.formatDuration(utr.getStartTime()), utr.getMiscCode().name, utr.getAnnotation().replace("\n", "; ")), imageViewPlay);
+                    txtUtteranceItem.setUserData(utr.getStartTime());
+                    txtUtteranceItem.setOnMouseClicked(this::actPlayAtUtterance);
+                    txtUtteranceItem.setCursor(Cursor.HAND);
+                    vbxAllUtteranceList.getChildren().add(txtUtteranceItem);
+
+                }
+
 
                 /* attach/format summary scores to report */
                 // integers: "%.0f"
@@ -2021,7 +2073,6 @@ public class MainController {
         }
 
     }
-
 
 
 
@@ -2786,6 +2837,25 @@ public class MainController {
                 btnUncodeReplay.setVisible(false);
                 btnRewind.setDisable(false);
                 break;
+
+            case REPORT:
+
+                sldSeek.setDisable(false);
+                btnPlayPause.setMinWidth(96.0);
+                btnPlayPause.setVisible(true);
+                btnPlayPause.setDisable(false);
+                btnReplay.setMinWidth(0.0);
+                btnReplay.setMaxWidth(0.0);
+                btnReplay.setVisible(false);
+                btnUncode.setMinWidth(0.0);
+                btnUncode.setMaxWidth(0.0);
+                btnUncode.setVisible(false);
+                btnUncodeReplay.setMinWidth(0.0);
+                btnUncodeReplay.setMaxWidth(0.0);
+                btnUncodeReplay.setVisible(false);
+                btnRewind.setDisable(false);
+                break;
+
         }
     }
 
