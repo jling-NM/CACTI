@@ -22,11 +22,6 @@ import edu.unm.casaa.main.Utils;
 import edu.unm.casaa.utterance.Utterance;
 import javafx.util.Duration;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 /**
  * The MiscDataItem is an object designed to hold all of the
  * relevant information for a MISC utterance.

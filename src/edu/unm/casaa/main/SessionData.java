@@ -1337,13 +1337,7 @@ public class SessionData
 
             List<Utterance> utteranceList = new ArrayList<>();
 
-            Scanner in;
-
-            try {
-                in = new Scanner(sessionFileTextFormat);
-            } catch (FileNotFoundException e) {
-                throw e;
-            }
+            Scanner in = new Scanner(sessionFileTextFormat);
 
             // get the audio filename line.
             String 			filenameAudio 	= in.nextLine();
@@ -1425,13 +1419,7 @@ public class SessionData
 
             HashMap<String, Integer> ratingList = new HashMap<>();
 
-            Scanner in;
-
-            try {
-                in = new Scanner(globalsFileTextFormat);
-            } catch (FileNotFoundException e) {
-                throw e;
-            }
+            Scanner in = new Scanner(globalsFileTextFormat);
 
             // get the audio filename line.
             String 			filenameAudio 	= in.nextLine();
@@ -1470,13 +1458,7 @@ public class SessionData
 
             String notes = "";
 
-            Scanner in;
-
-            try {
-                in = new Scanner(globalsFileTextFormat);
-            } catch (FileNotFoundException e) {
-                throw e;
-            }
+            Scanner in = new Scanner(globalsFileTextFormat);
 
             // get the audio filename line.
             String 			filenameAudio 	= in.nextLine();

@@ -1,4 +1,16 @@
------- 0.60.0 ------
+------ 0.80.0 ------
+20180717 - jl
+--------------------
+- Two separate text files (Utterances, Gloobal Ratings) have been combined into a single binary file.
+- Utterances can be annotated with text by right clicking timeline markers or by holding the CTRL key while clicking a code button.
+- Utterances can be associated with a global rating item by right clicking timeline markers or by holding the CTRL key while clicking a code button.
+- Utterances can be batch exported to a text format (Essentially the old text format).
+- Cosmetic changes to the timeline and the media playback interface.
+- A summary report has been added. This becomes available once a session has been started or resumes.
+- Data files for this version of the program are not backward compatible. However, before converting file formats, a backup is saved.
+
+
+------ 0.60.1 ------
 20170627 - jl
 --------------------
 CHANGES:

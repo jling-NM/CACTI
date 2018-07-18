@@ -1,5 +1,5 @@
 /*
-This source code file is part of the CASAA Treatment Coding System Utility
+    This source code file is part of the CASAA Treatment Coding System Utility
     Copyright (C) 2009  UNM CASAA
 
     This program is free software: you can redistribute it and/or modify
@@ -49,7 +49,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Scale;
 import javafx.stage.*;
 import javafx.util.Duration;
@@ -341,11 +340,18 @@ public class MainController {
     }
 
 
-    // TODO: comments
+    /**
+     * Play utterance on mediaplayer starting one second
+     * ahead of utterance start time
+     * @param mouseEvent
+     */
     private void actPlayAtUtterance(MouseEvent mouseEvent) {
         Label label = (Label) mouseEvent.getSource();
+        // get start time
         Duration pos = (Duration) label.getUserData();
+        // Position one second before start of utterance.
         setMediaPlayerPosition( pos.subtract(Duration.ONE) );
+        // start media play
         mediaPlayer.play();
     }
 
