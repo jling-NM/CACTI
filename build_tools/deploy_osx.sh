@@ -1,41 +1,42 @@
 #!/bin/bash
 
-version=0.60.1
-bundleversion=0.60.1
+version=0.80.0
+bundleversion=0.80.0
 appname=CACTI
 
+### build the jar in IDE to get classes ###
 ### jar ###
-javapackager \
--createjar \
--appclass edu.unm.casaa.main.Main \
--srcdir /Users/josef/projects/cacti2/out/production/CACTI \
--outdir /Users/josef/projects/cacti2/out/bundles \
--outfile $appname.$version -v
+#/Library/Java/JavaVirtualMachines/jdk1.8/Contents/Home/bin/javapackager \
+#-createjar \
+#-appclass edu.unm.casaa.main.Main \
+#-srcdir /Users/josef/projects/CACTI/out/production/CACTI \
+#-outdir /Users/josef/projects/CACTI/out/bundles \
+#-outfile $appname.$version -v
 
 ### package icons ###
 iconutil \
 --convert icns \
---output /Users/josef/projects/cacti2/media/osx.icns /Users/josef/projects/cacti2/media/osx.iconset
+--output /Users/josef/projects/CACTI/media/osx.icns /Users/josef/projects/CACTI/media/osx.iconset
 
 ### dmg ###
-javapackager \
+/Library/Java/JavaVirtualMachines/jdk1.8/Contents/Home/bin/javapackager \
 -deploy \
 -native dmg \
 -name $appname \
--srcdir /Users/josef/projects/cacti2/out/bundles \
--srcfiles $appname.$version.jar \
--outdir /Users/josef/projects/cacti2/out \
+-srcdir /Users/josef/projects/CACTI/out/artifacts/CACTI_jar \
+-srcfiles $appname.jar \
+-outdir /Users/josef/projects/CACTI/out \
 -appclass edu.unm.casaa.main.Main \
 -name $appname -title $appname \
 -outfile $appname.$version.dmg \
 \
 -BappVersion=$version \
--Bicon=/Users/josef/projects/cacti2/media/osx.icns \
+-Bicon=/Users/josef/projects/CACTI/media/osx.icns \
 -Bmac.category=Education -BjvmOptions=-Xmx128m \
 -BjvmOptions=-Xms128m \
--Bruntime=/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home \
+-Bruntime=/Library/Java/JavaVirtualMachines/jdk1.8/Contents/Home \
 -Bmac.CFBundleIdentifier=edu.unm.casaa.cacti \
 -Bmac.CFBundleName=$appname \
--Bmac.CFBundleVersion=061
+-Bmac.CFBundleVersion=080
 
 
