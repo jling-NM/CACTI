@@ -2189,7 +2189,7 @@ public class MainController {
      */
     private synchronized void insertUtterance(MiscCode miscCode, boolean annotate) {
 
-        System.out.println("--- Controller add utterance:" + miscCode.toDisplayString());
+        //System.out.println("--- Controller add utterance:" + miscCode.toDisplayString());
 
         // get current time
         Duration position = mediaPlayer.getCurrentTime();
