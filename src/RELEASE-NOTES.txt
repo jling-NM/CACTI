@@ -1,3 +1,10 @@
+------ 0.90.0 ------
+20181011 - jl
+--------------------
+- Support use of MP3 file format.
+- Change player display of file path.
+
+
 ------ 0.80.0 ------
 20180717 - jl
 --------------------

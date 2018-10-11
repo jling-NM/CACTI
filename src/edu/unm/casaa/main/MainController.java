@@ -65,7 +65,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.prefs.Preferences;
 import static java.lang.String.format;
-
+import java.net.URI;
 
 public class MainController {
 
@@ -1014,7 +1014,7 @@ public class MainController {
         FileChooser fc = new FileChooser();
         fc.setTitle("Open audio file");
         fc.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Audio Files (*.wav, *.m4a)", "*.wav","*.m4a")
+                new FileChooser.ExtensionFilter("Audio Files (*.wav, *.m4a, *.mp3)", "*.wav","*.m4a","*.mp3")
         );
 
         // set initial directory to preferences or users home directory
@@ -1738,7 +1738,7 @@ public class MainController {
         Stage ourTown = (Stage) menuBar.getScene().getWindow();
 
         // common control updates; file name in mediaplayer
-        lblAudioFilename.setText(mediaPlayer.getMedia().getSource());
+        lblAudioFilename.setText(currentAudioFile.getAbsolutePath());
 
         Locale locale = new Locale("en", "US");
         ResourceBundle resourceStrings = ResourceBundle.getBundle("strings", locale);

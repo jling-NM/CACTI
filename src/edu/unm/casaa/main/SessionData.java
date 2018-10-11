@@ -28,7 +28,6 @@ import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 import org.sqlite.SQLiteDataSource;
 import org.sqlite.SQLiteConfig;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.sql.*;
