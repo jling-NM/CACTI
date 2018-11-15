@@ -1776,7 +1776,7 @@ public class MainController {
 
                 // resize window. Since playback is smaller we first size window to controls, then set width to user prefs or a minimum
                 ourTown.sizeToScene();
-                ourTown.setWidth(appPrefs.getDouble("main.wind.w", 800.0));
+                ourTown.setWidth(appPrefs.getDouble("main.wind.w", ourTown.getWidth()));
 
                 break;
 
@@ -1785,6 +1785,8 @@ public class MainController {
             case MISC_CODING:
 
                 resetUserControlsContainer();
+
+                System.out.println(ourTown.getHeight());
 
                 // load new controls
                 loader = new FXMLLoader(getClass().getResource("MISC_CODING.fxml"), resourceStrings);
@@ -1860,9 +1862,9 @@ public class MainController {
                 // force last marker
                 gotoLastMarker();
 
-                // resize app window to user preferences or a minimum if no preferences available
-                ourTown.setWidth(appPrefs.getDouble("main.wind.w", 800.0));
-                ourTown.setHeight(appPrefs.getDouble("main.wind.h", 600.0));
+                // resize app window to user preferences or controls size
+                ourTown.setWidth(appPrefs.getDouble("main.wind.w", ourTown.getWidth() ));
+                ourTown.setHeight(appPrefs.getDouble("main.wind.h", ourTown.getHeight() ));
 
                 break;
 
@@ -1908,9 +1910,9 @@ public class MainController {
                 // load coding buttons from userConfiguration.xml appropriate for GuiState
                 parseUserControls();
 
-                // resize app window to user preferences or a minimum if no preferences available
-                ourTown.setWidth(appPrefs.getDouble("main.wind.w", 800.0));
-                ourTown.setHeight(appPrefs.getDouble("main.wind.h", 600.0));
+                // resize app window to user preferences or controller size
+                ourTown.setWidth(appPrefs.getDouble("main.wind.w", ourTown.getWidth() ));
+                ourTown.setHeight(appPrefs.getDouble("main.wind.h", ourTown.getHeight() ));
 
                 break;
 

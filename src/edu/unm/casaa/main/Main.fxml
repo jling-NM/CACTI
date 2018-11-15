@@ -145,7 +145,7 @@
                   </Pane>
                   <ToolBar fx:id="tbPlayer" styleClass="btnBarPane" GridPane.columnSpan="2147483647">
                      <items>
-                      <Button fx:id="btnPlayPause" contentDisplay="TOP" graphicTextGap="0.0" minWidth="96.0" mnemonicParsing="false" onAction="#btnActPlayPause" text="Play/Pause">
+                      <Button fx:id="btnPlayPause" contentDisplay="TOP" graphicTextGap="0.0" minWidth="96.0" mnemonicParsing="false" onAction="#btnActPlayPause" text="Play/Pause" styleClass="btn-player">
                            <graphic>
                               <ImageView fx:id="btnPlayImgVw" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-play" />
                            </graphic>
@@ -156,7 +156,7 @@
                               <Font size="10.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActReplay" prefWidth="0.0" text="Replay" visible="false">
+                        <Button fx:id="btnReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActReplay" prefWidth="0.0" text="Replay" visible="false" styleClass="btn-player">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-replay" />
                            </graphic>
@@ -167,7 +167,7 @@
                               <Font size="10.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnUncode" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncode" prefWidth="0.0" text="Uncode" visible="false">
+                        <Button fx:id="btnUncode" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncode" prefWidth="0.0" text="Uncode" visible="false" styleClass="btn-player">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncode" />
                            </graphic>
@@ -178,7 +178,7 @@
                               <Font size="10.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnUncodeReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeRewind" prefWidth="0.0" text="Uncode/Rewind" visible="false">
+                        <Button fx:id="btnUncodeReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeRewind" prefWidth="0.0" text="Uncode/Rewind" visible="false" styleClass="btn-player">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncodeReplay" />
                            </graphic>
@@ -189,7 +189,7 @@
                               <Font size="10.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnRewind" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="96.0" mnemonicParsing="false" onAction="#btnActRewind" text="Rewind">
+                        <Button fx:id="btnRewind" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="96.0" mnemonicParsing="false" onAction="#btnActRewind" text="Rewind" styleClass="btn-player">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
                            </graphic>
