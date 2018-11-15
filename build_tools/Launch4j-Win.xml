@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\josef\projects\CACTI\out\artifacts\CACTI_jar\CACTI.jar</jar>
-  <outfile>C:\Users\josef\projects\CACTI\out\artifacts\Cacti-0_80_0.exe</outfile>
+  <outfile>C:\Users\josef\projects\CACTI\out\artifacts\Cacti-0_90_0.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -15,7 +15,7 @@
   <manifest></manifest>
   <icon>C:\Users\josef\projects\CACTI\media\windows.iconset\cacti.ico</icon>
   <singleInstance>
-    <mutexName>CACTI_0800</mutexName>
+    <mutexName>CACTI_0900</mutexName>
     <windowTitle></windowTitle>
   </singleInstance>
   <jre>
@@ -34,12 +34,12 @@
     <timeoutErr>true</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>0.80.0.0</fileVersion>
-    <txtFileVersion>0.80.0</txtFileVersion>
+    <fileVersion>0.90.0.0</fileVersion>
+    <txtFileVersion>0.90.0</txtFileVersion>
     <fileDescription>The CASAA Application for Coding Treatment Interactions</fileDescription>
     <copyright>Copyright 2009</copyright>
-    <productVersion>0.80.0.0</productVersion>
-    <txtProductVersion>0.80.0</txtProductVersion>
+    <productVersion>0.90.0.0</productVersion>
+    <txtProductVersion>0.90.0</txtProductVersion>
     <productName>CACTI</productName>
     <companyName>Center on Alcoholism, Substance Abuse and Addictions at the University of New Mexico Albuquerque</companyName>
     <internalName>CACTI</internalName>
@@ -48,7 +48,7 @@
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
     <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
-    <jreVersionErr>CACT2 application requires a Java Runtime Environment</jreVersionErr>
+    <jreVersionErr>The CACTI application requires a Java Runtime Environment</jreVersionErr>
     <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
     <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
   </messages>
