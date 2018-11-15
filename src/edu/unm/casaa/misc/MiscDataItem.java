@@ -113,5 +113,10 @@ public class MiscDataItem implements Utterance {
     public String getAnnotation() {
         return this.annotation;
     }
+
+    @Override
+    public Boolean isAnnotated() {
+        return !this.annotation.isEmpty();
+    }
     // TODO: rating ids and annotation are bypassing data model for utterance MiscDataItem which really sucks. RESOLVE
 }

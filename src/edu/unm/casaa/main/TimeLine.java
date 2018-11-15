@@ -34,6 +34,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -203,7 +204,7 @@ public class TimeLine extends Group {
         if(activeMarker != null) {
             /* Edit active marker */
             String prevId  = activeMarker.getMarkerID();
-            double prevPos = activeMarker.posSeconds;
+            double prevPos = activeMarker.utterance.getStartTime().toSeconds();
 
             /* remove marker from timeline and model */
             utteranceList.remove(prevId);
@@ -314,8 +315,7 @@ public class TimeLine extends Group {
     public class TimeLineMarker extends VBox {
 
         private String markerID;            // how to find record in data
-        private double posSeconds;          // start position in bytes
-        private MiscCode.Speaker speaker;   //
+        private Utterance utterance;        // marker has an utterance
         private Text markerCode;            // displays utterance code for this marker
         private Polygon indicatorShape;     // displays arrow on timeline
         private int indicatorWidth = 4;     // size of arrow
@@ -325,26 +325,28 @@ public class TimeLine extends Group {
 
 
 
-        public String getAnnotationToolTipText() {
-            return annotationToolTip.getText();
-        }
 
         /**
          * Provide access for tooltip text so that changes in annotation text are immediately reflected in the
          * mouseover popup. Use this setter to avoid empty tooltip popups.
-         * @param annotationToolTipText
          */
-        public void setAnnotationToolTipText(String annotationToolTipText) {
+        public void setAnnotationToolTipText() {
 
             // update the tooltip text
-            this.annotationToolTip.setText(annotationToolTipText);
+            this.annotationToolTip.setText(this.utterance.getAnnotation());
             // remove any existing tooltip from marker
             Tooltip.uninstall(codeBubble, annotationToolTip);
+
             // if text is available, reinstall tooltip
-            if( !annotationToolTipText.isEmpty()) {
+            if(this.utterance.isAnnotated()) {
                 Tooltip.install(codeBubble, annotationToolTip);
             }
+
+            // update Annotation indicator
+            this.setAnnotationIndicator();
+
         }
+
 
 
         /**
@@ -355,12 +357,12 @@ public class TimeLine extends Group {
 
             // Set spacing between nodes inside marker. specify spacing as CSS doesn't appear to work for this
             this.setSpacing(0.0);
+            // timeline marker has an utterance
+            this.utterance = utterance;
             this.markerID = utterance.toString();
-            this.posSeconds = utterance.getStartTime().toSeconds();
-            this.speaker = utterance.getMiscCode().getSpeaker();
 
             // where does marker point on timeline
-            double tipPos = (posSeconds * pixelsPerSecond);
+            double tipPos = (utterance.getStartTime().toSeconds() * pixelsPerSecond);
 
             // initialize utterance code
             markerCode = new Text(utterance.getMiscCode().name);
@@ -370,8 +372,9 @@ public class TimeLine extends Group {
 
             // stack code and surrounding bubble
             codeBubble = new StackPane();
+
             // bubble outline
-            Rectangle codeBubbleOutline = new Rectangle( (markerCodeWidth + 4.0), (markerCodeHeight));
+            Rectangle codeBubbleOutline = new Rectangle( (markerCodeWidth + 4.0), (markerCodeHeight + 1.0));
             codeBubbleOutline.setArcHeight(5.0);
             codeBubbleOutline.setArcWidth(5.0);
             codeBubbleOutline.setFill(Color.WHITE);
@@ -379,7 +382,14 @@ public class TimeLine extends Group {
             codeBubbleOutline.setStrokeLineCap(StrokeLineCap.ROUND);
             codeBubbleOutline.setStrokeLineJoin(StrokeLineJoin.ROUND);
             codeBubbleOutline.setStrokeType(StrokeType.OUTSIDE);
+            //
             codeBubble.getChildren().addAll(codeBubbleOutline, markerCode);
+
+            // shape to indicate if utterance is annotated
+            if( utterance.isAnnotated() ) {
+                this.setAnnotationIndicator();
+            }
+            //
             codeBubble.autosize();
 
             // define tooltip for codeBubble. Assign text with setter member.
@@ -387,18 +397,32 @@ public class TimeLine extends Group {
             annotationToolTip.setWrapText(true);
             annotationToolTip.setTextOverrun(OverrunStyle.ELLIPSIS);
             annotationToolTip.setMaxWidth(300.0);
-            setAnnotationToolTipText(utterance.getAnnotation());
+            setAnnotationToolTipText();
 
             // formatting of marker varies on speaker (above/below timeline)
-            if( speaker.equals(MiscCode.Speaker.Therapist) ) {
+            if( utterance.getMiscCode().getSpeaker().equals(MiscCode.Speaker.Therapist) ) {
+
+                // individual node alignment in stackpane necessary to avoid little space between nodes on screen
+                StackPane.setAlignment(codeBubbleOutline, Pos.BOTTOM_CENTER);
+                StackPane.setAlignment(markerCode, Pos.CENTER);
+
                 // tick mark between code bubble and timeline
                 this.indicatorShape = new Polygon(0,-indicatorWidth, indicatorWidth, 0, indicatorWidth*2,-indicatorWidth);
+
                 // add code bubble and indicator to create marker
                 this.getChildren().addAll(codeBubble,indicatorShape);
+
                 // vertical placement on timeline
-                this.setTranslateY(5.5);
+                this.setTranslateY( (height/2.0)-(thickness/2.0)-indicatorWidth-codeBubbleOutline.getBoundsInParent().getHeight() );
+
+
             } else {
                 // speaker 2
+
+                // individual node alignment in stackpane necessary to avoid little space between nodes on screen
+                StackPane.setAlignment(codeBubbleOutline, Pos.TOP_CENTER);
+                StackPane.setAlignment(markerCode, Pos.CENTER);
+
                 this.indicatorShape = new Polygon(0,indicatorWidth, indicatorWidth,0, indicatorWidth*2,indicatorWidth);
                 this.getChildren().addAll(indicatorShape, codeBubble);
                 this.setTranslateY( (height/2.0)+thickness );
@@ -433,7 +457,6 @@ public class TimeLine extends Group {
                          * selected marker clicked again. If left-click, delect this marker, if right-click, don't.
                          */
                         if( e.getButton().equals(MouseButton.PRIMARY)) {
-                            //timeLineMarker.getIndicatorShape().setFill(Color.BLACK);
                             timeLineMarker.selected(false);
                             setSelectedMarker(null);
                         }
@@ -442,12 +465,10 @@ public class TimeLine extends Group {
                          * different marker selected, deselect any previous and select this one regardless of mouse button
                          */
                         if( getSelectedMarker() != null ) {
-                            //getSelectedMarker().getIndicatorShape().setFill(Color.BLACK);
                             getSelectedMarker().selected(false);
                         }
 
                         // SELECT
-                        //timeLineMarker.getIndicatorShape().setFill(Color.INDIANRED);
                         timeLineMarker.selected(true);
                         // set active
                         setSelectedMarker(timeLineMarker);
@@ -509,6 +530,36 @@ public class TimeLine extends Group {
 
 
 
+        public void setAnnotationIndicator() {
+
+            if (this.utterance.isAnnotated() && this.codeBubble.getChildren().size() == 2) {
+                // shape to indicate if utterance is annotated
+                Rectangle annotationShape = new Rectangle(4.0, 4.0);
+                annotationShape.setFill(Color.RED);
+                annotationShape.setStroke(Color.BLACK);
+                annotationShape.setStrokeWidth(1.0);
+                annotationShape.setStrokeType(StrokeType.INSIDE);
+                annotationShape.setArcWidth(4.0);
+                annotationShape.setArcHeight(4.0);
+
+                this.codeBubble.getChildren().add(annotationShape);
+
+                if (this.utterance.getMiscCode().getSpeaker().equals(MiscCode.Speaker.Therapist)) {
+                    StackPane.setAlignment(annotationShape, Pos.TOP_RIGHT);
+                } else {
+                    StackPane.setAlignment(annotationShape, Pos.BOTTOM_RIGHT);
+                }
+            }
+
+
+            if (!this.utterance.isAnnotated() && this.codeBubble.getChildren().size() == 3) {
+                this.codeBubble.getChildren().remove(2);
+            }
+
+        }
+
+
+
         public Polygon getIndicatorShape() {
             return indicatorShape;
         }
@@ -528,10 +579,6 @@ public class TimeLine extends Group {
         public String getCode() { return markerCode.getText(); }
 
         public void setCode(String code) { markerCode.setText(code); }
-
-        public MiscCode.Speaker getSpeaker() { return speaker; }
-
-        public void setSpeaker(MiscCode.Speaker newSpeaker) { this.speaker = newSpeaker; }
 
         public void selected(boolean b) {
             this.getIndicatorShape().setFill(b ? Color.INDIANRED : Color.BLACK);

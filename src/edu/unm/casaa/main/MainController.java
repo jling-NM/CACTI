@@ -1309,8 +1309,8 @@ public class MainController {
                     // update utterance
                     sessionData.annotateUtterance(utterance_id, extTa.getText(), globalCodeList);
                     // update tooltip for immediate gratification
-                    markerNode.setAnnotationToolTipText(extTa.getText());
-                    //timeLine.getSelectedMarker().setAnnotationToolTipText(extTa.getText());
+                    //markerNode.setAnnotationToolTipText(extTa.getText());
+                    markerNode.setAnnotationToolTipText();
                 } catch (SQLException e) {
                     showError("Error Annotating Utterance", e.getMessage());
                 }

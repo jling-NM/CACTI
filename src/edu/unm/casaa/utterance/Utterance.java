@@ -35,5 +35,6 @@ public interface Utterance {
 
 	String displayCoded();
     String getAnnotation();
+    Boolean isAnnotated();
 	// TODO: rating ids and annotation are bypassing data model for utterance MiscDataItem which really sucks. RESOLVE
 }
