@@ -153,7 +153,7 @@
                               <Tooltip text="%btn.tt.PlayPause" />
                            </tooltip>
                            <font>
-                              <Font size="10.0" />
+                              <Font size="12.0" />
                            </font>
                         </Button>
                         <Button fx:id="btnReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActReplay" prefWidth="0.0" text="Replay" visible="false" styleClass="btn-player">
@@ -164,7 +164,7 @@
                               <Tooltip text="%btn.tt.Replay" />
                            </tooltip>
                            <font>
-                              <Font size="10.0" />
+                              <Font size="12.0" />
                            </font>
                         </Button>
                         <Button fx:id="btnUncode" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncode" prefWidth="0.0" text="Uncode" visible="false" styleClass="btn-player">
@@ -175,7 +175,7 @@
                               <Tooltip text="%btn.tt.Uncode" />
                            </tooltip>
                            <font>
-                              <Font size="10.0" />
+                              <Font size="12.0" />
                            </font>
                         </Button>
                         <Button fx:id="btnUncodeReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeRewind" prefWidth="0.0" text="Uncode/Rewind" visible="false" styleClass="btn-player">
@@ -186,7 +186,7 @@
                               <Tooltip text="%btn.tt.UncodeReplay" />
                            </tooltip>
                            <font>
-                              <Font size="10.0" />
+                              <Font size="12.0" />
                            </font>
                         </Button>
                         <Button fx:id="btnRewind" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="96.0" mnemonicParsing="false" onAction="#btnActRewind" text="Rewind" styleClass="btn-player">
@@ -197,7 +197,7 @@
                               <Tooltip text="%btn.tt.Rewind" />
                            </tooltip>
                            <font>
-                              <Font size="10.0" />
+                              <Font size="12.0" />
                            </font>
                         </Button>
                      </items>

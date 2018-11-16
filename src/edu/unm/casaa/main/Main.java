@@ -15,6 +15,7 @@ This source code file is part of the CASAA Treatment Coding System Utility
 package edu.unm.casaa.main;
 
 import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -87,8 +88,6 @@ public class Main extends Application {
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_128x128.png")));
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_256x256.png")));
         mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_512x512.png")));
-
-
 
         Scene mainScene = new Scene(root);
         mainStage.setScene(mainScene);

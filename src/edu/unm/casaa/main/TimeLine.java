@@ -414,6 +414,9 @@ public class TimeLine extends Group {
 
                 // vertical placement on timeline
                 this.setTranslateY( (height/2.0)-(thickness/2.0)-indicatorWidth-codeBubbleOutline.getBoundsInParent().getHeight() );
+                if( System.getProperty("os.name","UNKNOWN").toLowerCase().contains("windows")) {
+                    this.setTranslateY( (height/2.0)-indicatorWidth-codeBubbleOutline.getBoundsInParent().getHeight() );
+                }
 
 
             } else {

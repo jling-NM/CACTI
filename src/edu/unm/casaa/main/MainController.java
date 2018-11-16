@@ -291,6 +291,8 @@ public class MainController {
     @FXML
     private void initialize() {
         // Use OS X standard menus no Java window menus
+        System.out.println(System.getProperty("os.name","UNKNOWN"));
+
         if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
             if( menuBar != null ) {
                 menuBar.setUseSystemMenuBar(true);
@@ -1752,6 +1754,8 @@ public class MainController {
 
                 // clean up non-playback controls
                 resetUserControlsContainer();
+                // disable window maximization for PLAYBACK state
+                ourTown.setMaximized(false);
 
                 /* Listener: currentTime
                    responsible for updating gui components with current playback position
@@ -1784,9 +1788,9 @@ public class MainController {
 
             case MISC_CODING:
 
+
                 resetUserControlsContainer();
 
-                System.out.println(ourTown.getHeight());
 
                 // load new controls
                 loader = new FXMLLoader(getClass().getResource("MISC_CODING.fxml"), resourceStrings);
@@ -1863,8 +1867,10 @@ public class MainController {
                 gotoLastMarker();
 
                 // resize app window to user preferences or controls size
-                ourTown.setWidth(appPrefs.getDouble("main.wind.w", ourTown.getWidth() ));
-                ourTown.setHeight(appPrefs.getDouble("main.wind.h", ourTown.getHeight() ));
+                Double winW = (ourTown.getWidth() >  appPrefs.getDouble("main.wind.w", 800.0 )) ? ourTown.getWidth() : appPrefs.getDouble("main.wind.w", 800.0 );
+                ourTown.setWidth( winW );
+                Double winH = (ourTown.getHeight() >  appPrefs.getDouble("main.wind.h", 600.0 )) ? ourTown.getWidth() : appPrefs.getDouble("main.wind.h", 600.0 );
+                ourTown.setHeight( winH );
 
                 break;
 
@@ -2769,8 +2775,19 @@ public class MainController {
      * This clears coding controls leaving only the playback device
      */
     private void resetUserControlsContainer() {
+
+        // always save current position
+        Stage ourTown = (Stage) menuBar.getScene().getWindow();
+        appPrefs.putDouble("main.wind.x",ourTown.getX());
+        appPrefs.putDouble("main.wind.y",ourTown.getY());
+
         // check length again before removing
         if( vbApp.getChildren().size() > 2 ) {
+
+            // only save current window size if NOT coming from PLAYBACK state
+            appPrefs.putDouble("main.wind.h",ourTown.getHeight());
+            appPrefs.putDouble("main.wind.w",ourTown.getWidth());
+
             // remove usercontrols content node. At some point i determined that remove add worked better than setContent()
             vbApp.getChildren().remove(2);
         }
@@ -2788,7 +2805,7 @@ public class MainController {
             case PLAYBACK:
 
                 sldSeek.setDisable(false);
-                btnPlayPause.setMinWidth(96.0);
+                btnPlayPause.setMinWidth(112.0);
                 btnPlayPause.setVisible(true);
                 btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(0.0);
@@ -2806,14 +2823,14 @@ public class MainController {
             case MISC_CODING:
 
                 sldSeek.setDisable(false);
-                btnPlayPause.setMinWidth(96.0);
+                btnPlayPause.setMinWidth(112.0);
                 btnPlayPause.setVisible(true);
                 btnPlayPause.setDisable(false);
-                btnReplay.setMinWidth(96.0);
+                btnReplay.setMinWidth(112.0);
                 btnReplay.setVisible(true);
-                btnUncode.setMinWidth(96.0);
+                btnUncode.setMinWidth(112.0);
                 btnUncode.setVisible(true);
-                btnUncodeReplay.setMinWidth(96.0);
+                btnUncodeReplay.setMinWidth(112.0);
                 btnUncodeReplay.setVisible(true);
                 btnRewind.setDisable(false);
                 btnReplay.getParent().autosize();
@@ -2831,7 +2848,7 @@ public class MainController {
             case GLOBAL_CODING:
 
                 sldSeek.setDisable(false);
-                btnPlayPause.setMinWidth(96.0);
+                btnPlayPause.setMinWidth(112.0);
                 btnPlayPause.setVisible(true);
                 btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(0.0);
@@ -2849,7 +2866,7 @@ public class MainController {
             case REPORT:
 
                 sldSeek.setDisable(false);
-                btnPlayPause.setMinWidth(96.0);
+                btnPlayPause.setMinWidth(112.0);
                 btnPlayPause.setVisible(true);
                 btnPlayPause.setDisable(false);
                 btnReplay.setMinWidth(0.0);
