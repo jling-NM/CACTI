@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\josef\projects\CACTI\out\artifacts\CACTI_jar\CACTI.jar</jar>
-  <outfile>C:\Users\josef\projects\CACTI\out\artifacts\Cacti-0_90_0.exe</outfile>
+  <outfile>C:\Users\josef\projects\CACTI\out\artifacts\Cacti-0_91_0.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -15,7 +15,7 @@
   <manifest></manifest>
   <icon>C:\Users\josef\projects\CACTI\media\windows.iconset\cacti.ico</icon>
   <singleInstance>
-    <mutexName>CACTI_0900</mutexName>
+    <mutexName>CACTI_0910</mutexName>
     <windowTitle></windowTitle>
   </singleInstance>
   <jre>
@@ -34,12 +34,12 @@
     <timeoutErr>true</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>0.90.0.0</fileVersion>
-    <txtFileVersion>0.90.0</txtFileVersion>
+    <fileVersion>0.91.0.0</fileVersion>
+    <txtFileVersion>0.91.0</txtFileVersion>
     <fileDescription>The CASAA Application for Coding Treatment Interactions</fileDescription>
     <copyright>Copyright 2009</copyright>
-    <productVersion>0.90.0.0</productVersion>
-    <txtProductVersion>0.90.0</txtProductVersion>
+    <productVersion>0.91.0.0</productVersion>
+    <txtProductVersion>0.91.0</txtProductVersion>
     <productName>CACTI</productName>
     <companyName>Center on Alcoholism, Substance Abuse and Addictions at the University of New Mexico Albuquerque</companyName>
     <internalName>CACTI</internalName>

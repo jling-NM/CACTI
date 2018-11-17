@@ -1,7 +1,7 @@
 #!/bin/bash
 
-version=0.90.0
-bundleversion=0.90.0
+version=0.91.0
+bundleversion=0.91.0
 appname=CACTI
 
 ### build the jar in IDE to get classes ###
@@ -37,6 +37,6 @@ iconutil \
 -Bruntime=/Library/Java/JavaVirtualMachines/jdk1.8/Contents/Home \
 -Bmac.CFBundleIdentifier=edu.unm.casaa.cacti \
 -Bmac.CFBundleName=$appname \
--Bmac.CFBundleVersion=090
+-Bmac.CFBundleVersion=091
 
 
