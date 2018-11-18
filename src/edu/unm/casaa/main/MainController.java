@@ -290,9 +290,7 @@ public class MainController {
      ******************************************************************/
     @FXML
     private void initialize() {
-        // Use OS X standard menus no Java window menus
-        System.out.println(System.getProperty("os.name","UNKNOWN"));
-
+        // Use OS X standard menus no Java window menus0
         if( System.getProperty("os.name","UNKNOWN").equals("Mac OS X")) {
             if( menuBar != null ) {
                 menuBar.setUseSystemMenuBar(true);
@@ -1615,7 +1613,7 @@ public class MainController {
 
             } catch ( MediaException mex ) {
                 if(mex.getType() == MediaException.Type.MEDIA_UNSUPPORTED) {
-                    showError("Error Playing Audio File", "The file you selected is not supported.\nMake sure your file is not encoded.");
+                    showError("Error Playing Audio File", "The file you selected is not a supported audio format.");
                 } else {
                     showError("Error Playing Audio File", mex.getType().toString());
                 }
