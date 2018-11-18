@@ -1865,9 +1865,11 @@ public class MainController {
                 gotoLastMarker();
 
                 // resize app window to user preferences or controls size
+                ourTown.sizeToScene();
+
                 Double winW = (ourTown.getWidth() >  appPrefs.getDouble("main.wind.w", 800.0 )) ? ourTown.getWidth() : appPrefs.getDouble("main.wind.w", 800.0 );
                 ourTown.setWidth( winW );
-                Double winH = (ourTown.getHeight() >  appPrefs.getDouble("main.wind.h", 600.0 )) ? ourTown.getWidth() : appPrefs.getDouble("main.wind.h", 600.0 );
+                Double winH = (ourTown.getHeight() >  appPrefs.getDouble("main.wind.h", 400.0 )) ? ourTown.getWidth() : appPrefs.getDouble("main.wind.h", 400.0 );
                 ourTown.setHeight( winH );
 
                 break;
@@ -2725,7 +2727,6 @@ public class MainController {
                         // width and height of button expands with grid resizing
                         button.prefWidthProperty().bind(panel.widthProperty());
                         button.prefHeightProperty().bind(panel.heightProperty());
-
                         panel.add(button, activeCol, activeRow, 1, 1);
 
                     }

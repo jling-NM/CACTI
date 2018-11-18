@@ -20,7 +20,8 @@
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.unm.casaa.main.MainController">
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.unm.casaa.main.MainController" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800"  maxHeight="-Infinity" minHeight="-Infinity" stylesheets="@Main.css">
   <children>
     <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
       <menus>

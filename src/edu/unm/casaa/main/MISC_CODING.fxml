@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
     This source code file is part of the CASAA Treatment Coding System Utility
     Copyright (C) 2009  UNM CASAA
@@ -16,6 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
@@ -27,7 +29,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="MISC_CODING" styleClass="controlsWin" stylesheets="@Main.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+<AnchorPane fx:id="MISC_CODING" styleClass="controlsWin" stylesheets="@Main.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox fx:id="vbPnlMiscCoding" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -63,9 +65,9 @@
                   <Insets bottom="2.0" />
                </padding>
             </TitledPane>
-            <AnchorPane prefHeight="600.0" prefWidth="800.0" VBox.vgrow="ALWAYS">
+            <AnchorPane prefHeight="260.0" prefWidth="800.0" VBox.vgrow="ALWAYS">
                <children>
-                  <GridPane prefHeight="600.0" prefWidth="796.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <GridPane prefHeight="260.0" prefWidth="796.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -110,11 +112,11 @@
             </AnchorPane>
             <VBox>
                <children>
-                  <AnchorPane VBox.vgrow="SOMETIMES">
+                  <AnchorPane minHeight="60.0" VBox.vgrow="SOMETIMES">
                      <children>
-                        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="12.0" prefWidth="111.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="12.0" prefWidth="111.0" />
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="88.0" />
                           </columnConstraints>
                           <rowConstraints>
@@ -155,7 +157,7 @@
                                     </Label>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                              <AnchorPane minWidth="96.0" prefHeight="200.0" prefWidth="200.0">
                                  <children>
                                     <Label fx:id="lblMiscFile" prefHeight="23.0" prefWidth="110.0" styleClass="lbl-file-path" text="%lbl.miscFile" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0">
                                        <padding>
