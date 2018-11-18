@@ -1865,8 +1865,8 @@ public class MainController {
                 gotoLastMarker();
 
                 // resize app window to user preferences or controls size
-                ourTown.sizeToScene();
-
+                vbApp.requestLayout();
+                //ourTown.sizeToScene();
                 Double winW = (ourTown.getWidth() >  appPrefs.getDouble("main.wind.w", 800.0 )) ? ourTown.getWidth() : appPrefs.getDouble("main.wind.w", 800.0 );
                 ourTown.setWidth( winW );
                 Double winH = (ourTown.getHeight() >  appPrefs.getDouble("main.wind.h", 400.0 )) ? ourTown.getWidth() : appPrefs.getDouble("main.wind.h", 400.0 );
