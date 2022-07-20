@@ -45,8 +45,37 @@ Download and run the EXE file. The Windows executable requires a pre-existing JR
 
 <b>Debian Linux</b>
 
-Download and install the DEB file. 
+Download and install the DEB file. JRE 8 is included so an existing JRE is not required.
 
 
-<b>NOTE: The program does work with JRE versions above version 8.</b>
+NOTE: CACTI does <b>NOT</b> work with any JRE other than version 8 as it was developed with the JavaFX framework coupled to JAVA by Oracle at that time.
 
+
+
+
+
+
+# Build
+<b>...under development...</b>
+
+Download JAVA JDK 1.8
+
+Download and install Maven 3.x.x
+
+Clone CACTI to local filesystem
+    
+    git clone https://github.com/jling-NM/CACTI.git
+
+Set JAVA 1.8 path in build terminal
+    
+    export JAVA_HOME=/path/to/jdk1.8
+
+    mvn --version
+        Apache Maven 3.6.0
+        Maven home: /usr/share/maven
+        Java version: 1.8.0_162, vendor: Oracle Corporation, runtime: /path/to/jdk1.8/jre
+        
+Build
+    
+    mvn clean compile package
+    
