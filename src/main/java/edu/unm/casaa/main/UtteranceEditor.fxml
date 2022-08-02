@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This source code file is part of the CASAA Treatment Coding System Utility
+    Copyright (C) 2009  UNM CASAA
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+
+<DialogPane fx:id="dlgEditor" expanded="true" prefWidth="240.0" styleClass="modal-dialog-glass" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.unm.casaa.main.MainController">
+   <content>
+      <VBox fx:id="dlgVbox" styleClass="modal-dialog-content">
+         <children>
+            <Label fx:id="dlgLblAnnotation" text="Annotation:" />
+            <TextArea fx:id="dlgAnnotation" prefHeight="70.0" prefWidth="304.0" wrapText="true" />
+            <Label fx:id="dlgLblRatings" text="Associated Global Ratings:">
+               <padding>
+                  <Insets top="8.0" />
+               </padding>
+            </Label>
+         </children>
+      </VBox>
+   </content>
+   <header>
+      <Label text="Edit utterance annotation and associate with Global Ratings." wrapText="true">
+         <padding>
+            <Insets left="8.0" right="8.0" top="8.0" />
+         </padding>
+      </Label>
+   </header>
+   <buttonTypes>
+      <ButtonType fx:constant="APPLY" />
+      <ButtonType fx:constant="CANCEL" />
+   </buttonTypes>
+   <padding>
+      <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+   </padding>
+</DialogPane>

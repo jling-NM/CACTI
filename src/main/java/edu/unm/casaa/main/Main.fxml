@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This source code file is part of the CASAA Treatment Coding System Utility
+    Copyright (C) 2009  UNM CASAA
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.unm.casaa.main.MainController" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" fx:id="vbApp" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="800"  maxHeight="-Infinity" minHeight="-Infinity" stylesheets="@Main.css">
+  <children>
+    <MenuBar id="menuBar" fx:id="menuBar" styleClass="menuBar" VBox.vgrow="NEVER">
+      <menus>
+        <Menu fx:id="mnuFile" text="%menu.title.file">
+          <items>
+            <MenuItem fx:id="mniLoadAudio" accelerator="Shortcut+F" mnemonicParsing="false" onAction="#mniActOpenFile" text="%menu.title.file.load.audio" />
+              <MenuItem fx:id="mniLoadCasaa" accelerator="Shortcut+C" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.file.load.casaa" />
+                  <MenuItem fx:id="mniLoadConfig" mnemonicParsing="false" onAction="#mniLoadConfig" text="%menu.title.file.load.config" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="mniExport" accelerator="Shortcut+E" mnemonicParsing="false" onAction="#mniExport" text="Export" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="mniExit" accelerator="Shortcut+Q" onAction="#mniActExit" text="%menu.title.file.exit" />
+          </items>
+        </Menu>
+        <Menu fx:id="mnuSession" text="%menu.title.session">
+          <items>
+            <MenuItem fx:id="mniSessionStart" accelerator="Shortcut+S" mnemonicParsing="false" onAction="#mniStartCoding" text="%menu.title.session.start" />
+            <MenuItem fx:id="mniSessionResume" accelerator="Shortcut+R" mnemonicParsing="false" onAction="#mniResumeCoding" text="%menu.title.session.resume" />
+            <MenuItem fx:id="mniReportView" accelerator="Shortcut+P" disable="true" mnemonicParsing="false" onAction="#mniReportView" text="%menu.title.session.report" />
+          </items>
+        </Menu>
+        <Menu fx:id="mnuCoding" disable="true" text="%menu.title.codingview">
+          <items>
+            <MenuItem fx:id="mniCoding" accelerator="Shortcut+U" mnemonicParsing="false" onAction="#mniCodingView" text="%menu.title.codingview.utterances" />
+            <MenuItem fx:id="mniGlobalScore" accelerator="Shortcut+G" mnemonicParsing="false" onAction="#mniGlobalScoringView" text="%menu.title.codingview.ratings" />
+          </items>
+        </Menu>
+            <Menu text="%menu.title.settings">
+              <items>
+                <MenuItem fx:id="mniSettingsKB" mnemonicParsing="false" onAction="#mniActSettingsKB" text="%menu.title.settings.kb" />
+              </items>
+            </Menu>
+            <Menu text="%menu.title.help">
+               <items>
+                  <MenuItem fx:id="mniAbout1" mnemonicParsing="false" onAction="#mniActAbout" text="%menu.title.help.about" />
+                  <MenuItem fx:id="mniOnlineHelp1" mnemonicParsing="false" onAction="#mniActOnlineHelp" text="%menu.title.help.online" />
+               </items>
+            </Menu>
+      </menus>
+    </MenuBar>
+      <AnchorPane fx:id="apMediaCtrls" disable="true" prefWidth="780.0" styleClass="player">
+         <children>
+            <GridPane fx:id="gpMediaPlayer" layoutX="25.5" layoutY="76.5" minWidth="400.0" prefWidth="615.0" styleClass="gp-player" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="64.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="64.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="22.0" minHeight="22.0" prefHeight="22.0" valignment="CENTER" vgrow="NEVER" />
+                <RowConstraints maxHeight="22.0" minHeight="18.0" prefHeight="18.0" valignment="TOP" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Slider fx:id="sldSeek" blockIncrement="0.1" max="1.0" onMousePressed="#sldSeekMousePressed" prefHeight="9.0" prefWidth="1140.0" styleClass="slider" stylesheets="@Main.css" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2">
+                     <GridPane.margin>
+                        <Insets left="12.0" />
+                     </GridPane.margin>
+                  </Slider>
+                  <MediaView fx:id="mediaView" fitHeight="10.0" fitWidth="10.0" GridPane.rowIndex="2" />
+                  <Label fx:id="lblAudioFilename" styleClass="player-text" GridPane.rowIndex="3" GridPane.valignment="TOP">
+                     <GridPane.margin>
+                        <Insets left="12.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <Pane maxWidth="58.0" minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="3">
+                     <children>
+                        <Label fx:id="lblVolume" alignment="CENTER" contentDisplay="TOP" prefHeight="52.0" prefWidth="30.0" text="0.0">
+                           <graphic>
+                              <ImageView fx:id="imgvwVolume" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="img-volume" />
+                           </graphic>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="sldVolume" blockIncrement="0.1" majorTickUnit="10" max="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-set">
+                           <padding>
+                              <Insets left="36.0" />
+                           </padding>
+                        </Slider>
+                     </children>
+                     <GridPane.margin>
+                        <Insets bottom="4.0" left="2.0" right="4.0" top="2.0" />
+                     </GridPane.margin>
+                  </Pane>
+                  <AnchorPane GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+                     <children>
+                        <Label fx:id="lblTimePos" alignment="BASELINE_CENTER" styleClass="player-text" text="00:00:00" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                     <GridPane.margin>
+                        <Insets left="10.0" />
+                     </GridPane.margin>
+                  </AnchorPane>
+                  <AnchorPane GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+                     <children>
+                        <Label fx:id="lblDuration" alignment="BASELINE_CENTER" styleClass="player-text" text="00:00:00" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                     <GridPane.margin>
+                        <Insets right="10.0" />
+                     </GridPane.margin>
+                  </AnchorPane>
+                  <Pane layoutX="563.0" layoutY="12.0" maxWidth="58.0" minHeight="46.0" minWidth="58.0" styleClass="pnVolume" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
+                     <children>
+                        <Label fx:id="lblRate" alignment="CENTER" contentDisplay="TOP" prefHeight="52.0" prefWidth="30.0" text="0.0">
+                           <graphic>
+                              <ImageView fx:id="imgvwRate" fitHeight="25.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="img-rate" />
+                           </graphic>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="sldRate" blockIncrement="0.1" majorTickUnit="10" max="2.0" min="1.0" minorTickCount="10" orientation="VERTICAL" prefHeight="26.0" prefWidth="30.0" styleClass="slider-set">
+                           <padding>
+                              <Insets left="36.0" />
+                           </padding>
+                        </Slider>
+                     </children>
+                     <GridPane.margin>
+                        <Insets bottom="4.0" left="2.0" right="4.0" top="2.0" />
+                     </GridPane.margin>
+                  </Pane>
+                  <ToolBar fx:id="tbPlayer" styleClass="btnBarPane" GridPane.columnSpan="2147483647">
+                     <items>
+                      <Button fx:id="btnPlayPause" contentDisplay="TOP" graphicTextGap="0.0" minWidth="96.0" mnemonicParsing="false" onAction="#btnActPlayPause" text="Play/Pause" styleClass="btn-player">
+                           <graphic>
+                              <ImageView fx:id="btnPlayImgVw" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-play" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.PlayPause" />
+                           </tooltip>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="btnReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActReplay" prefWidth="0.0" text="Replay" visible="false" styleClass="btn-player">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-replay" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.Replay" />
+                           </tooltip>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="btnUncode" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncode" prefWidth="0.0" text="Uncode" visible="false" styleClass="btn-player">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncode" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.Uncode" />
+                           </tooltip>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="btnUncodeReplay" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#btnActUncodeRewind" prefWidth="0.0" text="Uncode/Rewind" visible="false" styleClass="btn-player">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-uncodeReplay" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.UncodeReplay" />
+                           </tooltip>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="btnRewind" alignment="CENTER" contentDisplay="TOP" graphicTextGap="0.0" minWidth="96.0" mnemonicParsing="false" onAction="#btnActRewind" text="Rewind" styleClass="btn-player">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" styleClass="img-btn-rew" />
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="%btn.tt.Rewind" />
+                           </tooltip>
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Button>
+                     </items>
+                  </ToolBar>
+               </children>
+               <padding>
+                  <Insets top="2.0" />
+               </padding>
+            </GridPane>
+         </children>
+      </AnchorPane>
+  </children>
+</VBox>

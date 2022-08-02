@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<DialogPane onDragDropped="#srcDragDropped" onDragExited="#srcDragExited" onDragOver="#srcDragOver" prefHeight="264.0" prefWidth="600.0" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="edu.unm.casaa.main.ExportController">
+   <content>
+      <VBox>
+         <children>
+            <HBox>
+               <children>
+                  <Button fx:id="btnDstDir" mnemonicParsing="false" onAction="#selectDstDirectory" text="Output Directory:" />
+                  <Label fx:id="dstFilePathName" onDragDropped="#dstDragDropped" onDragExited="#dstDragExited" onDragOver="#dstDragOver" prefHeight="40.0" text="[Drag destination directory here]" textFill="#d50b0b">
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                     <graphic>
+                        <Label />
+                     </graphic>
+                  </Label>
+               </children>
+            </HBox>
+            <Label prefHeight="120.0" text="Successfully converted:" wrapText="true">
+               <padding>
+                  <Insets bottom="4.0" top="20.0" />
+               </padding></Label>
+            <ListView fx:id="dstListView" prefHeight="180.0" prefWidth="417.0" />
+         </children>
+         <padding>
+            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+         </padding>
+      </VBox>
+   </content>
+   <buttonTypes>
+      <ButtonType fx:constant="CLOSE" />
+   </buttonTypes>
+   <header>
+      <Label text="Export CASAA files to text files. To begin, select a destination directory for converted files by clicking the &quot;Output Dicrectory&quot; button or dragging the destination directory onto the window. To convert CASAA files or directories containing CASAA files, drag them onto this window." wrapText="true">
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+      </Label>
+   </header>
+</DialogPane>
