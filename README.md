@@ -56,7 +56,6 @@ NOTE: CACTI does <b>NOT</b> work with any JRE other than version 8 as it was dev
 
 
 # Build
-<b>...under development...</b>
 
 Download JAVA JDK 1.8
 
@@ -77,5 +76,9 @@ Set JAVA 1.8 path in build terminal
         
 Build
     
-    mvn clean compile package
+    cd build_tools
+    ./build.sh
     
+Output Directory
+
+    /target
