@@ -31,8 +31,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.*;
-import javafx.print.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.print.PageLayout;
+import javafx.print.PrinterJob;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -56,6 +59,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXParseException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.beans.PropertyChangeEvent;
@@ -64,8 +68,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.prefs.Preferences;
+
 import static java.lang.String.format;
-import java.net.URI;
 
 public class MainController {
 
@@ -236,6 +240,10 @@ public class MainController {
     private String filenameAudio         = null;        // name of active media file. Used when switching from PLAYBACK to MISC to GLOBALS
     private File currentAudioFile        = null;        // active media file
     private SessionData sessionData      = null;        // session persistence
+
+    public void setVbxRptScore_global_ratings(VBox vbxRptScore_global_ratings) {
+        this.vbxRptScore_global_ratings = vbxRptScore_global_ratings;
+    }
 
     private enum  GuiState {                            // available gui states
         PLAYBACK, MISC_CODING, GLOBAL_CODING, REPORT
@@ -446,7 +454,7 @@ public class MainController {
         assert root != null;
         about.setScene(new Scene(root));
         about.setTitle(resourceStrings.getString("txt.about.title"));
-        about.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        about.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("media/windows.iconset/icon_16x16.png"))));
         about.initModality(Modality.APPLICATION_MODAL);
         about.initStyle(StageStyle.UTILITY);
         about.showAndWait();
@@ -497,7 +505,7 @@ public class MainController {
         lblHeaderText.setWrapText(true);
         dlgSettingsKb.getDialogPane().setHeader(lblHeaderText);
         Stage dlgStage = (Stage) dlgSettingsKb.getDialogPane().getScene().getWindow();
-        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("media/windows.iconset/icon_16x16.png")));
         dlgSettingsKb.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 
         GridPane gridKb = new GridPane();
@@ -836,12 +844,12 @@ public class MainController {
 
         dlgExport.setTitle("Export");
         Stage dlgStage = (Stage) dlgExport.getDialogPane().getScene().getWindow();
-        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_32x32.png")));
+        dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("media/windows.iconset/icon_32x32.png")));
         dlgExport.initModality(Modality.APPLICATION_MODAL);
 
         Optional<ButtonType> result = dlgExport.showAndWait();
         if (result.isPresent() & (result.get() == ButtonType.APPLY)) {
-
+            // todo: what was this empty if statement for?
         }
     }
 
@@ -901,7 +909,7 @@ public class MainController {
 
             //report.setTitle(resourceStrings.getString("txt.about.title"));
             report.setTitle("Therapist Feedback");
-            report.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_32x32.png")));
+            report.getIcons().add(new Image(Main.class.getResourceAsStream("media/windows.iconset/icon_32x32.png")));
             report.initModality(Modality.APPLICATION_MODAL);
             report.initStyle(StageStyle.DECORATED);
 
@@ -1230,7 +1238,7 @@ public class MainController {
             /* only basic layout is in fxml. Further dialog settings here */
             dlgUtteranceEditor.setTitle("Annotate Utterance");
             Stage dlgStage = (Stage) dlgUtteranceEditor.getDialogPane().getScene().getWindow();
-            dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("/media/windows.iconset/icon_16x16.png")));
+            dlgStage.getIcons().add(new Image(Main.class.getResourceAsStream("media/windows.iconset/icon_16x16.png")));
             dlgUtteranceEditor.initStyle(StageStyle.TRANSPARENT);
             dlgUtteranceEditor.initModality(Modality.APPLICATION_MODAL);
             Scene scene = dlgStage.getScene();
@@ -1978,7 +1986,7 @@ public class MainController {
                 lblSessionID.setText(sessionData.getSessionLabel());
 
                 // play icon image for multiple use in labels below
-                Image imagePlayIcon = new Image(Main.class.getResourceAsStream("/media/btn_play.png"));
+                Image imagePlayIcon = new Image(Main.class.getResourceAsStream("media/btn_play.png"));
 
 
                 // global rating insert

@@ -1,0 +1,223 @@
+/*
+    This source code file is part of the CASAA Treatment Coding System Utility
+    Copyright (C) 2009  UNM CASAA
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+/**********************************************
+ * Annotation editor
+ **********************************************/
+ .modal-dialog-glass {
+  -fx-effect: dropshadow(three-pass-box, derive(gray, -50%), 1, 1, 0, 0);
+  -fx-background-insets: 3;
+  -fx-background-radius: 12;
+}
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: linear-gradient(#ed2d2d 0%, #c92e2e 25%, #bf1515 75%, #bf0a0a 100%);
+    -fx-text-fill: white;
+}
+
+.list-view:focused, .text-area:focused {
+    -fx-focus-color: red;
+    -fx-faint-focus-color: transparent;
+    -fx-inner-border: transparent;
+    -fx-body-color: red;
+    -fx-background-color: -fx-faint-focus-color, -fx-focus-color, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: -0.1, -0.1, 0, 0;
+    -fx-background-radius: 0.5, 0.5, 0, 0;
+}
+
+
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+.menuBar {
+    -fx-font-size: 12;
+}
+
+
+/* for button bar buttons */
+.btn-player {
+    -fx-background-color: transparent;
+}
+
+/* for button bar images */
+.img-btn-play {
+    -fx-image: url("media/btn_play.png");
+}
+.img-btn-pause {
+    -fx-image: url("media/btn_pause.png");
+}
+.img-btn-rew {
+    -fx-image: url("media/btn_rew.png");
+}
+.img-btn-replay {
+    -fx-image: url("media/btn_replay.png");
+}
+.img-btn-uncode {
+    -fx-image: url("media/btn_uncode.png");
+}
+.img-btn-uncodeReplay {
+    -fx-image: url("media/btn_uncodeReplay.png");
+}
+
+.img-about-bg {
+    -fx-image: url("media/splash.png");
+}
+
+
+/* */
+.btnBarPane {
+    -fx-alignment: center ;
+    -fx-background-color:none;
+}
+
+
+/**********************************************
+ * player style classes
+ **********************************************/
+.img-volume {
+    -fx-image: url("media/img_volume.png");
+}
+.img-rate {
+    -fx-image: url("media/img_rate.png");
+}
+
+.slider .track {
+    -fx-background-color:rgba(255,0,0,0.3);
+    /* -fx-background-insets: 1 0 -1 0, 0, 1; */
+    /*-fx-background-radius: 2.5, 2.5, 1.5; */
+    /*-fx-padding: 0.208333em; */
+    -fx-pref-height: 12px;
+    -fx-padding: 0;
+}
+.slider .thumb {
+    -fx-background-color: black, radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(0,0,0,0) );
+    -fx-background-radius: 4.1;
+}
+
+.slider-set .track {
+    -fx-background-color:rgba(255,0,0,0.3);
+    -fx-background-insets: 1 0 -1 0, 0, 1;
+    -fx-background-radius: 2.5, 2.5, 1.5;
+    -fx-padding: 5;
+}
+.slider-set .thumb {
+    -fx-background-color: black, radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(0,0,0,0) );
+    -fx-background-radius: 4.1;
+    /*-fx-pref-height: 6px; */
+    /*-fx-pref-width: 10px;*/
+    -fx-padding: 6;
+}
+.player {
+    -fx-border-color:rgba(201,201,201,1.0);
+    -fx-background-color:rgba(201,201,201,1.0);
+    -fx-border-width: 2.0;
+}
+.gp-player {
+    -fx-border-color:rgba(201,201,201,1.0);
+    -fx-border-insets: 0.1, 0.1, 0.1, 0.1;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, red 33%, darkred 80%);
+    -fx-background-radius: 7,4,3,5;
+    -fx-border-width: 1.5;
+}
+.pnVolume {
+    -fx-border-color:rgba(101,101,101,1.0);
+    -fx-border-insets: 0.1, 0.1, 0.1, 0.1;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, rgba(235,235,235,1.0) 0%, rgba(201,201,201,1.0) 100%);
+    -fx-background-radius: 5,4,3,5;
+    -fx-border-width: 0.5;
+}
+.player-text {
+    -fx-text-fill: linear-gradient(white, #d0d0d0);
+    -fx-font-weight: bold;
+}
+.contextMenu {
+    -fx-font-size: 8pt;
+    -fx-effect: dropshadow( one-pass-box, black, 2, 0.0, 2, 1 );
+}
+
+
+/* thinking of using this for coding and scoring background */
+.controlsWin {
+    -fx-background-color:rgba(201,201,201,1.0);
+}
+
+
+/* coding buttons */
+.btn-dark-blue {
+    -fx-background-color: #090a0c, linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%), linear-gradient(#20262b, #191d22), radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));
+    -fx-background-radius: 5,4,3,5;
+    -fx-background-insets: 0,1,2,0;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-text-fill: linear-gradient(white, #d0d0d0);
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 8 4 8;
+    -fx-min-width: 70px;
+    -fx-min-height:10px;
+    -fx-max-height:40px;
+}
+.btn-dark-blue:hover {
+    -fx-background-color: transparent, linear-gradient(#38424b 0%, #1f2429 20%, #191d22 100%), linear-gradient(#20262b, #191d22), radial-gradient(center 50% 0%, radius 100%, rgba(114,131,148,0.9), rgba(255,255,255,0));
+    /*-fx-text-fill: #38424b; */
+}
+.btn-dark-blue Text {
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.9) , 1, 0.0 , 0 , 1 );
+}
+.toggle-button:selected {
+    -fx-effect: null;
+    -fx-text-fill: red;
+}
+.timeline {
+    -fx-background-insets: 0,0,0,0;
+    -fx-padding: 0 0 0 0;
+    -fx-border-width: 0.5;
+}
+.lbl-file-path {
+     -fx-background-color: rgba(0,0,0,0.75),
+                           rgba(255,255,255,0.75),
+                           linear-gradient(to bottom,#aaaaaa 0%,#cccccc 100%);
+     -fx-background-insets: 0 1 1 0, 1 0 0 1, 1;
+     -fx-padding: 3px;
+     -fx-background-radius: 3px;
+     -fx-border-radius: 3px;
+ }
+
+/**********************************************
+ * report
+ **********************************************/
+.lbl-report-section {
+    -fx-font-size: 14px;
+    /*-fx-font-family: "Arial Narrow", "Arial"; */
+    -fx-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-smoothing-type: lcd;
+}
+.lbl-report-row {
+    -fx-font-size: 12px;
+    /*-fx-font-family: "Arial Narrow", "Arial"; */
+    -fx-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-smoothing-type: lcd;
+}
+.report-border {
+    -fx-border-color:rgba(0,0,0,0.4);
+    -fx-border-width: 2.0;
+}

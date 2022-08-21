@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This source code file is part of the CASAA Treatment Coding System Utility
+    Copyright (C) 2009  UNM CASAA
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@Main.css"  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+   <children>
+      <ImageView id="imgvwSplash" fx:id="imgvwSplash" fitHeight="600.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true" styleClass="img-about-bg" />
+      <HBox alignment="BOTTOM_LEFT" />
+      <Label alignment="BOTTOM_LEFT" contentDisplay="TOP" text="%txt.about" textFill="WHITE" textOverrun="CLIP" wrapText="true" StackPane.alignment="BOTTOM_LEFT">
+         <StackPane.margin>
+            <Insets bottom="20.0" left="10.0" right="10.0" top="120.0" />
+         </StackPane.margin>
+         <font>
+            <Font size="16.0" />
+         </font>
+         <effect>
+            <DropShadow />
+         </effect>
+      </Label>
+   </children>
+</StackPane>
