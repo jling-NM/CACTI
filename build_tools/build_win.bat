@@ -4,16 +4,17 @@ set version=1.0.0
 set bundleversion=1.0.0
 set appname=CACTI
 
+:: https://www.oracle.com/java/technologies/downloads/
+:: https://openjdk.org/
 set jdk=C:\Users\josef\projects\jdk-18.0.2.1
-set openjfx_mods=C:\Users\josef\projects\javafx-jmods-18.0.2
-set openjfx_lib=C:\Users\josef\projects\javafx-sdk-18.0.2\lib
 set jdk_mods=C:\Users\josef\projects\jdk-18.0.2.1\jmods
 
-cd ..
+:: https://gluonhq.com/products/javafx/
+set openjfx_mods=C:\Users\josef\projects\javafx-jmods-18.0.2
+set openjfx_lib=C:\Users\josef\projects\javafx-sdk-18.0.2\lib
+
 set project_base_dir=C:\Users\josef\projects\CACTI
-
-
-
+cd %project_base_dir%
 
 :: 
 :: clean and compile
@@ -25,13 +26,11 @@ MKDIR %project_base_dir%\target\classes
 Xcopy /E /I %project_base_dir%\src\main\resources %project_base_dir%\target\resources
 
 MKDIR %project_base_dir%\target\classes\edu\unm\casaa\main
-::copy /y %project_base_dir%\src\main\resources\edu\unm\casaa\main\* %project_base_dir%\target\classes\edu\unm\casaa\main
 
 :: extract classes directly into class path so they are just built into jar
 cd %project_base_dir%\target\classes
 %jdk%\bin\jar vxf %project_base_dir%\lib\sqlite-jdbc-3.25.2.jar
 cd %project_base_dir%
-
 
 echo ""
 echo "+++++++++++++++++++++++++++"
