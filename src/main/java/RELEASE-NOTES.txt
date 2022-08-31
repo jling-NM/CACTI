@@ -1,3 +1,9 @@
+------ 1.0.0 ------
+20220821 - jl
+--------------------
+- Reorganize for JAVA version > 8 enabling modules and JavaFX in JDK 18.
+
+
 ------ 0.90.1 ------
 20181022 - jl
 --------------------
@@ -15,7 +21,7 @@
 ------ 0.80.0 ------
 20180717 - jl
 --------------------
-- Two separate text files (Utterances, Gloobal Ratings) have been combined into a single binary file.
+- Two separate text files (Utterances, Global Ratings) have been combined into a single binary file.
 - Utterances can be annotated with text by right clicking timeline markers or by holding the CTRL key while clicking a code button.
 - Utterances can be associated with a global rating item by right clicking timeline markers or by holding the CTRL key while clicking a code button.
 - Utterances can be batch exported to a text format (Essentially the old text format).
