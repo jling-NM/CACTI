@@ -51,8 +51,8 @@ echo ""
 echo "+++++++++++++++++++++++++++"
 echo "    Test Jar"
 echo "+++++++++++++++++++++++++++"
-::%jdk%\bin\java -jar --module-path %jdk_mods% --add-modules java.xml,java.desktop,java.sql,java.prefs --module-path %openjfx_lib% --add-modules javafx.controls,javafx.fxml,javafx.media %project_base_dir%\target\cacti_%version%.jar
-%jdk%\bin\java -jar %project_base_dir%\target\windows\cacti_%version%.jar
+%jdk%\bin\java -jar --module-path %jdk_mods% --add-modules java.xml,java.desktop,java.sql,java.prefs --module-path %openjfx_lib% --add-modules javafx.controls,javafx.fxml,javafx.media %project_base_dir%\target\cacti_%version%.jar
+::%jdk%\bin\java -jar %project_base_dir%\target\windows\cacti_%version%.jar
 
 echo ""
 echo "+++++++++++++++++++++++++++"
