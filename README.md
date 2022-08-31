@@ -40,15 +40,12 @@ Download and mount DMG file. JRE 8 is included so an existing JRE is not require
 
 <b>Windows</b>
 
-Download and run the EXE file. The Windows executable requires a pre-existing JRE 8 installation.
+Download and run the CACTI-x_x_x-win.zip file. Extracted file contains executable and "cacti_jre" used by executable.
 
 
 <b>Debian Linux</b>
 
 Download and install the DEB file. JRE 8 is included so an existing JRE is not required.
-
-
-NOTE: CACTI does <b>NOT</b> work with any JRE other than version 8 as it was developed with the JavaFX framework coupled to JAVA by Oracle at that time.
 
 
 
@@ -57,27 +54,20 @@ NOTE: CACTI does <b>NOT</b> work with any JRE other than version 8 as it was dev
 
 # Build
 
-Download JAVA JDK 1.8
+Download JAVA JDK 18 [https://www.oracle.com/java/technologies/downloads/]
 
-Download and install Maven 3.x.x
+Download JavaFX SDK [https://gluonhq.com/products/javafx/]
 
 Clone CACTI to local filesystem
     
     git clone https://github.com/jling-NM/CACTI.git
 
-Set JAVA 1.8 path in build terminal
-    
-    export JAVA_HOME=/path/to/jdk1.8
+Modify /build_tools/build-win.bat for JDK and SDK
 
-    mvn --version
-        Apache Maven 3.6.0
-        Maven home: /usr/share/maven
-        Java version: 1.8.0_162, vendor: Oracle Corporation, runtime: /path/to/jdk1.8/jre
-        
 Build
     
     cd build_tools
-    ./build.sh
+    ./build_win.bat or deploy_osx.sh
     
 Output Directory
 
