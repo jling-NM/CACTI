@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\josef\projects\CACTI\out\artifacts\CACTI_jar\CACTI.jar</jar>
-  <outfile>C:\Users\josef\projects\CACTI\out\artifacts\Cacti-0_91_0.exe</outfile>
+  <jar>C:\Users\josef\projects\CACTI\target\cacti_1.0.0.jar</jar>
+  <outfile>C:\Users\josef\projects\CACTI\target\CACTI-1_0_0.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -13,37 +13,39 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\josef\projects\CACTI\media\windows.iconset\cacti.ico</icon>
+  <icon>C:\Users\josef\projects\CACTI\src\main\resources\edu\unm\casaa\main\media\windows.iconset\cacti.ico</icon>
   <singleInstance>
-    <mutexName>CACTI_0910</mutexName>
+    <mutexName>CACTI_1000</mutexName>
     <windowTitle></windowTitle>
   </singleInstance>
   <jre>
-    <path></path>
+    <path>cacti_jre</path>
     <bundledJre64Bit>false</bundledJre64Bit>
     <bundledJreAsFallback>false</bundledJreAsFallback>
-    <minVersion>1.8.0</minVersion>
+    <minVersion>11</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <splash>
-    <file>C:\Users\josef\projects\CACTI\media\splash.bmp</file>
+    <file>C:\Users\josef\projects\CACTI\src\main\resources\edu\unm\casaa\main\media\splash.bmp</file>
     <waitForWindow>true</waitForWindow>
     <timeout>60</timeout>
     <timeoutErr>true</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>0.91.0.0</fileVersion>
-    <txtFileVersion>0.91.0</txtFileVersion>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>1.0.0</txtFileVersion>
     <fileDescription>The CASAA Application for Coding Treatment Interactions</fileDescription>
     <copyright>Copyright 2009</copyright>
-    <productVersion>0.91.0.0</productVersion>
-    <txtProductVersion>0.91.0</txtProductVersion>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.0.0</txtProductVersion>
     <productName>CACTI</productName>
     <companyName>Center on Alcoholism, Substance Abuse and Addictions at the University of New Mexico Albuquerque</companyName>
     <internalName>CACTI</internalName>
     <originalFilename>CACTI.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
   </versionInfo>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
